@@ -1,0 +1,9 @@
+.idea
+*.Po
+config.log
+config.status
+config.h
+configure.ac
+Makefile
+Makefile.in
+cmake-build-debug
