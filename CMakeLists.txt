@@ -1,3 +1,5 @@
+cmake_minimum_required(VERSION 3.22)
+
 project( gloox )
 add_subdirectory( src )
 

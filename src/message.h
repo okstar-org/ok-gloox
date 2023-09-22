@@ -138,6 +138,10 @@ namespace gloox
       // reimplemented from Stanza
       virtual Tag* tag() const;
 
+      Tag* encrypted() const {
+        return m_encrypted;
+      }
+
     private:
 #ifdef MESSAGE_TEST
     public:
@@ -154,6 +158,7 @@ namespace gloox
       StringMap* m_bodies;
       StringMap* m_subjects;
       std::string m_thread;
+      Tag * m_encrypted;
   };
 
 }

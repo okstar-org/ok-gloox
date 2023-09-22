@@ -27,7 +27,7 @@ namespace gloox
   }
 
   Message::Message( Tag* tag )
-    : Stanza( tag ), m_subtype( Invalid ), m_bodies( 0 ), m_subjects( 0 )
+    : Stanza( tag ), m_subtype( Invalid ), m_bodies( 0 ), m_subjects( 0 ), m_encrypted(0)
   {
     if( !tag || tag->name() != "message" )
       return;
@@ -49,6 +49,9 @@ namespace gloox
       else if( (*it)->name() == "thread" )
         m_thread = (*it)->cdata();
     }
+
+
+    m_encrypted = tag->findChild("encrypted");
   }
 
   Message::Message( MessageType type, const JID& to,

@@ -279,7 +279,7 @@ namespace gloox
        * this option in the constructor.
        */
       void resetResource();
-
+      void setResource( const std::string& resource );
       /**
        * This function can be used to feed a message into the session. Ususally, only
        * ClientBase should call this function.
@@ -296,7 +296,7 @@ namespace gloox
        */
       virtual void send( const Message& msg );
       void decorate( Message& msg );
-      void setResource( const std::string& resource );
+
 
       typedef std::list<MessageFilter*> MessageFilterList;
       MessageFilterList m_messageFilterList;
