@@ -159,6 +159,7 @@ namespace gloox
       StringMap* m_subjects;
       std::string m_thread;
       Tag * m_encrypted;
+      Tag * m_encryption;
   };
 
 }

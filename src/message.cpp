@@ -27,7 +27,8 @@ namespace gloox
   }
 
   Message::Message( Tag* tag )
-    : Stanza( tag ), m_subtype( Invalid ), m_bodies( 0 ), m_subjects( 0 ), m_encrypted(0)
+    : Stanza( tag ), m_subtype( Invalid ), m_bodies( 0 ), m_subjects( 0 ),
+      m_encrypted(0),m_encryption(0)
   {
     if( !tag || tag->name() != "message" )
       return;
@@ -52,12 +53,14 @@ namespace gloox
 
 
     m_encrypted = tag->findChild("encrypted");
+    m_encryption = tag->findChild("encryption");
   }
 
   Message::Message( MessageType type, const JID& to,
                     const std::string& body, const std::string& subject,
                     const std::string& thread, const std::string& xmllang )
-    : Stanza( to ), m_subtype( type ), m_bodies( 0 ), m_subjects( 0 ), m_thread( thread )
+    : Stanza( to ), m_subtype( type ), m_bodies( 0 ), m_subjects( 0 ), m_thread( thread ),
+      m_encrypted(0),m_encryption(0)
   {
     setLang( &m_bodies, m_body, body, xmllang );
     setLang( &m_subjects, m_subject, subject, xmllang );
@@ -92,6 +95,14 @@ namespace gloox
     StanzaExtensionList::const_iterator it = m_extensionList.begin();
     for( ; it != m_extensionList.end(); ++it )
       t->addChild( (*it)->tag() );
+
+    if(m_encrypted){
+      t->addChild(m_encrypted);
+    }
+
+    if(m_encryption){
+      t->addChild(m_encryption);
+    }
 
     return t;
   }

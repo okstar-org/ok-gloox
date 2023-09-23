@@ -102,10 +102,11 @@ namespace gloox
                                      * not hard-code ExtUser's value anywhere, it is subject
                                      * to change. */
     ExtJingleMessage,          /**< An extension dealing with Jingle Message (@xep{0353}) */
-      ExtConference,
-      ExtAvatar,
-      ExtAvatarData,
-      ExtAvatarMeta
+    ExtConference,
+    ExtAvatar,
+    ExtAvatarData,
+    ExtAvatarMeta,
+
   };
 
   /**

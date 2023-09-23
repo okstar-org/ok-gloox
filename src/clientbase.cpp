@@ -140,7 +140,7 @@ namespace gloox
 #endif // GLOOX_MINIMAL
       m_tls( TLSOptional ), m_tlsVersion( TLSv1 ), m_port( port ),
       m_availableSaslMechs( SaslMechAll ), m_smContext( CtxSMInvalid ), m_smHandled( 0 ),
-      m_statisticsHandler( 0 ),
+      m_statisticsHandler( 0 ), m_incomingHandler ( 0 ),
 #if !defined( GLOOX_MINIMAL ) || defined( WANT_MUC )
       m_mucInvitationHandler( 0 ),
 #endif // GLOOX_MINIMAL
@@ -267,6 +267,8 @@ namespace gloox
       disconnect( ConnStreamClosed );
       return;
     }
+
+    m_incomingHandler->handleIncoming(tag);
 
     logInstance().dbg( LogAreaXmlIncoming, tag->xml() );
     ++m_stats.totalStanzasReceived;
@@ -1532,6 +1534,10 @@ void ClientBase::registerPingHandler( PingHandler* ph )
       ths.th = th;
       m_tagHandlers.push_back( ths );
     }
+  }
+
+  void ClientBase::registerIncomingHandler(gloox::IncomingHandler *th) {
+    m_incomingHandler = th;
   }
 
   void ClientBase::removeTagHandler( TagHandler* th, const std::string& tag, const std::string& xmlns )

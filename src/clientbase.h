@@ -33,6 +33,7 @@
 #include "connectiondatahandler.h"
 #include "parser.h"
 #include "atomicrefcount.h"
+#include "incominghandler.h"
 
 #include <string>
 #include <list>
@@ -561,6 +562,8 @@ namespace gloox
        */
       void registerTagHandler( TagHandler* th, const std::string& tag,
                                                const std::string& xmlns );
+
+      void registerIncomingHandler(IncomingHandler* th);
 
       /**
        * Registers @c sh as object that receives up-to-date connection statistics each time
@@ -1124,6 +1127,7 @@ namespace gloox
       TagHandlerList           m_tagHandlers;
       StringList               m_cacerts;
       StatisticsHandler      * m_statisticsHandler;
+      IncomingHandler        * m_incomingHandler;
 #if !defined( GLOOX_MINIMAL ) || defined( WANT_MUC )
       MUCInvitationHandler   * m_mucInvitationHandler;
 #endif // GLOOX_MINIMAL
