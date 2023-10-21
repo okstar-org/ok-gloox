@@ -178,6 +178,7 @@ namespace gloox
       }
     }
 
+#if _MSVC_LANG < 201103L
     /**
      * Delete all associated values from a map (not the key elements).
      * Const key type version.
@@ -195,6 +196,7 @@ namespace gloox
         M.erase( it2 );
       }
     }
+#endif
 
     /**
      * Does some fancy escaping. (& --> &amp;amp;, etc).
