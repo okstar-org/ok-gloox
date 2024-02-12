@@ -740,15 +740,6 @@ namespace gloox
        */
       const TagList sendQueue();
 
-
-      /**
-       * Sends the given data unchecked over the underlying transport connection. Use at your own risk.
-       * The server will check any data received anyway and disconnect if something is wrong.
-       * @param xml The data to send.
-       */
-      void send( const std::string& xml );
-
-
       // reimplemented from ParserHandler
       virtual void handleTag( Tag* tag );
 
@@ -897,6 +888,13 @@ namespace gloox
        * @return @b True if TLS is supported, @b false otherwise.
        */
       bool hasTls();
+
+      /**
+       * Sends the given data unchecked over the underlying transport connection. Use at your own risk.
+       * The server will check any data received anyway and disconnect if something is wrong.
+       * @param xml The data to send.
+       */
+      void send( const std::string& xml );
 
       /**
        * This function checks if there are any unacknowledged Tags in the send queue and resends

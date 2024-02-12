@@ -1101,6 +1101,8 @@ namespace gloox
             case PublishItem:
             {
               const PubSub* ps = iq.findExtension<PubSub>( ExtPubSub );
+              if(!ps)
+                return;
               rh->handleItemPublication( id, service, ps->node(),
                                          ps ? ps->items() : ItemList(),
                                          error );

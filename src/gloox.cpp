@@ -125,6 +125,11 @@ namespace gloox
   const std::string XMLNS_JINGLE_APPS_RTP_HDREXT = "urn:xmpp:jingle:apps:rtp:rtp-hdrext:0";
   const std::string XMLNS_JINGLE_APPS_RTP_SSMA = "urn:xmpp:jingle:apps:rtp:ssma:0";
 
+    const std::string XMLNS_JINGLE_FEATURE_AUDIO =
+        "urn:xmpp:jingle:apps:rtp:audio";
+    const std::string XMLNS_JINGLE_FEATURE_VIDEO =
+        "urn:xmpp:jingle:apps:rtp:video";
+
   const std::string XMLNS_SHIM              = "http://jabber.org/protocol/shim";
   const std::string XMLNS_ATTENTION         = "urn:xmpp:attention:0";
   const std::string XMLNS_STREAM_MANAGEMENT = "urn:xmpp:sm:3";
@@ -164,6 +169,9 @@ namespace gloox
   const std::string JITSI_VIDEO_TYPE = "video_type";
   const std::string JITSI_RAISED_HAND = "raised_hand";
   const std::string JITSI_USER_AGENT = "user_agent";
+
+  const std::string XMLNS_EXTERNAL_SERVICE_DISCOVERY = "urn:xmpp:extdisco:2";
+
 
 }
 

@@ -107,6 +107,8 @@ namespace gloox
     ExtAvatarData,
     ExtAvatarMeta,
 
+    ExtSrvDisco,          /** XEP-0215: External Service Discovery */
+
   };
 
   /**

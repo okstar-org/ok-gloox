@@ -43,7 +43,9 @@ namespace gloox
     FileTransfer::FileTransfer( const Tag* tag )
       : Plugin( PluginFileTransfer ), m_type( Invalid )
     {
-      if( !tag || tag->xmlns() != XMLNS_JINGLE_FILE_TRANSFER )
+      if( !(tag &&( tag->xmlns() == XMLNS_JINGLE_FILE_TRANSFER
+                  || tag->xmlns() == XMLNS_JINGLE_FILE_TRANSFER4
+                     || tag->xmlns() == XMLNS_JINGLE_FILE_TRANSFER5) ))
         return;
 
       std::string name = tag->name();
@@ -54,6 +56,8 @@ namespace gloox
         {
           parseFileList( c->findChildren( "file" ) );
           name = c->name();
+        }else{
+          parseFileList(tag->findChildren("file"));
         }
       }
       else if( name == "checksum" || name == "abort" || name == "received" )
@@ -98,15 +102,25 @@ namespace gloox
     {
       StringList sl;
       sl.push_back( XMLNS_JINGLE_FILE_TRANSFER );
+      sl.push_back( XMLNS_JINGLE_FILE_TRANSFER4 );
+      sl.push_back( XMLNS_JINGLE_FILE_TRANSFER5 );
       return sl;
     }
 
     const std::string& FileTransfer::filterString() const
     {
-      static const std::string filter = "content/description[@xmlns='" + XMLNS_JINGLE_FILE_TRANSFER + "']"
-                                        "|jingle/abort[@xmlns='" + XMLNS_JINGLE_FILE_TRANSFER + "']"
-                                        "|jingle/received[@xmlns='" + XMLNS_JINGLE_FILE_TRANSFER + "']"
+      static const std::string filter = "content/description[@xmlns='" + XMLNS_JINGLE_FILE_TRANSFER + "']"    //
+                                        "|content/description[@xmlns='" + XMLNS_JINGLE_FILE_TRANSFER4 + "']"   //
+                                        "|content/description[@xmlns='" + XMLNS_JINGLE_FILE_TRANSFER5 + "']"   //
+                                        "|jingle/abort[@xmlns='" + XMLNS_JINGLE_FILE_TRANSFER + "']"          //
+                                        "|jingle/abort[@xmlns='" + XMLNS_JINGLE_FILE_TRANSFER4 + "']"          //
+                                        "|jingle/abort[@xmlns='" + XMLNS_JINGLE_FILE_TRANSFER5 + "']"          //
+                                        "|jingle/received[@xmlns='" + XMLNS_JINGLE_FILE_TRANSFER + "']"       //
+                                        "|jingle/received[@xmlns='" + XMLNS_JINGLE_FILE_TRANSFER4 + "']"       //
+                                        "|jingle/received[@xmlns='" + XMLNS_JINGLE_FILE_TRANSFER5 + "']"       //
                                         "|jingle/checksum[@xmlns='" + XMLNS_JINGLE_FILE_TRANSFER + "']";
+                                        "|jingle/checksum[@xmlns='" + XMLNS_JINGLE_FILE_TRANSFER4 + "']";
+                                        "|jingle/checksum[@xmlns='" + XMLNS_JINGLE_FILE_TRANSFER5 + "']";
       return filter;
     }
 

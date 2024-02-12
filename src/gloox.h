@@ -617,8 +617,11 @@ namespace gloox
   GLOOX_API extern const std::string XMLNS_JINGLE_APPS_RTP_HDREXT;
   GLOOX_API extern const std::string XMLNS_JINGLE_APPS_RTP_SSMA;
 
+  GLOOX_API extern const std::string XMLNS_JINGLE_FEATURE_AUDIO;
+  GLOOX_API extern const std::string XMLNS_JINGLE_FEATURE_VIDEO;
 
-  /** Jingle File Transfer namespace (@xep{0234}) */
+
+    /** Jingle File Transfer namespace (@xep{0234}) */
   GLOOX_API extern const std::string XMLNS_JINGLE_FILE_TRANSFER;
   GLOOX_API extern const std::string XMLNS_JINGLE_FILE_TRANSFER4;
   GLOOX_API extern const std::string XMLNS_JINGLE_FILE_TRANSFER5;
@@ -710,6 +713,11 @@ namespace gloox
   GLOOX_API extern const std::string JITSI_VIDEO_TYPE;
   GLOOX_API extern const std::string JITSI_RAISED_HAND;
   GLOOX_API extern const std::string JITSI_USER_AGENT;
+
+  /**
+   * XEP-0215: External Service Discovery
+   */
+  GLOOX_API extern const std::string XMLNS_EXTERNAL_SERVICE_DISCOVERY;
 
   /**
    * This describes the possible states of a stream.
