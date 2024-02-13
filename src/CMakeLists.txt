@@ -1,6 +1,6 @@
 file( GLOB gloox_SRCS *.cpp )
 
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /D_ITERATOR_DEBUG_LEVEL=0")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}")
 
 add_library( gloox ${gloox_SRCS} )
 target_link_libraries( gloox ${LIBS} )

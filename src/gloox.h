@@ -579,6 +579,11 @@ namespace gloox
   /** General HTTP binding (BOSH) namespace (@xep{0124}) */
   GLOOX_API extern const std::string XMLNS_HTTPBIND;
 
+  /**
+   * XEP-0033: Extended Stanza Addressing
+   */
+  GLOOX_API extern const std::string XMLNS_ADDRESSES;
+
   /** XMPP-over-BOSH extensions (@xep{0206}) */
   GLOOX_API extern const std::string XMLNS_XMPP_BOSH;
 

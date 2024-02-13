@@ -26,10 +26,10 @@ namespace gloox
   class Tag;
 
   /**
-   * @brief An implementation of User Nickname (@xep{0172}) as a StanzaExtension.
+   * @brief XEP-0215: External Service Discovery
    *
    * XEP version: 1.0
-   * @author Jakob Schröter <js@camaya.net>
+   * @author GaoJie <cto@chuanshaninfo.com>
    * @since 1.0
    */
   class GLOOX_API ExtDisco : public StanzaExtension

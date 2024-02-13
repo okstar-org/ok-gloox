@@ -102,6 +102,8 @@ namespace gloox
 
   const std::string XMLNS_STREAM_COMPRESS   = "http://jabber.org/features/compress";
   const std::string XMLNS_HTTPBIND          = "http://jabber.org/protocol/httpbind";
+  const std::string XMLNS_ADDRESSES         = "http://jabber.org/protocol/address";
+
   const std::string XMLNS_XMPP_BOSH         = "urn:xmpp:xbosh";
   const std::string XMLNS_RECEIPTS          = "urn:xmpp:receipts";
   const std::string XMLNS_NICKNAME          = "http://jabber.org/protocol/nick";

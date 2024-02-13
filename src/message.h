@@ -15,6 +15,7 @@
 
 #include "delayeddelivery.h"
 #include "stanza.h"
+#include "addresses.h"
 
 #include <string>
 
@@ -133,7 +134,13 @@ namespace gloox
       {
         return static_cast<const DelayedDelivery*>( findExtension( ExtDelay ) );
       }
+
 #endif // GLOOX_MINIMAL
+
+      const Addresses* address() const
+      {
+        return static_cast<const Addresses*>( findExtension( ExtAddresses ) );
+      }
 
       // reimplemented from Stanza
       virtual Tag* tag() const;
