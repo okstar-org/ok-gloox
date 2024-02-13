@@ -18,14 +18,14 @@ namespace gloox {
 
     Addresses::Addresses(const std::list<Address> &addresses)
         : StanzaExtension(ExtAddresses), m_addressList(addresses) {
-
     }
-
 
     Addresses::Addresses(const Tag *tag)
         : StanzaExtension(ExtAddresses) {
-      if (!tag || tag->xmlns() != XMLNS_ADDRESSES)
+      if (!tag){
+        m_valid = false;
         return;
+      }
 
       TagList addressList = tag->findChildren("address");
       TagList::const_iterator it = addressList.begin();
@@ -38,6 +38,7 @@ namespace gloox {
         addr.desc=(*it)->findAttribute("desc");
         addr.delivered=(*it)->findAttribute("delivered");
         m_addressList.push_back(addr);
+        it++;
       }
       m_valid = true;
     }
@@ -46,18 +47,15 @@ namespace gloox {
     }
 
     const std::string &Addresses::filterString() const {
-      static const std::string filter =
-          "/message/addresses[@xmlns='" + XMLNS_ADDRESSES + "']";
+      static const std::string filter = "/message/addresses[@xmlns='" + XMLNS_ADDRESSES + "']";
       return filter;
     }
 
     Tag *Addresses::tag() const {
-      if (!m_valid)
+      if( !m_valid )
         return 0;
 
-      Tag *t = new Tag("addresses");
-      t->addAttribute(XMLNS, XMLNS_ADDRESSES);
-
+      Tag *t = new Tag("addresses", XMLNS, XMLNS_ADDRESSES);
       std::list<Address>::const_iterator it = m_addressList.begin();
       while (it != m_addressList.end()){
         Tag* a = new Tag(t, "address");
@@ -67,6 +65,7 @@ namespace gloox {
         a->addAttribute("node", (*it).node);
         a->addAttribute("desc", (*it).desc);
         a->addAttribute("delivered", (*it).delivered);
+        it++;
       }
 
       return t;

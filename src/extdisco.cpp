@@ -21,20 +21,24 @@ namespace gloox {
 
     ExtDisco::ExtDisco(const Tag *tag)
         : StanzaExtension(ExtSrvDisco) {
-      if (tag) {
-        TagList tags = tag->findChildren("service");
-        TagList::const_iterator it = tags.begin();
-        for (; it != tags.end(); ++it) {
-          Service srv;
-          srv.host = (*it)->findAttribute("host");
-          srv.port = std::atoi((*it)->findAttribute("port").data());
-          srv.type = (*it)->findAttribute("type");
-          srv.transport = (*it)->findAttribute("transport");
-          srv.username = (*it)->findAttribute("username");
-          srv.password = (*it)->findAttribute("password");
-          m_services.push_back(srv);
-        }
+      if (!tag) {
+        m_valid = false;
+        return;
       }
+
+      TagList tags = tag->findChildren("service");
+      TagList::const_iterator it = tags.begin();
+      for (; it != tags.end(); ++it) {
+        Service srv;
+        srv.host = (*it)->findAttribute("host");
+        srv.port = std::atoi((*it)->findAttribute("port").data());
+        srv.type = (*it)->findAttribute("type");
+        srv.transport = (*it)->findAttribute("transport");
+        srv.username = (*it)->findAttribute("username");
+        srv.password = (*it)->findAttribute("password");
+        m_services.push_back(srv);
+      }
+      m_valid = true;
     }
 
     const std::string &ExtDisco::filterString() const {

@@ -53,19 +53,12 @@ namespace gloox
           std::string  username;
           std::string  password;
       }  Service;
+
       /**
        * Constructs a new object from the given Tag.
        * @param tag A Tag to parse.
        */
-      ExtDisco( const Tag* tag );
-
-      /**
-       * Constructs a new Nickname object.
-       * @param nick The nickname to include.
-       */
-      ExtDisco( const std::string& nick )
-        : StanzaExtension( ExtSrvDisco )
-      {}
+      ExtDisco( const Tag* tag = nullptr);
 
       /**
        * Virtual destructor.
