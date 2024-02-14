@@ -132,7 +132,7 @@ namespace gloox
 
       /**
        * This function is called if the room that was just joined didn't exist prior to the attempted
-       * join. Therfore the room was created by MUC service. To accept the default configuration of
+       * join. Therefore the room was created by MUC service. To accept the default configuration of
        * the room assigned by the MUC service, return @b true from this function. The room will be opened
        * by the MUC service and available for other users to join. If you don't want to accept the default
        * room configuration, return @b false from this function. The room will stay locked until it is

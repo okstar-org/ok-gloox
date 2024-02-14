@@ -390,6 +390,12 @@ namespace gloox
       const std::string nick() const { return m_nick.resource(); }
 
       /**
+       * Return room's jid.
+       * @return
+       */
+      const JID jid() const { return JID(m_nick.full()).bareJID(); };
+
+      /**
        * Join this room.
        * @param type The presence to join with, defaults to Available.
        * @param status The presence's optional status text.
