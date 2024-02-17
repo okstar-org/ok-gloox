@@ -350,6 +350,11 @@ namespace gloox
       void disableRoster();
 
       /**
+       * Enable the roster management.
+       */
+      RosterManager * enableRoster();
+
+      /**
        * This function gives access to the @c RosterManager object.
        * @return A pointer to the RosterManager.
        */

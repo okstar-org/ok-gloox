@@ -108,7 +108,7 @@ namespace gloox
       m_auth( 0 ), m_forceNonSasl( false ),
 #endif // GLOOX_MINIMAL
       m_presence( Presence::Available, JID() ),
-      m_manageRoster( true ),
+      m_manageRoster( false ),
       m_smId( EmptyString ), m_smLocation( EmptyString ), m_smResume( false ), m_smWanted( false ), m_smMax( 0 ),
       m_streamFeatures( 0 )
   {
@@ -123,7 +123,7 @@ namespace gloox
       m_auth( 0 ), m_forceNonSasl( false ),
 #endif // GLOOX_MINIMAL
       m_presence( Presence::Available, JID() ),
-      m_manageRoster( true ),
+      m_manageRoster( false ),
       m_smId( EmptyString ), m_smLocation( EmptyString ), m_smResume( false ), m_smWanted( false ), m_smMax( 0 ),
       m_streamFeatures( 0 )
   {
@@ -142,7 +142,7 @@ namespace gloox
 
   void Client::init()
   {
-    m_rosterManager = new RosterManager( this );
+
     registerStanzaExtension( new ResourceBind( 0 ) );
 
 #if !defined( GLOOX_MINIMAL ) || defined( WANT_CAPABILITIES )
@@ -648,10 +648,10 @@ namespace gloox
       r->addAttribute( "previd", m_smId );
       send( r );
       m_smContext = CtxSMResume;
-    } 
+    }
     else
       disconnect();
- 
+
   }
 
   void Client::ackStreamManagement()
@@ -737,8 +737,22 @@ namespace gloox
   void Client::disableRoster()
   {
     m_manageRoster = false;
-    delete m_rosterManager;
-    m_rosterManager = 0;
+    if(m_rosterManager){
+      delete m_rosterManager;
+      m_rosterManager = 0;
+    }
+  }
+
+  RosterManager * Client::enableRoster() {
+    if(m_rosterManager){
+      return m_rosterManager;
+    }
+
+    m_rosterManager = new RosterManager(this);
+    notifyStreamEvent( StreamEventRoster );
+    m_rosterManager->fill();
+    m_manageRoster = true;
+    return m_rosterManager;
   }
 
 #if !defined( GLOOX_MINIMAL ) || defined( WANT_NONSASLAUTH )
@@ -754,12 +768,6 @@ namespace gloox
   {
     if( m_authed && m_smContext != CtxSMResumed )
     {
-      if( m_manageRoster )
-      {
-        notifyStreamEvent( StreamEventRoster );
-        m_rosterManager->fill();
-      }
-      else
         rosterFilled();
     }
     else
