@@ -18,92 +18,30 @@ See the Mulan PubL v2 for more details.
 
 namespace gloox {
 
-
     class Conference : public StanzaExtension {
     public:
-
-        Conference(const JID &focus, const std::string &room,
-                   const std::string &machineUid,
-                   const bool disableRtx = false,
-                   const bool enableLipSync = true,
-                   const bool openSctp = true);
 
         Conference();
 
         Conference(const Tag *tag);
 
-        Conference(const Conference &conference);
 
-        virtual Tag *tag() const;
+        virtual Tag *tag() const override;
 
         virtual const std::string &filterString() const;
 
         virtual StanzaExtension *newInstance(const Tag *tag) const {
-            return new Conference(tag);
+          return new Conference(tag);
         }
 
         virtual StanzaExtension *clone() const { return new Conference(*this); }
 
-        bool disableRtc() { return m_disableRtx; }
 
-        bool enableLipSync() { return m_enableLipSync; }
-
-        bool openSctp() { return m_openSctp; }
-
-        bool ready() { return m_ready; }
-
-        const JID &focusJid() { return m_focusJid; }
-
-        bool auth() { return m_auth; }
-
-        const std::string &room() { return m_room; }
+        const JID &jid()const{ return m_jid; }
 
     private:
-        JID m_focus;
-        std::string m_room;
-        std::string m_machineUid;
-
-        bool m_disableRtx;
-        bool m_enableLipSync;
-        bool m_openSctp;
-
-        //返回值
-        bool m_ready;
-        JID m_focusJid;
-        bool m_auth;
-
+        JID m_jid;
     };
-
-    class GLOOX_API ConferenceHandler {
-    public:
-        /**
-         * Virtual destructor.
-         */
-        virtual ~ConferenceHandler() {}
-
-        virtual void onStart(const Conference *j) = 0;
-    };
-
-    class GLOOX_API ConferenceManager : public IqHandler {
-    public:
-        ConferenceManager(ClientBase *parent, ConferenceHandler *ch);
-
-        virtual ~ConferenceManager();
-
-        void create(const JID &jid, const JID &focus, const std::string &machineUid,
-                    ConferenceHandler *handler);
-
-        // reimplemented from IqHandler
-        virtual bool handleIq(const IQ &iq) override;
-
-        // reimplemented from IqHandler
-        virtual void handleIqID(const IQ & /*iq*/, int /*context*/) override;
-
-    private:
-        ClientBase *m_parent;
-        ConferenceHandler *m_handler;
-    };
-
 } // namespace gloox
 
 #endif // CONFERENCE_H

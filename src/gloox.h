@@ -496,6 +496,10 @@ namespace gloox
   /** SOCKS5 Bytestreams namespace (@xep{0065}) */
   GLOOX_API extern const std::string XMLNS_BYTESTREAMS;
 
+
+  /** (@xep{0045}) @link https://xmpp.org/extensions/attic/jep-0045-1.19.html#invite */
+  GLOOX_API extern const std::string XMLNS_X_CONFERENCE;
+
   /** Multi-User Chat namespace (@xep{0045}) */
   GLOOX_API extern const std::string XMLNS_MUC;
 

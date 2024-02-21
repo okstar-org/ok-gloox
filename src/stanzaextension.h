@@ -109,6 +109,9 @@ namespace gloox
 
     ExtSrvDisco,          /** XEP-0215: External Service Discovery */
     ExtAddresses,         /** XEP-0033: Extended Stanza Addressing */
+
+    ExtJitsiConference,
+
   };
 
   /**

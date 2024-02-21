@@ -41,8 +41,7 @@ namespace gloox
 
   const std::string& RosterX::filterString() const
   {
-    static const std::string filter = "/message/x"
-                                      "|/iq/x";
+    static const std::string filter = "/iq/x";
     return filter;
   }
 
