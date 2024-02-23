@@ -478,6 +478,11 @@ namespace gloox
   /** Bookmark Storage namespace (@xep{0048}) */
   GLOOX_API extern const std::string XMLNS_BOOKMARKS;
 
+  /** XEP-0402: PEP Native Bookmarks */
+  GLOOX_API extern const std::string XMLNS_BOOKMARKS2;
+  GLOOX_API extern const std::string XMLNS_BOOKMARKS2_COMPAT;
+  GLOOX_API extern const std::string XMLNS_BOOKMARKS2_NOTIFY;
+
   /** Annotations namespace (@xep{0145}) */
   GLOOX_API extern const std::string XMLNS_ANNOTATIONS;
 

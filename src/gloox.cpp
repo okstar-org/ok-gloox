@@ -60,6 +60,9 @@ namespace gloox
   const std::string XMLNS_X_VCARD_UPDATE    = "vcard-temp:x:update";
 
   const std::string XMLNS_BOOKMARKS         = "storage:bookmarks";
+  const std::string XMLNS_BOOKMARKS2        = "urn:xmpp:bookmarks:1";
+  const std::string XMLNS_BOOKMARKS2_COMPAT = XMLNS_BOOKMARKS2+ "#compat";
+  const std::string XMLNS_BOOKMARKS2_NOTIFY = XMLNS_BOOKMARKS2+ "+notify";
   const std::string XMLNS_ANNOTATIONS       = "storage:rosternotes";
   const std::string XMLNS_ROSTER_DELIMITER  = "roster:delimiter";
   const std::string XMLNS_XMPP_PING         = "urn:xmpp:ping";
