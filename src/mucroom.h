@@ -797,10 +797,8 @@ namespace gloox
 
       bool m_joined;
 
-    private:
-#ifdef MUCROOM_TEST
     public:
-#endif
+
       /**
        * @brief An abstraction of a MUC owner query.
        *

@@ -502,7 +502,7 @@ namespace gloox
   GLOOX_API extern const std::string XMLNS_BYTESTREAMS;
 
 
-  /** (@xep{0045}) @link https://xmpp.org/extensions/attic/jep-0045-1.19.html#invite */
+  /** XEP-0249: Direct MUC Invitations */
   GLOOX_API extern const std::string XMLNS_X_CONFERENCE;
 
   /** Multi-User Chat namespace (@xep{0045}) */

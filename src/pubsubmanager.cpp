@@ -784,7 +784,7 @@ namespace gloox
                                             DataForm* options,
                                             ResultHandler* handler )
     {
-      if( !m_parent || !handler )
+      if( !m_parent)
       {
         util::clearList( items );
         return EmptyString;
@@ -799,7 +799,9 @@ namespace gloox
       iq.addExtension( ps );
 
       m_trackMapMutex.lock();
-      m_resultHandlerTrackMap[id] = handler;
+      if(handler){
+        m_resultHandlerTrackMap[id] = handler;
+      }
       m_trackMapMutex.unlock();
       m_parent->send( iq, this, PublishItem );
       return id;

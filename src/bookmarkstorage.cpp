@@ -15,7 +15,8 @@
 
 #include "bookmarkstorage.h"
 #include "clientbase.h"
-
+#include "pubsubmanager.h"
+#include "pubsubitem.h"
 
 namespace gloox
 {
@@ -53,7 +54,16 @@ namespace gloox
       new Tag( i, "password", (*itc).password );
     }
 
-    storeXML( s, this );
+    PubSub::Manager  pubsub (m_parent);
+
+    PubSub::Item *item = new PubSub::Item();
+    item->setID("current");
+    item->setPayload(s);
+
+    PubSub::ItemList items;
+    items.push_back(item);
+
+    pubsub.publishItem(JID(), XMLNS_BOOKMARKS, items, 0, 0);
   }
 
   void BookmarkStorage::requestBookmarks()
