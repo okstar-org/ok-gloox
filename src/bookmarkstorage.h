@@ -17,7 +17,7 @@
 #define BOOKMARKSTORAGE_H__
 
 #include "macros.h"
-
+#include "pubsubmanager.h"
 #include "bookmarkhandler.h"
 #include "privatexml.h"
 #include "privatexmlhandler.h"
@@ -144,6 +144,7 @@ namespace gloox
 
     private:
       BookmarkHandler* m_bookmarkHandler;
+      PubSub::Manager* m_pubSubManager;
   };
 
 }

@@ -25,10 +25,12 @@ namespace gloox
     : PrivateXML( parent ),
       m_bookmarkHandler( 0 )
   {
+    m_pubSubManager = new PubSub::Manager(m_parent);
   }
 
   BookmarkStorage::~BookmarkStorage()
   {
+    delete m_pubSubManager;
   }
 
   void BookmarkStorage::storeBookmarks( const BookmarkList& bList, const ConferenceList& cList )
@@ -54,7 +56,6 @@ namespace gloox
       new Tag( i, "password", (*itc).password );
     }
 
-    PubSub::Manager  pubsub (m_parent);
 
     PubSub::Item *item = new PubSub::Item();
     item->setID("current");
@@ -63,7 +64,7 @@ namespace gloox
     PubSub::ItemList items;
     items.push_back(item);
 
-    pubsub.publishItem(JID(), XMLNS_BOOKMARKS, items, 0, 0);
+    m_pubSubManager->publishItem(JID(), XMLNS_BOOKMARKS, items, 0, 0);
   }
 
   void BookmarkStorage::requestBookmarks()
