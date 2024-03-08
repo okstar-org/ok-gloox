@@ -53,10 +53,3 @@ jobs:
           path: |
             ${{ github.workspace }}/include
             ${{ github.workspace }}/${{ matrix.configuration }}/libgloox.a
-
-      - name: Release
-        uses: marvinpinto/action-automatic-releases@latest
-        with: 
-          repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          files: artifaces/packages/*
-          prerelease: false
