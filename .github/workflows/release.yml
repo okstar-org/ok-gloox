@@ -23,6 +23,6 @@ jobs:
           automatic_release_tag: "latest"
           prerelease: false
           files: |
-            README
-            COPYING
-            README.symbian
+            ${{ github.workspace }}/README
+            ${{ github.workspace }}/COPYING
+            ${{ github.workspace }}/README.symbian
