@@ -1,6 +1,8 @@
 name: CI
 
-on: [ push ]
+on: 
+  release:
+    types: [ created ]
 
 jobs:
   build-and-test:
@@ -13,6 +15,9 @@ jobs:
       matrix:
         configuration: [ debug, release ]
         os: [ ubuntu-latest, windows-latest ]
+
+    permissions:
+      contents: write
       
     steps:
       - name: Checkout Code
@@ -63,6 +68,10 @@ jobs:
             ${{ github.workspace }}/${{ matrix.configuration }}/libgloox.so
 
       - name: Release
-        uses: toolmantim/release-drafter@v5.2.0
-        env :
-          GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+        uses: marvinpinto/action-automatic-releases@latest
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: "latest"
+          title: "Development Build"
+          prerelease: true
+          files: README
