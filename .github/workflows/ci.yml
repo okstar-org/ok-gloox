@@ -26,15 +26,21 @@ jobs:
 
       - name: Pack on win
         if  : startsWith(matrix.os, 'windows')
-        run : mv ${{ github.workspace }}/build/src/${{ matrix.configuration }}/libgloox.so ${{ github.workspace }}/${{ matrix.configuration }}
+        run : |
+          mkdir ${{ github.workspace }}/${{ matrix.configuration }}
+          mv ${{ github.workspace }}/build/src/${{ matrix.configuration }}/libgloox.so ${{ github.workspace }}/${{ matrix.configuration }}
 
       - name: Pack on ubuntu with debug
         if  : startsWith(matrix.os, 'ubuntu') && matrix.configuration == 'Debug'
-        run : mv ${{ github.workspace }}/build/src/libgloox.so ${{ github.workspace }}/debug
+        run : |
+          mkdir ${{ github.workspace }}/debug
+          mv ${{ github.workspace }}/build/src/libgloox.so ${{ github.workspace }}/debug
 
       - name: Pack on ubuntu with release
         if  : startsWith(matrix.os, 'ubuntu') && matrix.configuration == 'Release'
-        run : mv ${{ github.workspace }}/build/src/libgloox.so ${{ github.workspace }}/release
+        run : |
+          mkdir ${{ github.workspace }}/release
+          mv ${{ github.workspace }}/build/src/libgloox.so ${{ github.workspace }}/release
 
       - name: Release on win
         uses: actions/upload-artifact@v3
