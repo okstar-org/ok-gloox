@@ -64,7 +64,7 @@ jobs:
 
       - name: Test
         if  : startsWith(matrix.os, 'ubuntu')
-        run : tar -czvf libgloox-linux-x64.tar ${{ github.workspace }}/
+        run : tar -czvf libgloox-linux-x64.tar ${{ github.workspace }}/include ${{ github.workspace }}/${{ matrix.configuration }}
 
       - name: Upload to release
         uses: JasonEtco/upload-to-release@master
