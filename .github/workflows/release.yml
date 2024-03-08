@@ -8,14 +8,17 @@ on:
 jobs:
   tagged-release:
 
-    name: ${{ matrix.os }} (${{ matrix.configuration }})
-    runs-on: ${{ matrix.os }}
+    name: "Tagged Release"
+    runs-on: "ubuntu-latest"
 
-    strategy:
-      fail-fast: false
-      matrix:
-        configuration: [ debug, release ]
-        os: [ ubuntu-latest, windows-latest ]
+    # name: ${{ matrix.os }} (${{ matrix.configuration }})
+    # runs-on: ${{ matrix.os }}
+
+    # strategy:
+    #   fail-fast: false
+    #   matrix:
+    #     configuration: [ debug, release ]
+    #     os: [ ubuntu-latest, windows-latest ]
       
     steps:
       - uses: "marvinpinto/action-automatic-releases@latest"
