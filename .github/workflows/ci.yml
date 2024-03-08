@@ -36,7 +36,7 @@ jobs:
           mkdir ${{ github.workspace }}/${{ matrix.configuration }}
           mv ${{ github.workspace }}/build/src/libgloox.so ${{ github.workspace }}/${{ matrix.configuration }}
 
-      - name: Release on win
+      - name: Upload on win
         uses: actions/upload-artifact@v3
         if  : startsWith(matrix.os, 'windows')
         with: 
@@ -45,7 +45,7 @@ jobs:
             ${{ github.workspace }}/include
             ${{ github.workspace }}/${{ matrix.configuration }}/gloox.dll
 
-      - name: Release on ubuntu
+      - name: Upload on ubuntu
         uses: actions/upload-artifact@v3
         if  : startsWith(matrix.os, 'ubuntu')
         with: 
@@ -53,3 +53,10 @@ jobs:
           path: |
             ${{ github.workspace }}/include
             ${{ github.workspace }}/${{ matrix.configuration }}/libgloox.so
+
+      - name: Release
+        uses: marvinpinto/action-automatic-releases@latest
+        with: 
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          files: artifaces/packages/*
+          prerelease: false
