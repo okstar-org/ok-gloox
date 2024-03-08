@@ -123,7 +123,7 @@ public:
   void setSsrcGroup(const SsrcGroup &);
   const SsrcGroup &ssrcGroup() const;
 
-  const bool rtcpMux() const;
+  bool rtcpMux() const;
 
   void setRtcpMux(bool rtcpMux);
 
