@@ -1,0 +1,55 @@
+name: CI
+
+on: [ push, pull_request ]
+
+jobs:
+  build-and-test:
+
+    name: ${{ matrix.os }} (${{ matrix.configuration }})
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        configuration: [ debug, release ]
+        os: [ ubuntu-latest, windows-latest ]
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Configure CMake
+        run : cmake -B${{ github.workspace }}/build -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} -DBUILD_SHARED_LIBS=OFF
+
+      - name: Build
+        run : cmake --build ${{ github.workspace }}/build --config ${{ matrix.configuration }}
+
+      - name: Pack on win
+        if  : startsWith(matrix.os, 'windows')
+        run : |
+          mkdir ${{ github.workspace }}/${{ matrix.configuration }}
+          mv ${{ github.workspace }}/build/src/${{ matrix.configuration }}/gloox.lib ${{ github.workspace }}/${{ matrix.configuration }}
+
+      - name: Pack on ubuntu
+        if  : startsWith(matrix.os, 'ubuntu')
+        run : |
+          mkdir ${{ github.workspace }}/${{ matrix.configuration }}
+          mv ${{ github.workspace }}/build/src/libgloox.a ${{ github.workspace }}/${{ matrix.configuration }}
+
+      - name: Upload on win
+        uses: actions/upload-artifact@v3
+        if  : startsWith(matrix.os, 'windows')
+        with: 
+          name: libgloox-win-x64
+          path: |
+            ${{ github.workspace }}/include
+            ${{ github.workspace }}/${{ matrix.configuration }}/gloox.lib
+
+      - name: Upload on ubuntu
+        uses: actions/upload-artifact@v3
+        if  : startsWith(matrix.os, 'ubuntu')
+        with: 
+          name: libgloox-linux-x64
+          path: |
+            ${{ github.workspace }}/include
+            ${{ github.workspace }}/${{ matrix.configuration }}/libgloox.a
