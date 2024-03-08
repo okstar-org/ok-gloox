@@ -28,7 +28,7 @@ jobs:
         if  : startsWith(matrix.os, 'windows')
         run : |
           mkdir ${{ github.workspace }}/${{ matrix.configuration }}
-          mv ${{ github.workspace }}/build/src/${{ matrix.configuration }}/libgloox.so ${{ github.workspace }}/${{ matrix.configuration }}
+          mv ${{ github.workspace }}/build/src/${{ matrix.configuration }}/gloox.dll ${{ github.workspace }}/${{ matrix.configuration }}
 
       - name: Pack on ubuntu
         if  : startsWith(matrix.os, 'ubuntu')
