@@ -63,6 +63,7 @@ jobs:
             ${{ github.workspace }}/${{ matrix.configuration }}/libgloox.so
 
       - name: Test
+        if  : startsWith(matrix.os, 'ubuntu')
         run : tar -czvf libgloox-linux-x64.tar ${{ github.workspace }}/
 
       - name: Upload to release
