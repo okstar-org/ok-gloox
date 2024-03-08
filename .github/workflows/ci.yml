@@ -24,12 +24,14 @@ jobs:
       - name: Build
         run:  cmake --build ${{ github.workspace }}/build --config ${{ matrix.configuration }}
 
-      - name: Release on windows
+      - name: Release on win
         uses: actions/upload-artifact@v3
         if  : startsWith(matrix.os, 'windows')
         with: 
           name: libgloox-win-x64.zip
-          path: ${{ github.workspace }}/build/${{ matrix.configuration }}/gloox.dll
+          path: |
+            ${{ github.workspace }}/include
+            ${{ github.workspace }}/build/${{ matrix.configuration }}/gloox.dll
 
       - name: Release on ubuntu
         uses: actions/upload-artifact@v3
