@@ -31,6 +31,7 @@ namespace gloox {
 
       Tag *x = new Tag("x", XMLNS, XMLNS_X_CONFERENCE);
       x->addAttribute("jid", m_jid.full());
+      return x;
     }
 
     const std::string &Conference::filterString() const {
