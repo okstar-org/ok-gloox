@@ -13,9 +13,6 @@ jobs:
       matrix:
         configuration: [ debug, release ]
         os: [ ubuntu-latest, windows-latest ]
-        
-    permissions:
-      contents: write
       
     steps:
       - name: Checkout Code
