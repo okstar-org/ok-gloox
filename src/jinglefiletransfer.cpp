@@ -118,8 +118,8 @@ namespace gloox
                                         "|jingle/received[@xmlns='" + XMLNS_JINGLE_FILE_TRANSFER + "']"       //
                                         "|jingle/received[@xmlns='" + XMLNS_JINGLE_FILE_TRANSFER4 + "']"       //
                                         "|jingle/received[@xmlns='" + XMLNS_JINGLE_FILE_TRANSFER5 + "']"       //
-                                        "|jingle/checksum[@xmlns='" + XMLNS_JINGLE_FILE_TRANSFER + "']";
-                                        "|jingle/checksum[@xmlns='" + XMLNS_JINGLE_FILE_TRANSFER4 + "']";
+                                        "|jingle/checksum[@xmlns='" + XMLNS_JINGLE_FILE_TRANSFER + "']"        // 
+                                        "|jingle/checksum[@xmlns='" + XMLNS_JINGLE_FILE_TRANSFER4 + "']"        //
                                         "|jingle/checksum[@xmlns='" + XMLNS_JINGLE_FILE_TRANSFER5 + "']";
       return filter;
     }

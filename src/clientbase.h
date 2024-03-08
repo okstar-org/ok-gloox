@@ -772,10 +772,8 @@ namespace gloox
       virtual void handlePing( const PingType type, const std::string& body );
 #endif // GLOOX_MINIMAL
 
-  protected:
-#if defined( CLIENTBASE_TEST ) || defined( ENABLE_SEND_RAW_XML )
     public:
-#endif
+
       /**
        * This function is called when resource binding yieled an error.
        * @param error A pointer to an Error object that contains more
@@ -894,7 +892,7 @@ namespace gloox
        * The server will check any data received anyway and disconnect if something is wrong.
        * @param xml The data to send.
        */
-      void send( const std::string& xml );
+      void send(const std::string& xml );
 
       /**
        * This function checks if there are any unacknowledged Tags in the send queue and resends
