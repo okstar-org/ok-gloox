@@ -14,17 +14,17 @@ See the Mulan PubL v2 for more details.
 #include "disco.h"
 
 namespace gloox {
-    Conference::Conference() : StanzaExtension(ExtConference) {}
+    JitsiConference::JitsiConference() : StanzaExtension(ExtJitsiConference) {}
 
-    Conference::Conference(const JID &focus, const std::string &room,
+    JitsiConference::JitsiConference(const JID &focus, const std::string &room,
                            const std::string &machineUid, const bool disableRtx,
                            const bool enableLipSync, const bool openSctp)
-            : StanzaExtension(ExtConference), m_focus(focus), m_room(room),
+            : StanzaExtension(ExtJitsiConference), m_focus(focus), m_room(room),
               m_machineUid(machineUid), m_disableRtx(disableRtx),
               m_enableLipSync(enableLipSync), m_openSctp(openSctp) {}
 
-    Conference::Conference(const Tag *tag) : StanzaExtension(ExtConference) {
-        if (!tag || tag->name() != "conference" || tag->xmlns() != JITSI_CONFERENCE)
+    JitsiConference::JitsiConference(const Tag *tag) : StanzaExtension(ExtJitsiConference) {
+        if (!tag || tag->name() != "JitsiConference" || tag->xmlns() != JITSI_CONFERENCE)
             return;
 
         m_room = tag->findAttribute("room");
@@ -49,15 +49,15 @@ namespace gloox {
         m_focusJid = JID(tag->findAttribute("focusjid"));
     }
 
-    Conference::Conference(const Conference &conference)
-            : StanzaExtension(ExtConference), m_focus(conference.m_focus),
-              m_room(conference.m_room), m_machineUid(conference.m_machineUid),
-              m_disableRtx(conference.m_disableRtx),
-              m_enableLipSync(conference.m_enableLipSync),
-              m_openSctp(conference.m_openSctp) {}
+    JitsiConference::JitsiConference(const JitsiConference &JitsiConference)
+            : StanzaExtension(ExtJitsiConference), m_focus(JitsiConference.m_focus),
+              m_room(JitsiConference.m_room), m_machineUid(JitsiConference.m_machineUid),
+              m_disableRtx(JitsiConference.m_disableRtx),
+              m_enableLipSync(JitsiConference.m_enableLipSync),
+              m_openSctp(JitsiConference.m_openSctp) {}
 
-    Tag *Conference::tag() const {
-        Tag *t = new Tag("conference", XMLNS, JITSI_CONFERENCE);
+    Tag *JitsiConference::tag() const {
+        Tag *t = new Tag("JitsiConference", XMLNS, JITSI_CONFERENCE);
         t->addAttribute("room", m_room);
         t->addAttribute("machine-uid", m_machineUid);
 
@@ -77,24 +77,24 @@ namespace gloox {
         return t;
     }
 
-    const std::string &Conference::filterString() const {
+    const std::string &JitsiConference::filterString() const {
         static const std::string filter =
-                "/iq/conference[@xmlns='" + JITSI_CONFERENCE + "']";
+                "/iq/JitsiConference[@xmlns='" + JITSI_CONFERENCE + "']";
         return filter;
     }
 
-    ConferenceManager::ConferenceManager(ClientBase *parent, ConferenceHandler *ch)
+    JitsiConferenceManager::JitsiConferenceManager(ClientBase *parent, JitsiConferenceHandler *ch)
             : m_parent(parent), m_handler(ch) {
-        m_parent->registerIqHandler(this, ExtConference);
+        m_parent->registerIqHandler(this, ExtJitsiConference);
         m_parent->disco()->addFeature(JITSI_CONFERENCE);
-        m_parent->registerStanzaExtension(new Conference());
+        m_parent->registerStanzaExtension(new JitsiConference());
     }
 
-    ConferenceManager::~ConferenceManager() {}
+    JitsiConferenceManager::~JitsiConferenceManager() {}
 
-    bool ConferenceManager::handleIq(const IQ &iq) {
+    bool JitsiConferenceManager::handleIq(const IQ &iq) {
 
-        const Conference *j = iq.findExtension<Conference>(ExtConference);
+        const JitsiConference *j = iq.findExtension<JitsiConference>(ExtJitsiConference);
         if (!j || !m_handler || !m_parent)
 
             return false;
@@ -103,19 +103,19 @@ namespace gloox {
         return true;
     }
 
-    void ConferenceManager::handleIqID(const IQ &iq, int context) {
+    void JitsiConferenceManager::handleIqID(const IQ &iq, int context) {
     }
 
-    void ConferenceManager::create(const JID &room,               //
+    void JitsiConferenceManager::create(const JID &room,               //
                                    const JID &focus,              //
                                    const std::string &machineUid, //
-                                   ConferenceHandler *handler) {
+                                   JitsiConferenceHandler *handler) {
         m_handler = handler;
 
         IQ iq(IQ::IqType::Set, focus, m_parent->getID());
         auto t = iq.tag();
 
-//        auto c = new Tag("conference", "xmlns", JITSI_CONFERENCE);
+//        auto c = new Tag("JitsiConference", "xmlns", JITSI_JitsiConference);
 //        c->addAttribute("room", room.bare());
 //        c->addAttribute("machine-uid", machineUid);
 //        auto p1 = new Tag("property", "name", "disableRtx");
@@ -129,15 +129,15 @@ namespace gloox {
         //  type='set'
         //  from='18510248810@meet.chuanshaninfo.com/OkEDU-Classroom-Desktop'
         //  xmlns='jabber:client'>
-        //  <conference xmlns='http://jitsi.org/protocol/focus'
-        //  room='280300a4-av@conference.meet.chuanshaninfo.com'
+        //  <JitsiConference xmlns='http://jitsi.org/protocol/focus'
+        //  room='280300a4-av@JitsiConference.meet.chuanshaninfo.com'
         //  machine-uid='{c3b17767-342f-460d-a3e4-5a32753af1aa}'>
         //  <property name='disableRtx' value='false'/>
         //  <property name='enableLipSync' value='true'/>
         //  <property name='openSctp' value='true'/>
-        //  </conference></iq>
+        //  </JitsiConference></iq>
 
-        iq.addExtension(new gloox::Conference(focus,       //
+        iq.addExtension(new gloox::JitsiConference(focus,       //
                                               room.full(), //
                                               machineUid,  //
                                               false, true, true));

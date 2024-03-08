@@ -274,7 +274,7 @@ namespace gloox {
 
         const RTP::HdrExts &RTP::hdrExts() const { return m_hdrExts; }
 
-        const bool RTP::rtcpMux() const { return m_rtcpMux; }
+        bool RTP::rtcpMux() const { return m_rtcpMux; }
 
         const RTP::Sources &RTP::sources() const { return m_sources; }
 

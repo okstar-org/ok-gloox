@@ -10,8 +10,8 @@ MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 See the Mulan PubL v2 for more details.
 */
 
-#ifndef CONFERENCE_H
-#define CONFERENCE_H
+#ifndef JitsiConference_H
+#define JitsiConference_H
 
 #include "client.h"
 #include "stanzaextension.h"
@@ -19,30 +19,30 @@ See the Mulan PubL v2 for more details.
 namespace gloox {
 
 
-    class Conference : public StanzaExtension {
+    class JitsiConference : public StanzaExtension {
     public:
 
-        Conference(const JID &focus, const std::string &room,
+        JitsiConference(const JID &focus, const std::string &room,
                    const std::string &machineUid,
                    const bool disableRtx = false,
                    const bool enableLipSync = true,
                    const bool openSctp = true);
 
-        Conference();
+        JitsiConference();
 
-        Conference(const Tag *tag);
+        JitsiConference(const Tag *tag);
 
-        Conference(const Conference &conference);
+        JitsiConference(const JitsiConference &JitsiConference);
 
         virtual Tag *tag() const;
 
         virtual const std::string &filterString() const;
 
         virtual StanzaExtension *newInstance(const Tag *tag) const {
-            return new Conference(tag);
+            return new JitsiConference(tag);
         }
 
-        virtual StanzaExtension *clone() const { return new Conference(*this); }
+        virtual StanzaExtension *clone() const { return new JitsiConference(*this); }
 
         bool disableRtc() { return m_disableRtx; }
 
@@ -74,24 +74,24 @@ namespace gloox {
 
     };
 
-    class GLOOX_API ConferenceHandler {
+    class GLOOX_API JitsiConferenceHandler {
     public:
         /**
          * Virtual destructor.
          */
-        virtual ~ConferenceHandler() {}
+        virtual ~JitsiConferenceHandler() {}
 
-        virtual void onStart(const Conference *j) = 0;
+        virtual void onStart(const JitsiConference *j) = 0;
     };
 
-    class GLOOX_API ConferenceManager : public IqHandler {
+    class GLOOX_API JitsiConferenceManager : public IqHandler {
     public:
-        ConferenceManager(ClientBase *parent, ConferenceHandler *ch);
+        JitsiConferenceManager(ClientBase *parent, JitsiConferenceHandler *ch);
 
-        virtual ~ConferenceManager();
+        virtual ~JitsiConferenceManager();
 
         void create(const JID &jid, const JID &focus, const std::string &machineUid,
-                    ConferenceHandler *handler);
+                    JitsiConferenceHandler *handler);
 
         // reimplemented from IqHandler
         virtual bool handleIq(const IQ &iq) override;
@@ -101,9 +101,9 @@ namespace gloox {
 
     private:
         ClientBase *m_parent;
-        ConferenceHandler *m_handler;
+        JitsiConferenceHandler *m_handler;
     };
 
 } // namespace gloox
 
-#endif // CONFERENCE_H
+#endif // JitsiConference_H
