@@ -11,7 +11,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        configuration: [ Debug, Release ]
+        configuration: [ debug, release ]
         os: [ ubuntu-latest, windows-latest ]
 
     steps:
@@ -30,17 +30,11 @@ jobs:
           mkdir ${{ github.workspace }}/${{ matrix.configuration }}
           mv ${{ github.workspace }}/build/src/${{ matrix.configuration }}/libgloox.so ${{ github.workspace }}/${{ matrix.configuration }}
 
-      - name: Pack on ubuntu with debug
-        if  : startsWith(matrix.os, 'ubuntu') && matrix.configuration == 'Debug'
+      - name: Pack on ubuntu
+        if  : startsWith(matrix.os, 'ubuntu')
         run : |
-          mkdir ${{ github.workspace }}/debug
-          mv ${{ github.workspace }}/build/src/libgloox.so ${{ github.workspace }}/debug
-
-      - name: Pack on ubuntu with release
-        if  : startsWith(matrix.os, 'ubuntu') && matrix.configuration == 'Release'
-        run : |
-          mkdir ${{ github.workspace }}/release
-          mv ${{ github.workspace }}/build/src/libgloox.so ${{ github.workspace }}/release
+          mkdir ${{ github.workspace }}/${{ matrix.configuration }}
+          mv ${{ github.workspace }}/build/src/libgloox.so ${{ github.workspace }}/${{ matrix.configuration }}
 
       - name: Release on win
         uses: actions/upload-artifact@v3
@@ -49,8 +43,7 @@ jobs:
           name: libgloox-win-x64
           path: |
             ${{ github.workspace }}/include
-            ${{ github.workspace }}/Debug/gloox.dll
-            ${{ github.workspace }}/Release/gloox.dll
+            ${{ github.workspace }}/${{ matrix.configuration }}/gloox.dll
 
       - name: Release on ubuntu
         uses: actions/upload-artifact@v3
@@ -59,5 +52,4 @@ jobs:
           name: libgloox-linux-x64
           path: |
             ${{ github.workspace }}/include
-            ${{ github.workspace }}/debug/libgloox.so
-            ${{ github.workspace }}/release/libgloox.so
+            ${{ github.workspace }}/${{ matrix.configuration }}/libgloox.so
