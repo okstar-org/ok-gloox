@@ -23,6 +23,4 @@ jobs:
           automatic_release_tag: "latest"
           prerelease: false
           files: |
-            ${{ github.workspace }}/README
-            ${{ github.workspace }}/COPYING
-            ${{ github.workspace }}/README.symbian
+            ${{ github.workspace }}/src/addresses.cpp
