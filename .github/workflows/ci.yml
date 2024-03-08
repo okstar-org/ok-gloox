@@ -25,14 +25,15 @@ jobs:
         run : cmake --build ${{ github.workspace }}/build --config ${{ matrix.configuration }}
 
       - name: Pack on win
+        if  : startsWith(matrix.os, 'windows')
         run : mv ${{ github.workspace }}/build/src/${{ matrix.configuration }}/libgloox.so ${{ github.workspace }}/${{ matrix.configuration }}
 
       - name: Pack on ubuntu with debug
-        if  : matrix.configuration == 'Debug'
+        if  : startsWith(matrix.os, 'ubuntu') && matrix.configuration == 'Debug'
         run : mv ${{ github.workspace }}/build/src/libgloox.so ${{ github.workspace }}/debug
 
       - name: Pack on ubuntu with release
-        if  : matrix.configuration == 'Release'
+        if  : startsWith(matrix.os, 'ubuntu') && matrix.configuration == 'Release'
         run : mv ${{ github.workspace }}/build/src/libgloox.so ${{ github.workspace }}/release
 
       - name: Release on win
