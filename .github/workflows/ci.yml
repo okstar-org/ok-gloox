@@ -28,7 +28,7 @@ jobs:
         uses: actions/upload-artifact@v3
         if  : startsWith(matrix.os, 'windows')
         with: 
-          name: libgloox-win-x64.zip
+          name: libgloox-win-x64
           path: |
             ${{ github.workspace }}/include
             ${{ github.workspace }}/build/src/${{ matrix.configuration }}/gloox.dll
@@ -37,7 +37,7 @@ jobs:
         uses: actions/upload-artifact@v3
         if  : startsWith(matrix.os, 'ubuntu')
         with: 
-          name: libgloox-linux-x64.tar.gz
+          name: libgloox-linux-x64
           path: |
             ${{ github.workspace }}/include
             ${{ github.workspace }}/build/src/libgloox.so
