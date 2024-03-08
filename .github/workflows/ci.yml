@@ -19,10 +19,21 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Configure CMake
-        run:  cmake -B${{ github.workspace }}/build -DCMAKE_BUILD_TYPE=${{ matrix.configuration }}
+        run : cmake -B${{ github.workspace }}/build -DCMAKE_BUILD_TYPE=${{ matrix.configuration }}
 
       - name: Build
-        run:  cmake --build ${{ github.workspace }}/build --config ${{ matrix.configuration }}
+        run : cmake --build ${{ github.workspace }}/build --config ${{ matrix.configuration }}
+
+      - name: Pack on win
+        run : mv ${{ github.workspace }}/build/src/${{ matrix.configuration }}/libgloox.so ${{ github.workspace }}/${{ matrix.configuration }}
+
+      - name: Pack on ubuntu with debug
+        if  : matrix.configuration == 'Debug'
+        run : mv ${{ github.workspace }}/build/src/libgloox.so ${{ github.workspace }}/debug
+
+      - name: Pack on ubuntu with release
+        if  : matrix.configuration == 'Release'
+        run : mv ${{ github.workspace }}/build/src/libgloox.so ${{ github.workspace }}/release
 
       - name: Release on win
         uses: actions/upload-artifact@v3
@@ -31,7 +42,8 @@ jobs:
           name: libgloox-win-x64
           path: |
             ${{ github.workspace }}/include
-            ${{ github.workspace }}/build/src/${{ matrix.configuration }}/gloox.dll
+            ${{ github.workspace }}/Debug/gloox.dll
+            ${{ github.workspace }}/Release/gloox.dll
 
       - name: Release on ubuntu
         uses: actions/upload-artifact@v3
@@ -40,4 +52,5 @@ jobs:
           name: libgloox-linux-x64
           path: |
             ${{ github.workspace }}/include
-            ${{ github.workspace }}/build/src/libgloox.so
+            ${{ github.workspace }}/debug/libgloox.so
+            ${{ github.workspace }}/release/libgloox.so
