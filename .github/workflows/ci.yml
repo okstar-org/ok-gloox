@@ -31,11 +31,13 @@ jobs:
           name: libgloox-win-x64.zip
           path: |
             ${{ github.workspace }}/include
-            ${{ github.workspace }}/build/${{ matrix.configuration }}/gloox.dll
+            ${{ github.workspace }}/build/src/${{ matrix.configuration }}/gloox.dll
 
       - name: Release on ubuntu
         uses: actions/upload-artifact@v3
         if  : startsWith(matrix.os, 'ubuntu')
         with: 
           name: libgloox-linux-x64.tar.gz
-          path: ${{ github.workspace }}/build/libgloox.so
+          path: |
+            ${{ github.workspace }}/include
+            ${{ github.workspace }}/build/src/libgloox.so
