@@ -1,8 +1,6 @@
 name: CI
 
-on: 
-  release:
-    types: [ created ]
+on: [ push ]
 
 jobs:
   build-and-test:
@@ -16,9 +14,6 @@ jobs:
         configuration: [ debug, release ]
         os: [ ubuntu-latest, windows-latest ]
 
-    permissions:
-      contents: write
-      
     steps:
       - name: Checkout Code
         uses: actions/checkout@v2
@@ -66,12 +61,3 @@ jobs:
             ${{ github.workspace }}/include
             ${{ github.workspace }}/${{ matrix.configuration }}/libgloox.a
             ${{ github.workspace }}/${{ matrix.configuration }}/libgloox.so
-
-      - name: Release
-        uses: marvinpinto/action-automatic-releases@latest
-        with:
-          repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          automatic_release_tag: "latest"
-          title: "Development Build"
-          prerelease: true
-          files: README
