@@ -1,6 +1,9 @@
 name: Release
 
-on: [ release ]
+on:
+  push:
+    tags:
+      - v[0-9]+.*
 
 jobs:
   build-and-release:
@@ -67,7 +70,7 @@ jobs:
         run : tar -czvf libgloox-linux-x64.tar ${{ github.workspace }}/include ${{ github.workspace }}/${{ matrix.configuration }}
 
       - name: Upload to release
-        uses: JasonEtco/upload-to-release@master
+        uses: taiki-e/upload-rust-binary-action@v1
         if  : startsWith(matrix.os, 'ubuntu')
         with:
           args: libgloox-linux-x64.tar
