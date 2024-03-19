@@ -73,6 +73,6 @@ jobs:
         uses: taiki-e/upload-rust-binary-action@v1
         if  : startsWith(matrix.os, 'ubuntu')
         with:
-          args: libgloox-linux-x64.tar
+          bin: libgloox-linux-x64
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
