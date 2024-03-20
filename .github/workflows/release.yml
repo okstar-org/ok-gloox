@@ -99,7 +99,7 @@ jobs:
           tag_name: ${{ github.ref }}
           release_name: Release ${{ github.ref }}
       
-      - name: Upload Release Asset
+      - name: Upload Release Asset on win
         uses: actions/upload-release-asset@v1
         env :
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -107,4 +107,14 @@ jobs:
           asset_path: libgloox-win-x64.zip
           asset_name: libgloox-win-x64.zip
           asset_content_type: application/tar
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+
+      - name: Upload Release Asset on ubuntu
+        uses: actions/upload-release-asset@v1
+        env :
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          asset_content_type: application/gzip
+          asset_path: libgloox-linux-x64.tar.gz
+          asset_name: libgloox-linux-x64.tar.gz
           upload_url: ${{ steps.create_release.outputs.upload_url }}
