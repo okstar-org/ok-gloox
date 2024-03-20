@@ -68,21 +68,29 @@ jobs:
   release:
 
     needs: build-and-artifact
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os  : [ ubuntu-latest, windows-latest ]
     
     steps:
-      - uses: actions/download-artifact@v3
+      - name: Format
+        id  : format
+        run : echo "::set-output name=format::$(if [ startsWith(matrix.os, 'windows') ]; then echo 'win'; else echo 'linux'; fi)"
+
+      - name: Suffix
+        id  : suffix
+        run : echo "::set-output name=suffix::$(if [ startsWith(matrix.os, 'windows') ]; then echo 'zip'; else echo 'tar'; fi)"
+
+      - name: Download Artifact
+        uses: actions/download-artifact@v3
         with:
-          name: libgloox-linux-x64
+          name: libgloox-${{ steps.format.outputs.format }}-x64
+          path: libgloox-${{ steps.format.outputs.format }}-x64
 
-      - name: Test1
-        run : ls
-
-      - uses: montudor/action-zip@v1
-        with:
-          args: zip -qq -r libgloox-linux-x64.zip debug release include
-
-      - name: Test2
+      - name: Test
+        if  : startsWith(matrix.os, 'ubuntu')
         run : ls
           
       - name: Create Release
@@ -101,7 +109,7 @@ jobs:
         env :
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          asset_path: libgloox-linux-x64.zip
-          asset_name: libgloox-linux-x64.zip
-          asset_content_type: application/zip
           upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_content_type: application/${{ steps.suffix.outputs.suffix }}
+          asset_path: libgloox-${{ steps.format.outputs.format }}-x64.${{ steps.suffix.outputs.suffix }}
+          asset_name: libgloox-${{ steps.format.outputs.format }}-x64.${{ steps.suffix.outputs.suffix }}
