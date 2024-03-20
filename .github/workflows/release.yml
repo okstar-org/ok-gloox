@@ -78,11 +78,11 @@ jobs:
     steps:
       - name: Format
         id  : format
-        run : echo "::set-output name=format::$(if [ startsWith(${{ matrix.os }}, 'windows') ]; then echo 'win'; else echo 'linux'; fi)"
+        run : echo "format=$(if [ ${{ matrix.os }} == 'windows-latest' ]; then echo 'win'; else echo 'linux'; fi)" >> $GITHUB_OUTPUT
 
       - name: Suffix
         id  : suffix
-        run : echo "::set-output name=suffix::$(if [ startsWith(${{ matrix.os }}, 'windows') ]; then echo 'zip'; else echo 'tar'; fi)"
+        run : echo "suffix=$(if [ ${{ matrix.os }} == 'windows-latest' ]; then echo 'zip'; else echo 'tar'; fi)" >> $GITHUB_OUTPUT
 
       - name: Download Artifact
         uses: actions/download-artifact@v3
