@@ -1,9 +1,6 @@
 name: Release
 
-on:
-  push:
-    tags:
-      - v[0-9]+.*
+on: [ pull_request ]
 
 jobs:
   build-and-artifact:
@@ -87,9 +84,12 @@ jobs:
           
       - name: Get Upload URL
         id  : get_upload_url
-        uses: eddiejaoude/github-action-get-release-upload-url@v1
-        with:
-          tag_name: ${{ github.ref }}
+        run : |
+          curl -L \
+          -H "Accept: application/vnd.github+json" \
+          -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+          -H "X-GitHub-Api-Version: 2022-11-28" \
+          https://api.github.com/repos/${{ github.owner }}/${{ github.repo }}/releases/${{ github.ref }}/TAG
       
       - name: Upload Release Asset on win
         uses: actions/upload-release-asset@v1
