@@ -10,9 +10,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v2
-        
       - name: Test
         run : |
           echo ${GITHUB_REPOSITORY}
@@ -26,6 +23,6 @@ jobs:
           -H "Accept: application/vnd.github+json" \
           -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
           -H "X-GitHub-Api-Version: 2022-11-28" \
-          https://api.github.com/repos/$GITHUB_REPOSITORY/releases/tags/${{ github.ref }}
+          https://api.github.com/repos/${GITHUB_REPOSITORY}/releases/tags/${{ github.ref }}
         env :
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
