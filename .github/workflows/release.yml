@@ -85,16 +85,11 @@ jobs:
         working-directory: libgloox-linux-x64
         run : tar -czvf libgloox-linux-x64.tar.gz debug release include
           
-      - name: Create Release
-        id  : create_release
-        uses: actions/create-release@v1
-        env :
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Get Upload URL
+        id  : get_upload_url
+        uses: eddiejaoude/github-action-get-release-upload-url@v1
         with:
-          draft: false
-          prerelease: false
           tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
       
       - name: Upload Release Asset on win
         uses: actions/upload-release-asset@v1
@@ -114,4 +109,4 @@ jobs:
           asset_content_type: application/gzip
           asset_name: libgloox-linux-x64.tar.gz
           asset_path: libgloox-linux-x64/libgloox-linux-x64.tar.gz
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          upload_url: ${{ steps.get_upload_url.outputs.upload_url }}
