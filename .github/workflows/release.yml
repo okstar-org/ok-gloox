@@ -66,8 +66,8 @@ jobs:
             ${{ github.workspace }}/${{ matrix.configuration }}/libgloox.so
 
   release:
-  
-    name: Upload Release Asset
+
+    needs: build-and-artifact
     runs-on: windows-latest
     
     steps:
