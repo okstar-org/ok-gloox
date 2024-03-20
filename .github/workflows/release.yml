@@ -32,14 +32,14 @@ jobs:
           cmake --build ${{ github.workspace }}/build_shared --config ${{ matrix.configuration }}
 
       - name: Pack on win
-        if  : startsWith({{ matrix.os }}, 'windows')
+        if  : startsWith(${{ matrix.os }}, 'windows')
         run : |
           mkdir ${{ github.workspace }}/${{ matrix.configuration }}
           mv ${{ github.workspace }}/build_static/src/${{ matrix.configuration }}/gloox.lib ${{ github.workspace }}/${{ matrix.configuration }}
           mv ${{ github.workspace }}/build_shared/src/${{ matrix.configuration }}/gloox.dll ${{ github.workspace }}/${{ matrix.configuration }}
 
       - name: Pack on ubuntu
-        if  : startsWith({{ matrix.os }}, 'ubuntu')
+        if  : startsWith(${{ matrix.os }}, 'ubuntu')
         run : |
           mkdir ${{ github.workspace }}/${{ matrix.configuration }}
           mv ${{ github.workspace }}/build_static/src/libgloox.a ${{ github.workspace }}/${{ matrix.configuration }}
@@ -47,7 +47,7 @@ jobs:
 
       - name: Upload on win
         uses: actions/upload-artifact@v3
-        if  : startsWith({{ matrix.os }}, 'windows')
+        if  : startsWith(${{ matrix.os }}, 'windows')
         with: 
           name: libgloox-win-x64
           path: |
@@ -57,7 +57,7 @@ jobs:
 
       - name: Upload on ubuntu
         uses: actions/upload-artifact@v3
-        if  : startsWith({{ matrix.os }}, 'ubuntu')
+        if  : startsWith(${{ matrix.os }}, 'ubuntu')
         with: 
           name: libgloox-linux-x64
           path: |
@@ -78,11 +78,11 @@ jobs:
     steps:
       - name: Format
         id  : format
-        run : echo "::set-output name=format::$(if [ startsWith({{ matrix.os }}, 'windows') ]; then echo 'win'; else echo 'linux'; fi)"
+        run : echo "::set-output name=format::$(if [ startsWith(${{ matrix.os }}, 'windows') ]; then echo 'win'; else echo 'linux'; fi)"
 
       - name: Suffix
         id  : suffix
-        run : echo "::set-output name=suffix::$(if [ startsWith({{ matrix.os }}, 'windows') ]; then echo 'zip'; else echo 'tar'; fi)"
+        run : echo "::set-output name=suffix::$(if [ startsWith(${{ matrix.os }}, 'windows') ]; then echo 'zip'; else echo 'tar'; fi)"
 
       - name: Download Artifact
         uses: actions/download-artifact@v3
@@ -91,7 +91,7 @@ jobs:
           path: libgloox-${{ steps.format.outputs.format }}-x64
 
       - name: Test
-        if  : startsWith({{ matrix.os }}, 'ubuntu')
+        if  : startsWith(${{ matrix.os }}, 'ubuntu')
         run : ls
           
       - name: Create Release
