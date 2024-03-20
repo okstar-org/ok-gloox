@@ -77,12 +77,6 @@ jobs:
     steps:
       - name: Download Artifact
         uses: actions/download-artifact@v3
-        with:
-          name: libgloox-linux-x64
-
-      - uses: montudor/action-zip@v1
-        with:
-          args: zip -qq -r libgloox-linux-x64.zip debug release include
 
       - name: Test
         run : ls
@@ -103,7 +97,7 @@ jobs:
         env :
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          asset_path: libgloox-linux-x64.zip
-          asset_name: libgloox-linux-x64.zip
+          asset_path: libgloox-win-x64.zip
+          asset_name: libgloox-win-x64.zip
           asset_content_type: application/zip
           upload_url: ${{ steps.create_release.outputs.upload_url }}
