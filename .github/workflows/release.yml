@@ -74,6 +74,10 @@ jobs:
       - uses: actions/download-artifact@v3
         with:
           name: libgloox-win-x64
+
+      - name: Test
+        run : |
+          dir
           
       - name: Create Release
         id  : create_release
