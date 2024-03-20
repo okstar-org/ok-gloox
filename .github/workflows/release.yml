@@ -68,20 +68,19 @@ jobs:
   release:
 
     needs: build-and-artifact
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     
     steps:
       - uses: actions/download-artifact@v3
         with:
-          name: libgloox-win-x64
+          name: libgloox-linux-x64
 
       - uses: montudor/action-zip@v1
         with:
-          args: zip -qq -r ${{ github.workspace }}\libgloox-win-x64.zip ${{ github.workspace }}\debug ${{ github.workspace }}\release ${{ github.workspace }}\include
+          args: zip -qq -r ${{ github.workspace }}\libgloox-linux-x64.zip ${{ github.workspace }}\debug ${{ github.workspace }}\release ${{ github.workspace }}\include
 
       - name: Test
-        run : |
-          dir
+        run : ls
           
       - name: Create Release
         id  : create_release
@@ -99,7 +98,7 @@ jobs:
         env :
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          asset_name: libgloox-win-x64.zip
+          asset_name: libgloox-linux-x64.zip
           asset_content_type: application/zip
-          asset_path: ${{ github.workspace }}\libgloox-win-x64.zip
+          asset_path: ${{ github.workspace }}\libgloox-linux-x64.zip
           upload_url: ${{ steps.create_release.outputs.upload_url }}
