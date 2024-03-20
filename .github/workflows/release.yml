@@ -83,7 +83,7 @@ jobs:
         with:
           draft: false
           prerelease: false
-          tag_name: ${{ github.ref }}--
+          tag_name: ${{ github.ref }}
           release_name: Release ${{ github.ref }}
       
       - name: Upload Release Asset
