@@ -97,5 +97,9 @@ jobs:
         with:
           asset_name: libgloox-win-x64.zip
           asset_content_type: application/zip
-          asset_path: ${{ github.workspace }}\libgloox-win-x64
           upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: |
+            ${{ github.workspace }}\debug
+            ${{ github.workspace }}\release
+            ${{ github.workspace }}\include
+          
