@@ -10,23 +10,17 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Test
-        run : |
-          echo ${GITHUB_REPOSITORY}
-          echo $GITHUB_REPOSITORY
-          echo ${{ github.ref }}
-
-      - id  : test
-        run : echo "test=$GITHUB_REPOSITORY" >> "$GITHUB_OUTPUT"
+      - name: Get Repo
+        id  : get_repo
+        run : echo "repo=${ GITHUB_REPOSITORY }" >> "$GITHUB_OUTPUT"
           
       - name: Get Upload URL
         id  : get_upload_url
-        shell: bash
         run : |
           curl -L \
           -H "X-GitHub-Api-Version: 2022-11-28" \
           -H "Accept: application/vnd.github+json" \
           -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-          https://api.github.com/repos/${{ steps.test.outputs.test }}/releases/tags/${{ github.ref }}
+          https://api.github.com/repos/${{ steps.get_repo.outputs.repo }}/releases/tags/${{ github.ref }}
         env :
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
