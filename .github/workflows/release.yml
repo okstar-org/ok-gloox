@@ -74,17 +74,16 @@ jobs:
       - name: Download Artifact
         uses: actions/download-artifact@v3
 
-      - uses: montudor/action-zip@v1
-        with: 
-          working-directory: libgloox-win-x64
-          args: zip -qq -r libgloox-win-x64.zip debug release include
+      - name: Install zip
+        uses: montudor/action-zip@v1
+
+      - name: Zip
+        working-directory: libgloox-win-x64
+        run: zip -qq -r libgloox-win-x64.zip debug release include
 
       - name: Tar
         working-directory: libgloox-linux-x64
         run : tar -czvf libgloox-linux-x64.tar.gz debug release include
-
-      - name: Test
-        run : ls -l
           
       - name: Create Release
         id  : create_release
