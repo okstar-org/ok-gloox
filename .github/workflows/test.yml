@@ -34,3 +34,13 @@ jobs:
           echo ${GITHUB_REF}
           echo ${GITHUB_REF#refs/}
           echo ${{ steps.get_upload_url.outputs.upload_url }}
+
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        env :
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          asset_path: README
+          asset_name: README
+          asset_content_type: application/zip
+          upload_url: ${{ steps.get_upload_url.outputs.upload_url }}
