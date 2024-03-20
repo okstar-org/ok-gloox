@@ -75,10 +75,12 @@ jobs:
         with:
           name: libgloox-win-x64
 
+      - uses: montudor/action-zip@v1
+        with:
+          args: zip -qq -r ${{ github.workspace }}\libgloox-win-x64.zip ${{ github.workspace }}\debug ${{ github.workspace }}\release ${{ github.workspace }}\include
+
       - name: Test
         run : |
-          dir
-          zip -r ${{ github.workspace }}\libgloox-win-x64.zip ${{ github.workspace }}\debug ${{ github.workspace }}\release ${{ github.workspace }}\include
           dir
           
       - name: Create Release
