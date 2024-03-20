@@ -12,7 +12,7 @@ jobs:
     steps:
       - name: Get Tag
         id  : get_tag
-        run : echo "tag=${github.ref#refs/*/}" >> "$GITHUB_OUTPUT"
+        run : echo "tag=${GITHUB_REF#refs/*/}" >> "$GITHUB_OUTPUT"
         
       - name: Get Repo
         id  : get_repo
