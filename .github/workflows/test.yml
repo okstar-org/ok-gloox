@@ -16,9 +16,9 @@ jobs:
       - name: Test
         shell: bash
         run : |
-          echo ${ GITHUB_REPOSITORY }
           echo ${GITHUB_REPOSITORY}
           echo $GITHUB_REPOSITORY
+          echo ${{ GITHUB_REPOSITORY }}
           echo ${{ github.ref }}
         env :
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
