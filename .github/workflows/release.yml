@@ -76,10 +76,12 @@ jobs:
 
       - uses: montudor/action-zip@v1
         with: 
-          args: zip -qq -r libgloox-win-x64.zip libgloox-win-x64/debug libgloox-win-x64/release libgloox-win-x64/include
+          working-directory: libgloox-win-x64
+          args: zip -qq -r libgloox-win-x64.zip debug release include
 
       - name: Tar
-        run : tar -czvf libgloox-linux-x64.tar.gz libgloox-linux-x64/debug libgloox-linux-x64/release libgloox-linux-x64/include
+        working-directory: libgloox-linux-x64
+        run : tar -czvf libgloox-linux-x64.tar.gz debug release include
 
       - name: Test
         run : ls -l
@@ -100,9 +102,9 @@ jobs:
         env :
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          asset_path: libgloox-win-x64.zip
           asset_name: libgloox-win-x64.zip
           asset_content_type: application/zip
+          asset_path: libgloox-win-x64/libgloox-win-x64.zip
           upload_url: ${{ steps.create_release.outputs.upload_url }}
 
       - name: Upload Release Asset on ubuntu
@@ -111,6 +113,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           asset_content_type: application/gzip
-          asset_path: libgloox-linux-x64.tar.gz
           asset_name: libgloox-linux-x64.tar.gz
+          asset_path: libgloox-linux-x64/libgloox-linux-x64.tar.gz
           upload_url: ${{ steps.create_release.outputs.upload_url }}
