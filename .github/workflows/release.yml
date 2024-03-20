@@ -79,7 +79,10 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: libgloox-linux-x64
-          path: libgloox-linux-x64.zip
+
+      - uses: montudor/action-zip@v1
+        with:
+          args: zip -qq -r libgloox-linux-x64.zip debug release include
 
       - name: Test
         run : ls
