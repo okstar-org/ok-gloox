@@ -32,14 +32,14 @@ jobs:
           cmake --build ${{ github.workspace }}/build_shared --config ${{ matrix.configuration }}
 
       - name: Pack on win
-        if  : startsWith(matrix.os, 'windows')
+        if  : ${{ startsWith(matrix.os, 'windows') }}
         run : |
           mkdir ${{ github.workspace }}/${{ matrix.configuration }}
           mv ${{ github.workspace }}/build_static/src/${{ matrix.configuration }}/gloox.lib ${{ github.workspace }}/${{ matrix.configuration }}
           mv ${{ github.workspace }}/build_shared/src/${{ matrix.configuration }}/gloox.dll ${{ github.workspace }}/${{ matrix.configuration }}
 
       - name: Pack on ubuntu
-        if  : startsWith(matrix.os, 'ubuntu')
+        if  : ! ${{ startsWith(matrix.os, 'windows') }}
         run : |
           mkdir ${{ github.workspace }}/${{ matrix.configuration }}
           mv ${{ github.workspace }}/build_static/src/libgloox.a ${{ github.workspace }}/${{ matrix.configuration }}
@@ -47,7 +47,7 @@ jobs:
 
       - name: Upload on win
         uses: actions/upload-artifact@v3
-        if  : startsWith(matrix.os, 'windows')
+        if  : ${{ startsWith(matrix.os, 'windows') }}
         with: 
           name: libgloox-win-x64
           path: |
@@ -57,7 +57,7 @@ jobs:
 
       - name: Upload on ubuntu
         uses: actions/upload-artifact@v3
-        if  : startsWith(matrix.os, 'ubuntu')
+        if  : ! ${{ startsWith(matrix.os, 'windows') }}
         with: 
           name: libgloox-linux-x64
           path: |
@@ -80,6 +80,9 @@ jobs:
         with:
           name: libgloox-win-x64
           path: libgloox-win-x64.zip
+
+      - name: Test
+        run : dir
           
       - name: Create Release
         id  : create_release
