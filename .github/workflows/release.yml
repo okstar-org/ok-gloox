@@ -68,11 +68,7 @@ jobs:
   release:
 
     needs: build-and-artifact
-    runs-on: ${{ matrix.os }}
-
-    strategy:
-      matrix:
-        os  : [ ubuntu-latest ]
+    runs-on: ubuntu-latest
     
     steps:
       - name: Download Artifact
