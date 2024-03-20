@@ -69,10 +69,21 @@ jobs:
         if  : startsWith(matrix.os, 'ubuntu')
         run : tar -czvf libgloox-linux-x64.tar ${{ github.workspace }}/include ${{ github.workspace }}/${{ matrix.configuration }}
 
-      - name: Upload to release
-        uses: taiki-e/upload-rust-binary-action@v1
+      - name: Set up Docker Buildx
         if  : startsWith(matrix.os, 'ubuntu')
+        uses: docker/setup-buildx-action@v3
+      
+      - name: Login to Docker Hub
+        if  : startsWith(matrix.os, 'ubuntu')
+        uses: docker/login-action@v3
         with:
-          bin: libgloox-linux-x64
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      
+      - name: Build and push
+        if  : startsWith(matrix.os, 'ubuntu')
+        uses: docker/build-push-action@v5
+        with:
+          push: true
+          context: libgloox-linux-x64.tar
+          tags: libgloox-linux-x64.tar:latest
