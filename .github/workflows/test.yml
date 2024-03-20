@@ -21,7 +21,7 @@ jobs:
       - name: Get Upload URL
         id  : get_upload_url
         run : |
-          echo "upload_url=`curl -L \
+          echo "upload_url=`curl -L -s \
           -H "X-GitHub-Api-Version: 2022-11-28" \
           -H "Accept: application/vnd.github+json" \
           -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
