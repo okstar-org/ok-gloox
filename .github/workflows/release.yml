@@ -106,6 +106,7 @@ jobs:
         env :
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
+          asset_content_type: application/zip
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: libgloox-${{ steps.format.outputs.format }}-x64
           asset_name: libgloox-${{ steps.format.outputs.format }}-x64.${{ steps.suffix.outputs.suffix }}
