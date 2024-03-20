@@ -78,8 +78,7 @@ jobs:
       - name: Download Artifact
         uses: actions/download-artifact@v3
         with:
-          name: libgloox-linux-x64
-          path: libgloox-linux-x64.tar
+          merge-multiple: true
 
       - name: Test
         run : ls -l
@@ -100,7 +99,7 @@ jobs:
         env :
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          asset_path: libgloox-linux-x64.tar
-          asset_name: libgloox-linux-x64.tar
+          asset_path: libgloox-win-x64
+          asset_name: libgloox-win-x64.zip
           asset_content_type: application/tar
           upload_url: ${{ steps.create_release.outputs.upload_url }}
