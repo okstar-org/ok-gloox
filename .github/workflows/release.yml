@@ -106,7 +106,7 @@ jobs:
         with:
           asset_path: libgloox-win-x64.zip
           asset_name: libgloox-win-x64.zip
-          asset_content_type: application/tar
+          asset_content_type: application/zip
           upload_url: ${{ steps.create_release.outputs.upload_url }}
 
       - name: Upload Release Asset on ubuntu
