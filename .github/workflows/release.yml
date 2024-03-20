@@ -69,6 +69,18 @@ jobs:
         if  : startsWith(matrix.os, 'ubuntu')
         run : tar -czvf libgloox-linux-x64.tar ${{ github.workspace }}/include ${{ github.workspace }}/${{ matrix.configuration }}
 
+      - name: Create Release
+        if  : startsWith(matrix.os, 'ubuntu')
+        id  : create_release
+        uses: actions/create-release@v1
+        env :
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          draft: false
+          prerelease: false
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+      
       - name: Upload Release Asset
         if  : startsWith(matrix.os, 'ubuntu')
         uses: actions/upload-release-asset@v1
