@@ -17,6 +17,7 @@ jobs:
         run : |
           echo ${ GITHUB_REPOSITORY }
           echo ${GITHUB_REPOSITORY}
+          echo $GITHUB_REPOSITORY
           echo ${{ github.ref }}
           
       - name: Get Upload URL
