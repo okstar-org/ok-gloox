@@ -6,7 +6,7 @@ on:
       - v[0-9]+.*
 
 jobs:
-  build-and-release:
+  build-and-artifact:
     
     name: ${{ matrix.os }} (${{ matrix.configuration }})
     runs-on: ${{ matrix.os }}
@@ -65,12 +65,17 @@ jobs:
             ${{ github.workspace }}/${{ matrix.configuration }}/libgloox.a
             ${{ github.workspace }}/${{ matrix.configuration }}/libgloox.so
 
-      - name: Test
-        if  : startsWith(matrix.os, 'ubuntu')
-        run : tar -czvf libgloox-linux-x64.tar ${{ github.workspace }}/include ${{ github.workspace }}/${{ matrix.configuration }}
-
+  release:
+  
+    name: Upload Release Asset
+    runs-on: windows-latest
+    
+    steps:
+      - uses: actions/download-artifact@main
+        with:
+          name: libgloox-win-x64
+          
       - name: Create Release
-        if  : startsWith(matrix.os, 'ubuntu')
         id  : create_release
         uses: actions/create-release@v1
         env :
@@ -82,12 +87,11 @@ jobs:
           release_name: Release ${{ github.ref }}
       
       - name: Upload Release Asset
-        if  : startsWith(matrix.os, 'ubuntu')
         uses: actions/upload-release-asset@v1
         env :
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          asset_name: libgloox-linux-x64.tar
-          asset_content_type: application/tar
-          asset_path: ./libgloox-linux-x64.tar
+          asset_name: libgloox-win-x64
+          asset_path: ./libgloox-win-x64.zip
+          asset_content_type: application/zip
           upload_url: ${{ steps.create_release.outputs.upload_url }}
