@@ -83,7 +83,7 @@ jobs:
         with:
           draft: false
           prerelease: false
-          tag_name: ${{ github.ref }}
+          tag_name: ${{ github.ref }}--
           release_name: Release ${{ github.ref }}
       
       - name: Upload Release Asset
@@ -92,6 +92,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           asset_name: libgloox-win-x64
-          asset_path: ./libgloox-win-x64.zip
           asset_content_type: application/zip
+          asset_path: ${{ github.workspace }}/libgloox-win-x64.zip
           upload_url: ${{ steps.create_release.outputs.upload_url }}
