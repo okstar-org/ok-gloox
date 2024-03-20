@@ -71,7 +71,7 @@ jobs:
     runs-on: windows-latest
     
     steps:
-      - uses: actions/download-artifact@main
+      - uses: actions/download-artifact@v3
         with:
           name: libgloox-win-x64
           
