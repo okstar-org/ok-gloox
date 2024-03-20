@@ -108,5 +108,4 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: libgloox-${{ steps.format.outputs.format }}-x64
-          asset_content_type: application/${{ steps.suffix.outputs.suffix }}
           asset_name: libgloox-${{ steps.format.outputs.format }}-x64.${{ steps.suffix.outputs.suffix }}
