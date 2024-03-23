@@ -1,9 +1,12 @@
-name: CI
+name: Release
 
-on: [ push ]
+on:
+  push:
+    tags:
+      - v[0-9]+.*
 
 jobs:
-  build-and-test:
+  build-and-artifact:
     
     name: ${{ matrix.os }} (${{ matrix.configuration }})
     runs-on: ${{ matrix.os }}
@@ -13,7 +16,7 @@ jobs:
       matrix:
         configuration: [ debug, release ]
         os: [ ubuntu-latest, windows-latest ]
-      
+
     steps:
       - name: Checkout Code
         uses: actions/checkout@v2
@@ -36,7 +39,7 @@ jobs:
           mv ${{ github.workspace }}/build_shared/src/${{ matrix.configuration }}/gloox.dll ${{ github.workspace }}/${{ matrix.configuration }}
 
       - name: Pack on ubuntu
-        if  : startsWith(matrix.os, 'ubuntu')
+        if  : startsWith(matrix.os, 'windows') != true
         run : |
           mkdir ${{ github.workspace }}/${{ matrix.configuration }}
           mv ${{ github.workspace }}/build_static/src/libgloox.a ${{ github.workspace }}/${{ matrix.configuration }}
@@ -54,7 +57,7 @@ jobs:
 
       - name: Upload on ubuntu
         uses: actions/upload-artifact@v3
-        if  : startsWith(matrix.os, 'ubuntu')
+        if  : startsWith(matrix.os, 'windows') != true
         with: 
           name: libgloox-linux-x64
           path: |
@@ -62,7 +65,61 @@ jobs:
             ${{ github.workspace }}/${{ matrix.configuration }}/libgloox.a
             ${{ github.workspace }}/${{ matrix.configuration }}/libgloox.so
 
-      - name: Release
-        uses: toolmantim/release-drafter@v5.2.0
+  release:
+
+    needs: build-and-artifact
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Download Artifact
+        uses: actions/download-artifact@v3
+
+      - name: Install zip
+        uses: montudor/action-zip@v1
+
+      - name: Zip
+        working-directory: libgloox-win-x64
+        run: zip -qq -r libgloox-win-x64.zip debug release include
+
+      - name: Tar
+        working-directory: libgloox-linux-x64
+        run : tar -czvf libgloox-linux-x64.tar.gz debug release include
+          
+      - name: Get Tag
+        id  : get_tag
+        run : echo "tag=${GITHUB_REF#refs/}" >> "$GITHUB_OUTPUT"
+        
+      - name: Get Repo
+        id  : get_repo
+        run : echo "repo=${GITHUB_REPOSITORY}" >> "$GITHUB_OUTPUT"
+          
+      - name: Get Upload URL
+        id  : get_upload_url
+        run : |
+          echo "upload_url=`curl -L -s \
+          -H "X-GitHub-Api-Version: 2022-11-28" \
+          -H "Accept: application/vnd.github+json" \
+          -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+          https://api.github.com/repos/${{ steps.get_repo.outputs.repo }}/releases/${{ steps.get_tag.outputs.tag }} | jq -r '.upload_url'`" >> "$GITHUB_OUTPUT"
         env :
-          GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Upload Release Asset on win
+        uses: actions/upload-release-asset@v1
+        env :
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          asset_name: libgloox-win-x64.zip
+          asset_content_type: application/zip
+          asset_path: libgloox-win-x64/libgloox-win-x64.zip
+          upload_url: ${{ steps.get_upload_url.outputs.upload_url }}
+
+      - name: Upload Release Asset on ubuntu
+        uses: actions/upload-release-asset@v1
+        env :
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          asset_content_type: application/gzip
+          asset_name: libgloox-linux-x64.tar.gz
+          asset_path: libgloox-linux-x64/libgloox-linux-x64.tar.gz
+          upload_url: ${{ steps.get_upload_url.outputs.upload_url }}
