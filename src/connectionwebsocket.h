@@ -21,6 +21,7 @@
 
 #if defined(_WIN32) || defined (_WIN32_WCE)
 #include <windows.h>
+#include <Wincrypt.h>
 #endif
 
 #include "gloox.h"
