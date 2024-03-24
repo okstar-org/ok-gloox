@@ -334,7 +334,7 @@ namespace gloox
 
     /* acquire credentials */
     error = AcquireCredentialsHandle( 0,
-                                      const_cast<LPWSTR>(UNISP_NAME),
+                                      (LPWSTR)UNISP_NAME,
                                       SECPKG_CRED_OUTBOUND,
                                       0,
                                       &tlscred,
