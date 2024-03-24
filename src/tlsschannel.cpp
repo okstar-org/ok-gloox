@@ -332,6 +332,8 @@ namespace gloox
         break;
     }
 
+
+
     /* acquire credentials */
     error = AcquireCredentialsHandle( 0,
                                       (LPWSTR)UNISP_NAME,
