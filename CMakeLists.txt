@@ -2,8 +2,11 @@ cmake_minimum_required(VERSION 3.22)
 
 project( gloox )
 
-if (WIN32 AND CMAKE_BUILD_TYPE STREQUAL Debug)
-add_definitions(-D_ITERATOR_DEBUG_LEVEL=0) 
+if (WIN32)
+    add_compile_options(/utf-8)
+    if (CMAKE_BUILD_TYPE STREQUAL Debug)
+        add_definitions(-D_ITERATOR_DEBUG_LEVEL=0)
+    endif ()
 endif()
 
 include( FindZLIB )
