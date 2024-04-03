@@ -54,8 +54,8 @@
 
 #ifdef _WIN
   #ifdef UNICODE
-      typedef LPWSTR LPTSTR
+      typedef LPWSTR LPTSTR;
   #else
-      typedef LPSTR LPTSTR
+      typedef LPSTR LPTSTR;
   #endif
 #endif

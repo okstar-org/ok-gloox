@@ -336,7 +336,7 @@ namespace gloox
 
     /* acquire credentials */
     error = AcquireCredentialsHandle( 0,
-                                      UNISP_NAME,
+                                      (LPTSTR)UNISP_NAME,
                                       SECPKG_CRED_OUTBOUND,
                                       0,
                                       &tlscred,
