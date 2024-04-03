@@ -14,12 +14,13 @@ if( ZLIB_FOUND )
     write_file( ${CMAKE_CURRENT_SOURCE_DIR}/config.h "#define HAVE_ZLIB 1" APPEND)
 endif( ZLIB_FOUND)
 
-find_package(OpenSSL)
-if(OpenSSL_FOUND)
-    message(STATUS "Find OpenSSL")
-    set(LIBS ${LIBS} OpenSSL::SSL OpenSSL::Crypto)
+if (UNIX)
+    find_package(OpenSSL)
+    if(OpenSSL_FOUND)
+        message(STATUS "Find OpenSSL")
+        set(LIBS ${LIBS} ${OpenSSL_LIBRARIES})
+    endif ()
 endif ()
-
 
 include( CheckFunctionExists )
 
