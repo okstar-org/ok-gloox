@@ -14,6 +14,14 @@
 
 #ifdef HAVE_WINTLS
 
+#ifdef _WIN
+  #ifdef UNICODE
+      typedef LPWSTR LPTSTR;
+  #else
+      typedef LPSTR LPTSTR;
+  #endif
+#endif
+
 #include <stdio.h> // just for debugging output
 
 namespace gloox
