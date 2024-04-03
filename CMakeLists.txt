@@ -7,8 +7,13 @@ if (WIN32)
     add_definitions(-D_WIN -DUNICODE)
 
     if (CMAKE_BUILD_TYPE STREQUAL Debug)
+        set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MTd /utf-8")
         add_definitions(-D_ITERATOR_DEBUG_LEVEL=0)
     endif ()
+
+    if(CMAKE_BUILD_TYPE STREQUAL Release)
+        set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /DNDEBUG /MT /utf-8")
+    endif()
 endif()
 
 include( FindZLIB )
