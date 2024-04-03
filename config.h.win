@@ -51,3 +51,9 @@
 
 /* It seems it is necessary to include this to properly use getnameinfo() */
 #define _WIN32_WINNT 0x501
+
+#ifdef UNICODE
+    typedef LPWSTR LPTSTR;
+#else
+    typedef LPSTR LPTSTR;
+#endif
