@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.22)
 project( gloox )
 
 if (WIN32)
-    add_compile_options(/utf-8)
+    set(CMAKE_CXX_FALGS ${CMAKE_CXX_FALGS} /utf-8)
     if (CMAKE_BUILD_TYPE STREQUAL Debug)
         add_definitions(-D_ITERATOR_DEBUG_LEVEL=0)
     endif ()
@@ -34,7 +34,7 @@ if( SETSOCKOPT_EXISTS )
     write_file( ${CMAKE_CURRENT_SOURCE_DIR}/config.h "#define HAVE_SETSOCKOPT 1")
 endif( SETSOCKOPT_EXISTS )
 
-
+message(STATUS "CMAKE_CXX_FALGS=${CMAKE_CXX_FALGS}")
 add_subdirectory( src )
 
 
