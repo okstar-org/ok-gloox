@@ -42,6 +42,8 @@ if( SETSOCKOPT_EXISTS )
 endif( SETSOCKOPT_EXISTS )
 
 message(STATUS "CMAKE_CXX_FALGS=${CMAKE_CXX_FALGS}")
+message(STATUS "CMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}")
+
 add_subdirectory( src )
 
 
