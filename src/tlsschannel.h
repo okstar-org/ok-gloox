@@ -18,14 +18,6 @@
 #include "config.h"
 
 #ifdef HAVE_WINTLS
-#ifdef _WIN
-  #ifdef UNICODE
-      typedef LPWSTR LPTSTR;
-  #else
-      typedef LPSTR LPTSTR;
-  #endif
-#endif
-
 #include <ctime>
 
 #define SECURITY_WIN32
