@@ -29,6 +29,7 @@
 #endif
 
 #include <string.h>
+#include <iostream>
 
 namespace gloox
 {
@@ -71,8 +72,8 @@ namespace gloox
     setClientCert( clientKey, clientCerts );
     setCACerts( cacerts );
 
-    if( !SSL_CTX_set_cipher_list( m_ctx, "HIGH:MEDIUM:AES:@STRENGTH" ) )
-      return false;
+//    if( !SSL_CTX_set_cipher_list( m_ctx, "HIGH:MEDIUM:AES:@STRENGTH" ) )
+//      return false;
 
     m_ssl = SSL_new( m_ctx );
     if( !m_ssl )
@@ -191,7 +192,9 @@ namespace gloox
           break;
       }
 
-      switch( SSL_get_error( m_ssl, ret ) )
+      int err = SSL_get_error( m_ssl, ret );
+      std::cout<<"SSL_get_error is:"<< ERR_error_string(SSL_ERROR_SSL, NULL)<<std::endl;
+      switch( err )
       {
         case SSL_ERROR_WANT_READ:
         case SSL_ERROR_WANT_WRITE:
