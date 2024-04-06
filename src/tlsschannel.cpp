@@ -289,7 +289,7 @@ namespace gloox
     tlscred.grbitEnabledProtocols = SP_PROT_TLS1_CLIENT | SP_PROT_TLS1_1_CLIENT | SP_PROT_TLS1_2_CLIENT | SP_PROT_TLS1_3_CLIENT;;
     /* acquire credentials */
     error = AcquireCredentialsHandle( 0,
-                                      UNISP_NAME,
+                                      (LPTSTR)UNISP_NAME,
                                       SECPKG_CRED_OUTBOUND,
                                       0,
                                       &tlscred,

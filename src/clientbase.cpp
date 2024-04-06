@@ -622,7 +622,8 @@ namespace gloox
           ident = &identity;
         }
 
-        AcquireCredentialsHandleW( 0, L"NTLM", SECPKG_CRED_OUTBOUND, 0, ident, 0, 0, &m_credHandle, 0 );
+        AcquireCredentialsHandleW( 0, const_cast<LPWSTR>( L"NTLM" ), SECPKG_CRED_OUTBOUND, 0,
+                                   ident, 0, 0, &m_credHandle, 0 );
 
         if( usernameW != 0 )
         {

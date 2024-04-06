@@ -133,7 +133,7 @@ namespace gloox
 
   void Client::init()
   {
-    m_rosterManager = new RosterManager( this );
+//    m_rosterManager = new RosterManager( this );
     m_disco->setIdentity( "client", "bot" );
     registerStanzaExtension( new ResourceBind( 0 ) );
     registerStanzaExtension( new Capabilities() );
