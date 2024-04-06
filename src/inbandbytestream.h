@@ -86,10 +86,8 @@ namespace gloox
       // reimplemented from MessageHandler
       virtual void handleMessage( const Message& msg, MessageSession* session = 0 );
 
-    private:
-#ifdef INBANDBYTESTREAM_TEST
     public:
-#endif
+
       enum IBBType
       {
         IBBOpen,

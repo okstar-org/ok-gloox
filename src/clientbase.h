@@ -715,10 +715,8 @@ namespace gloox
       // reimplemented from TLSHandler
       virtual void handleHandshakeResult( const TLSBase* base, bool success, CertInfo &certinfo );
 
-    protected:
-#ifdef CLIENTBASE_TEST
-    public:
-#endif
+
+  public:
       /**
        * This function is called when resource binding yieled an error.
        * @param error A pointer to an Error object that contains more
