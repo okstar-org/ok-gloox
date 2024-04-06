@@ -12,8 +12,6 @@
 
 
 
-#if !defined( GLOOX_MINIMAL ) || defined( WANT_CONNECTIONTCPSERVER )
-
 #include "gloox.h"
 
 #include "config.h"
@@ -27,7 +25,12 @@
 #include "mutexguard.h"
 #include "util.h"
 
-#if !defined( _WIN32 ) && !defined( _WIN32_WCE )
+#ifdef __MINGW32__
+# include <winsock2.h>
+# include <ws2tcpip.h>
+#endif
+
+#if ( !defined( _WIN32 ) && !defined( _WIN32_WCE ) ) || defined( __SYMBIAN32__ )
 # include <netinet/in.h>
 # include <arpa/nameser.h>
 # include <resolv.h>
@@ -41,7 +44,7 @@
 # include <errno.h>
 #endif
 
-#if defined( _WIN32 ) || defined( __MINGW32__ )
+#if defined( _WIN32 ) && !defined( __SYMBIAN32__ )
 # include <winsock2.h>
 # include <ws2tcpip.h>
 #elif defined( _WIN32_WCE )
@@ -79,7 +82,7 @@ namespace gloox
     return new ConnectionTCPServer( m_connectionHandler, m_logInstance, m_server, m_port );
   }
 
-  ConnectionError ConnectionTCPServer::connect( int timeout )
+  ConnectionError ConnectionTCPServer::connect()
   {
     util::MutexGuard mg( &m_sendMutex );
 
@@ -96,7 +99,7 @@ namespace gloox
 
 #ifdef HAVE_SETSOCKOPT
     int buf = 0;
-#if defined( _WIN32 )
+#if defined( _WIN32 ) && !defined( __SYMBIAN32__ )
     int bufbytes = sizeof( int );
 #else
     socklen_t bufbytes = sizeof( int );
@@ -123,7 +126,7 @@ namespace gloox
       err = errno;
       std::string message = "getaddrinfo() for " + ( m_server.empty() ? std::string( "*" ) : m_server )
           + " (" + util::int2string( m_port ) + ") failed. "
-#if defined( _WIN32 )
+#if defined( _WIN32 ) && !defined( __SYMBIAN32__ )
           "WSAGetLastError: " + util::int2string( ::WSAGetLastError() );
 #else
           + strerror( err ) + " (errno: " + util::int2string( err ) + ")";
@@ -139,7 +142,7 @@ namespace gloox
       err = errno;
       std::string message = "bind() to " + ( m_server.empty() ? std::string( "*" ) : m_server )
           + " (" + /*inet_ntoa( local.sin_addr ) + ":" +*/ util::int2string( m_port ) + ") failed. "
-#if defined( _WIN32 )
+#if defined( _WIN32 ) && !defined( __SYMBIAN32__ )
           "WSAGetLastError: " + util::int2string( ::WSAGetLastError() );
 #else
           + strerror( err ) + " (errno: " + util::int2string( err ) + ")";
@@ -155,7 +158,7 @@ namespace gloox
       err = errno;
       std::string message = "listen() on " + ( m_server.empty() ? std::string( "*" ) : m_server )
           + " (" + /*inet_ntoa( local.sin_addr ) +*/ ":" + util::int2string( m_port ) + ") failed. "
-#if defined( _WIN32 )
+#if defined( _WIN32 ) && !defined( __SYMBIAN32__ )
           "WSAGetLastError: " + util::int2string( ::WSAGetLastError() );
 #else
           + strerror( err ) + " (errno: " + util::int2string( err ) + ")";
@@ -188,7 +191,7 @@ namespace gloox
 
     struct sockaddr_storage they;
     int addr_size = sizeof( struct sockaddr_storage );
-#if defined( _WIN32 )
+#if defined( _WIN32 ) && !defined( __SYMBIAN32__ )
     int newfd = static_cast<int>( accept( static_cast<SOCKET>( m_socket ), reinterpret_cast<struct sockaddr*>( &they ), &addr_size ) );
 #else
     int newfd = accept( m_socket, reinterpret_cast<struct sockaddr*>( &they ), reinterpret_cast<socklen_t*>( &addr_size ) );
@@ -212,5 +215,3 @@ namespace gloox
   }
 
 }
-
-#endif // GLOOX_MINIMAL

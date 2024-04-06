@@ -14,14 +14,6 @@
 
 #ifdef HAVE_WINTLS
 
-#ifdef _WIN
-  #ifdef UNICODE
-      typedef LPWSTR LPTSTR;
-  #else
-      typedef LPSTR LPTSTR;
-  #endif
-#endif
-
 #include <stdio.h> // just for debugging output
 
 namespace gloox
@@ -44,7 +36,6 @@ namespace gloox
     if( !m_handler )
       return false;
 
-    m_mutexCryptOp.lock();
     //printf(">> SChannel::encrypt()\n");
     std::string data_copy = data;
 
@@ -54,14 +45,12 @@ namespace gloox
 
     PBYTE e_iobuffer = static_cast<PBYTE>( malloc( cbIoBufferLength ) );
 
-    if( e_iobuffer == 0 )
+    if( e_iobuffer == NULL )
     {
       //printf("**** Out of memory (2)\n");
       cleanup();
       if( !m_secure )
         m_handler->handleHandshakeResult( this, false, m_certInfo );
-
-      m_mutexCryptOp.unlock();
       return false;
     }
     PBYTE e_message = e_iobuffer + m_sizes.cbHeader;
@@ -108,16 +97,13 @@ namespace gloox
         e_iobuffer = 0;
         if( !m_secure )
           m_handler->handleHandshakeResult( this, false, m_certInfo );
-
         cleanup();
-        m_mutexCryptOp.unlock();
         return false;
       }
     }
     while( data_copy.size() > 0 );
     free( e_iobuffer );
     e_iobuffer = 0;
-    m_mutexCryptOp.unlock();
     return true;
   }
 
@@ -130,11 +116,7 @@ namespace gloox
     //printf(">> SChannel::decrypt()\n");
     if( m_secure )
     {
-      m_mutexDeCryptOp.lock();
-
-      //m_buffer += data;
-
-      m_bufferDecrypt += data;
+      m_buffer += data;
 
       SecBuffer buffer[4];
       SecBufferDesc buffer_desc;
@@ -142,14 +124,12 @@ namespace gloox
       bool wantNewBufferSize = false;
 
       PBYTE e_iobuffer = static_cast<PBYTE>( malloc( cbIoBufferLength ) );
-      if( e_iobuffer == 0 )
+      if( e_iobuffer == NULL )
       {
         //printf("**** Out of memory (2)\n");
         cleanup();
         if( !m_secure )
           m_handler->handleHandshakeResult( this, false, m_certInfo );
-
-        m_mutexDeCryptOp.unlock();
         return 0;
       }
       SECURITY_STATUS e_status;
@@ -167,24 +147,20 @@ namespace gloox
           else
           {
             //printf("**** Out of memory (2)\n");
-
-            free( e_iobuffer );
             cleanup();
             m_handler->handleHandshakeResult( this, false, m_certInfo );
-            m_mutexDeCryptOp.unlock();
             return 0;
           }
         }
 
         // copy data chunk from tmp string into encryption memory buffer
-        memcpy( e_iobuffer, m_bufferDecrypt.data(), m_bufferDecrypt.size() > cbIoBufferLength
-                                                      ? cbIoBufferLength
-                                                      : m_bufferDecrypt.size() );
+        memcpy( e_iobuffer, m_buffer.data(), m_buffer.size() >
+               cbIoBufferLength ? cbIoBufferLength : m_buffer.size() );
 
         buffer[0].pvBuffer     = e_iobuffer;
-        buffer[0].cbBuffer     = static_cast<unsigned long>( m_bufferDecrypt.size() > cbIoBufferLength
-                                                              ? cbIoBufferLength
-                                                              : m_bufferDecrypt.size() );
+        buffer[0].cbBuffer     = static_cast<unsigned long>( m_buffer.size() > cbIoBufferLength
+                                                               ? cbIoBufferLength
+                                                               : m_buffer.size() );
         buffer[0].BufferType   = SECBUFFER_DATA;
         buffer[1].cbBuffer = buffer[2].cbBuffer = buffer[3].cbBuffer = 0;
         buffer[1].BufferType = buffer[2].BufferType = buffer[3].BufferType  = SECBUFFER_EMPTY;
@@ -201,16 +177,16 @@ namespace gloox
         //     printf("buffer[%d].cbBuffer: %d   \t%d\n", n, buffer[n].cbBuffer, buffer[n].BufferType);
 
         // Locate data and (optional) extra buffers.
-        SecBuffer* pDataBuffer  = 0;
-        SecBuffer* pExtraBuffer = 0;
+        SecBuffer* pDataBuffer  = NULL;
+        SecBuffer* pExtraBuffer = NULL;
         for( int i = 1; i < 4; i++ )
         {
-          if( pDataBuffer == 0 && buffer[i].BufferType == SECBUFFER_DATA )
+          if( pDataBuffer == NULL && buffer[i].BufferType == SECBUFFER_DATA )
           {
             pDataBuffer = &buffer[i];
             //printf("buffer[%d].BufferType = SECBUFFER_DATA\n",i);
           }
-          if( pExtraBuffer == 0 && buffer[i].BufferType == SECBUFFER_EXTRA )
+          if( pExtraBuffer == NULL && buffer[i].BufferType == SECBUFFER_EXTRA )
           {
             pExtraBuffer = &buffer[i];
           }
@@ -220,14 +196,14 @@ namespace gloox
           std::string decrypted( reinterpret_cast<const char*>( pDataBuffer->pvBuffer ),
                                  pDataBuffer->cbBuffer );
           m_handler->handleDecryptedData( this, decrypted );
-          if( pExtraBuffer == 0 )
+          if( pExtraBuffer == NULL )
           {
-            m_bufferDecrypt.erase( 0, processed_data );
+            m_buffer.erase( 0, processed_data );
           }
           else
           {
             //std::cout << "m_buffer.size() = " << pExtraBuffer->cbBuffer << std::endl;
-            m_bufferDecrypt.erase( 0, processed_data - pExtraBuffer->cbBuffer );
+            m_buffer.erase( 0, processed_data - pExtraBuffer->cbBuffer );
             //std::cout << "m_buffer.size() = " << m_buffer.size() << std::endl;
 
             cbIoBufferLength = m_sizes.cbHeader + m_sizes.cbMaximumMessage + m_sizes.cbTrailer;
@@ -236,7 +212,7 @@ namespace gloox
         }
         else if( e_status == SEC_E_INCOMPLETE_MESSAGE )
         {
-          if( cbIoBufferLength < 200000 && m_bufferDecrypt.size() > cbIoBufferLength )
+          if( cbIoBufferLength < 200000 && m_buffer.size() > cbIoBufferLength )
           {
             cbIoBufferLength += 1000;
             wantNewBufferSize = true;
@@ -253,15 +229,12 @@ namespace gloox
           //std::cout << "decrypt !!!ERROR!!!\n";
           if( !m_secure )
             m_handler->handleHandshakeResult( this, false, m_certInfo );
-
           cleanup();
           break;
         }
       }
-      while( m_bufferDecrypt.size() != 0 );
-
+      while( m_buffer.size() != 0 );
       free( e_iobuffer );
-      m_mutexDeCryptOp.unlock();
     }
     else
     {
@@ -277,7 +250,6 @@ namespace gloox
       return;
 
     m_buffer = "";
-    m_bufferDecrypt = "";
     if( !m_cleanedup )
     {
       m_valid = false;
@@ -314,37 +286,10 @@ namespace gloox
     /* initialize TLS credential */
     memset( &tlscred, 0, sizeof( SCHANNEL_CRED ) );
     tlscred.dwVersion = SCHANNEL_CRED_VERSION;
-    switch( m_tlsVersion )
-    {
-//      case SSLv3:
-//        tlscred.grbitEnabledProtocols = SP_PROT_SSL3_CLIENT | SP_PROT_TLS1_CLIENT | SP_PROT_TLS1_1_CLIENT | SP_PROT_TLS1_2_CLIENT | SP_PROT_TLS1_3_CLIENT;
-//        break;
-      default:
-      case TLSv1:
-        tlscred.grbitEnabledProtocols = SP_PROT_TLS1_CLIENT | SP_PROT_TLS1_1_CLIENT | SP_PROT_TLS1_2_CLIENT | SP_PROT_TLS1_3_CLIENT;
-        break;
-      case TLSv1_1:
-        tlscred.grbitEnabledProtocols = SP_PROT_TLS1_1_CLIENT | SP_PROT_TLS1_2_CLIENT | SP_PROT_TLS1_3_CLIENT;
-        break;
-      case TLSv1_2:
-        tlscred.grbitEnabledProtocols = SP_PROT_TLS1_2_CLIENT | SP_PROT_TLS1_3_CLIENT;
-        break;
-      case TLSv1_3:
-        tlscred.grbitEnabledProtocols = SP_PROT_TLS1_3_CLIENT;
-        break;
-      case DTLSv1:
-        tlscred.grbitEnabledProtocols = SP_PROT_DTLS1_0_CLIENT | SP_PROT_DTLS1_2_CLIENT;
-        break;
-      case DTLSv1_2:
-        tlscred.grbitEnabledProtocols = SP_PROT_DTLS1_2_CLIENT;
-        break;
-    }
-
-
-
+    tlscred.grbitEnabledProtocols = SP_PROT_TLS1_CLIENT | SP_PROT_TLS1_1_CLIENT | SP_PROT_TLS1_2_CLIENT | SP_PROT_TLS1_3_CLIENT;;
     /* acquire credentials */
     error = AcquireCredentialsHandle( 0,
-                                      (LPTSTR)UNISP_NAME,
+                                      UNISP_NAME,
                                       SECPKG_CRED_OUTBOUND,
                                       0,
                                       &tlscred,
@@ -383,7 +328,7 @@ namespace gloox
                                          &m_context,
                                          &obufs,
                                          &return_flags,
-                                         0 );
+                                         NULL );
       //print_error(error, "handshake() ~ InitializeSecurityContext()");
 
       if( error == SEC_I_CONTINUE_NEEDED )
@@ -493,7 +438,7 @@ namespace gloox
          */
 
         // STUFF TO SEND??
-        if( obuf[0].cbBuffer != 0 && obuf[0].pvBuffer != 0 )
+        if( obuf[0].cbBuffer != 0 && obuf[0].pvBuffer != NULL )
         {
           std::string senddata( static_cast<char*>(obuf[0].pvBuffer), obuf[0].cbBuffer );
           FreeContextBuffer( obuf[0].pvBuffer );
@@ -546,11 +491,9 @@ namespace gloox
   {
 #ifdef HAVE_WINTLS_CHANNEL_BINDING // see ../config.h.win if the following doesn't compile
     SecPkgContext_Bindings buf;
-    if( QueryContextAttributes( static_cast<PCtxtHandle>( &m_context ),
-                                SECPKG_ATTR_UNIQUE_BINDINGS, &buf ) == SEC_E_OK )
+    if( QueryContextAttributes( &m_context, SECPKG_ATTR_UNIQUE_BINDINGS, &buf ) == SEC_E_OK )
     {
-      return std::string( buf->Bindings[buf->Bindings.dwApplicationDataOffset],
-                          buf->Bindings.cbApplicationDataLength );
+      return std::string( buf->Bindings[buf->Bindings.dwApplicationDataOffset], buf->Bindings.cbApplicationDataLength );
     }
 #endif
     return EmptyString;
@@ -599,18 +542,18 @@ namespace gloox
     CERT_CHAIN_POLICY_PARA policyParameter;
     CERT_CHAIN_POLICY_STATUS policyStatus;
 
-    PCCERT_CONTEXT remoteCertContext = 0;
-    PCCERT_CHAIN_CONTEXT chainContext = 0;
+    PCCERT_CONTEXT remoteCertContext = NULL;
+    PCCERT_CHAIN_CONTEXT chainContext = NULL;
     CERT_CHAIN_PARA chainParameter;
     PSTR serverName = const_cast<char*>( m_server.c_str() );
 
-    PWSTR uServerName = 0;
+    PWSTR uServerName = NULL;
     DWORD csizeServerName;
 
     LPSTR Usages[] = {
-      const_cast<LPSTR>( szOID_PKIX_KP_SERVER_AUTH ),
-      const_cast<LPSTR>( szOID_SERVER_GATED_CRYPTO ),
-      const_cast<LPSTR>( szOID_SGC_NETSCAPE )
+      szOID_PKIX_KP_SERVER_AUTH,
+      szOID_SERVER_GATED_CRYPTO,
+      szOID_SGC_NETSCAPE
     };
     DWORD cUsages = sizeof( Usages ) / sizeof( LPSTR );
 
@@ -627,9 +570,9 @@ namespace gloox
 
       // unicode conversation
       // calculating unicode server name size
-      csizeServerName = MultiByteToWideChar( CP_ACP, 0, serverName, -1, 0, 0 );
+      csizeServerName = MultiByteToWideChar( CP_ACP, 0, serverName, -1, NULL, 0 );
       uServerName = reinterpret_cast<WCHAR *>( malloc( csizeServerName * sizeof( WCHAR ) ) );
-      if( uServerName == 0 )
+      if( uServerName == NULL )
       {
         //printf("SEC_E_INSUFFICIENT_MEMORY ~ Not enough memory!!!\n");
         break;
@@ -650,8 +593,8 @@ namespace gloox
       chainParameter.RequestedUsage.Usage.cUsageIdentifier     = cUsages;
       chainParameter.RequestedUsage.Usage.rgpszUsageIdentifier = Usages;
 
-      if( !CertGetCertificateChain( 0, remoteCertContext, 0, remoteCertContext->hCertStore,
-                                    &chainParameter, 0, 0, &chainContext ) )
+      if( !CertGetCertificateChain( NULL, remoteCertContext, NULL, remoteCertContext->hCertStore,
+                                    &chainParameter, 0, NULL, &chainContext ) )
       {
 //         DWORD status = GetLastError();
 //         printf("Error 0x%x returned by CertGetCertificateChain!!!\n", status);
@@ -688,48 +631,12 @@ namespace gloox
       valid = true;
     }
     while( false );
-
     // cleanup
     if( chainContext )
       CertFreeCertificateChain( chainContext );
-
     if( uServerName != 0 )
       free( uServerName );
-
     m_certInfo.chain = valid;
-    if( !valid )
-    {
-      switch( policyStatus.dwError )
-      {
-        case CERT_E_UNTRUSTEDROOT:
-          m_certInfo.status = CertSignerUnknown;
-          break;
-        case CRYPT_E_REVOKED:
-          m_certInfo.status = CertRevoked;
-          break;
-        case CERT_E_EXPIRED:
-          m_certInfo.status = CertExpired;
-          break;
-        case CERT_E_VALIDITYPERIODNESTING:
-          m_certInfo.status = CertNotActive;
-          break;
-        case CERT_E_CN_NO_MATCH:
-          m_certInfo.status = CertWrongPeer;
-          break;
-        case CERT_E_ROLE:
-          m_certInfo.status = CertSignerNotCa;
-          break;
-        case TRUST_E_BASIC_CONSTRAINTS:
-        case CERT_E_INVALID_POLICY:
-        case CERT_E_CRITICAL:
-        default:
-          m_certInfo.status = CertInvalid;
-      }
-    }
-    else
-    {
-      m_certInfo.status = CertOk;
-    }
   }
 
   void SChannel::connectionInfos()
@@ -742,37 +649,23 @@ namespace gloox
     {
       switch( conn_info.dwProtocol )
       {
-        // case SP_PROT_SSL3_SERVER:
-        // case SP_PROT_SSL3_CLIENT:
-        //   m_certInfo.protocol = SSLv3;
-        //   break;
-        case SP_PROT_TLS1_SERVER:
         case SP_PROT_TLS1_CLIENT:
-          m_certInfo.protocol = TLSv1;
+          m_certInfo.protocol = "TLSv1.0";
           break;
-        case SP_PROT_TLS1_1_SERVER:
         case SP_PROT_TLS1_1_CLIENT:
-          m_certInfo.protocol = TLSv1_1;
+          m_certInfo.protocol = "TLSv1.1";
           break;
-        case SP_PROT_TLS1_2_SERVER:
         case SP_PROT_TLS1_2_CLIENT:
-          m_certInfo.protocol = TLSv1_2;
+          m_certInfo.protocol = "TLSv1.2";
           break;
-        case SP_PROT_TLS1_3_SERVER:
         case SP_PROT_TLS1_3_CLIENT:
-          m_certInfo.protocol = TLSv1_3;
+          m_certInfo.protocol = "TLSv1.3";
           break;
-        case SP_PROT_DTLS1_0_SERVER:
-        case SP_PROT_DTLS1_0_CLIENT:
-          m_certInfo.protocol = DTLSv1;
-          break;
-        case SP_PROT_DTLS1_2_SERVER:
-        case SP_PROT_DTLS1_2_CLIENT:
-          m_certInfo.protocol = DTLSv1_2;
+        case SP_PROT_SSL3_CLIENT:
+          m_certInfo.protocol = "SSLv3";
           break;
         default:
-          m_certInfo.protocol = TLSInvalid;
-          break;
+          m_certInfo.protocol = "unknown";
       }
 
       switch( conn_info.aiCipher )
@@ -795,9 +688,6 @@ namespace gloox
         case CALG_RC4:
           m_certInfo.cipher = "RC4";
           break;
-        case 0:
-          m_certInfo.cipher = "No encryption";
-          break;
         default:
           m_certInfo.cipher = EmptyString;
       }
@@ -818,7 +708,7 @@ namespace gloox
 
   void SChannel::certData()
   {
-    PCCERT_CONTEXT remoteCertContext = 0;
+    PCCERT_CONTEXT remoteCertContext = NULL;
     CHAR certString[1000];
 
     // getting server's certificate

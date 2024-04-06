@@ -24,7 +24,9 @@
 #elif defined( HAVE_OPENSSL )
 # define HAVE_TLS
 # include "tlsopensslclient.h"
+#ifndef __SYMBIAN32__
 # include "tlsopensslserver.h"
+#endif
 #elif defined( HAVE_WINTLS )
 # define HAVE_TLS
 # include "tlsschannel.h"
@@ -59,7 +61,9 @@ namespace gloox
         break;
       case VerifyingServer:
 #ifdef HAVE_OPENSSL
+#ifndef __SYMBIAN32__
         m_impl = new OpenSSLServer( th );
+#endif
 #endif
         break;
       default:
@@ -76,13 +80,8 @@ namespace gloox
                          const std::string& clientCerts,
                          const StringList& cacerts )
   {
-    if( m_impl )
-    {
-      m_impl->setTLSVersion( m_tlsVersion );
-      return m_impl->init( clientKey, clientCerts, cacerts );
-    }
-
-    return false;
+    return m_impl ? m_impl->init( clientKey, clientCerts,
+                                  cacerts ) : false;
   }
 
   int TLSDefault::types()
@@ -135,6 +134,11 @@ namespace gloox
   const std::string TLSDefault::channelBinding() const
   {
     return m_impl ? m_impl->channelBinding() : EmptyString;
+  }
+
+  const std::string TLSDefault::channelBindingType() const
+  {
+    return m_impl ? m_impl->channelBindingType() : "tls-unique";
   }
 
   void TLSDefault::setCACerts( const StringList& cacerts )

@@ -10,9 +10,6 @@
  * This software is distributed without any warranty.
  */
 
-
-#if !defined( GLOOX_MINIMAL ) || defined( WANT_CONNECTIONBOSH )
-
 #ifndef CONNECTIONBOSH_H__
 #define CONNECTIONBOSH_H__
 
@@ -142,20 +139,13 @@ namespace gloox
       void setMode( ConnMode mode ) { m_connMode = mode; }
 
       // reimplemented from ConnectionBase
-      virtual ConnectionError connect( int timeout = -1 );
+      virtual ConnectionError connect();
 
       // reimplemented from ConnectionBase
       virtual ConnectionError recv( int timeout = -1 );
 
       // reimplemented from ConnectionBase
       virtual bool send( const std::string& data );
-
-      // reimplemented from ConnectionBase
-      virtual bool send( const char* /*data*/, const size_t /*len*/ )
-      {
-        m_logInstance.err( LogAreaClassConnectionBOSH, "Sending binary not implemented" );
-        return false;
-      }
 
       // reimplemented from ConnectionBase
       virtual ConnectionError receive();
@@ -190,8 +180,8 @@ namespace gloox
       bool sendRequest( const std::string& xml );
       bool sendXML();
       const std::string getHTTPField( const std::string& field );
-      ConnectionBase* getConnection( int timeout = -1 );
-      ConnectionBase* activateConnection( int timeout = -1 );
+      ConnectionBase* getConnection();
+      ConnectionBase* activateConnection();
       void putConnection();
 
       //ConnectionBase *m_connection;
@@ -233,5 +223,3 @@ namespace gloox
 }
 
 #endif // CONNECTIONBOSH_H__
-
-#endif // GLOOX_MINIMAL

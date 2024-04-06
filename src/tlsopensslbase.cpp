@@ -20,46 +20,27 @@
 #include <cctype>
 #include <ctime>
 #include <cstdlib>
-#include <iostream>
+
+#include <openssl/err.h>
+#include <openssl/x509v3.h>
+
+#ifndef OPENSSL_NO_COMP
+  #include <openssl/comp.h>
+#endif
 
 #include <string.h>
 
-#include <openssl/err.h>
-#ifndef _WIN32
-#include <strings.h>
-#else // _WIN32
-#if defined( _WIN32 ) || defined( _WIN64 )
-#define snprintf _snprintf
-#define vsnprintf _vsnprintf
-#define strcasecmp _stricmp
-#define strncasecmp _strnicmp
-#endif // _WIN32 || _WIN64
-#endif
-#include <openssl/x509v3.h>
-#include <openssl/ssl.h>
-
-#define HOSTNAME_MAX_SIZE 255
-
 namespace gloox
 {
-#ifdef HAVE_PTHREAD
-  pthread_mutex_t **OpenSSLBase::lockarray = 0;
-#endif // HAVE_PTHREAD
 
   OpenSSLBase::OpenSSLBase( TLSHandler* th, const std::string& server )
     : TLSBase( th, server ), m_ssl( 0 ), m_ctx( 0 ), m_buf( 0 ), m_bufsize( 17000 )
   {
     m_buf = static_cast<char*>( calloc( m_bufsize + 1, sizeof( char ) ) );
-#ifdef HAVE_PTHREAD
-    initLocks();
-#endif // HAVE_PTHREAD
   }
 
   OpenSSLBase::~OpenSSLBase()
   {
-#ifdef HAVE_PTHREAD
-    killLocks();
-#endif // HAVE_PTHREAD
     m_handler = 0;
     free( m_buf );
     SSL_CTX_free( m_ctx );
@@ -68,84 +49,6 @@ namespace gloox
     BIO_free( m_nbio );
     cleanup();
   }
-
-#ifdef HAVE_PTHREAD
-  void OpenSSLBase::lockCallback( int mode, int type, char *file, int line )
-  {
-    //std::cerr << "OpenSSLBase::lock_callback : "  << file  << "line " << line << std::endl;
-    if( !OpenSSLBase::lockarray[type] )
-      return;
-
-    if( mode & CRYPTO_LOCK )
-    {
-      pthread_mutex_lock( OpenSSLBase::lockarray[type] );
-    }
-    else
-    {
-      pthread_mutex_unlock( OpenSSLBase::lockarray[type] );
-    }
-  }
-  
-  unsigned long OpenSSLBase::threadId()
-  {
-    unsigned long ret;
-   
-    ret = static_cast<unsigned long>( pthread_self() );
-    //std::cerr << "OpenSSLBase::thread_id : " << ret << std::endl;
-    return ret;
-  }
-
-  void OpenSSLBase::initLocks()
-  {
-    int i;
-    static bool init_done = false;
-
-    //std::cerr << "OpenSSLBase::init_locks "  << std::endl;
-    if( init_done == false )
-    {
-      OpenSSLBase::lockarray = static_cast<pthread_mutex_t **>( OPENSSL_malloc( CRYPTO_num_locks() *
-                                                                sizeof( pthread_mutex_t *) ) );
-      for( i = 0; i < CRYPTO_num_locks(); i++ )
-      {
-        OpenSSLBase::lockarray[i] = static_cast<pthread_mutex_t *>( OPENSSL_malloc( sizeof( pthread_mutex_t ) ) );
-        pthread_mutex_init( OpenSSLBase::lockarray[i], 0 );
-        //std::cerr << "OpenSSLBase::init_locks OK "  << i << std::endl;
-      }
-      
-      CRYPTO_set_id_callback( (unsigned long (*)())threadId );
-      CRYPTO_set_locking_callback( (void (*)(int, int, const char*, int) )lockCallback );
-      init_done = true;
-    }
-  }
-
-  void OpenSSLBase::killLocks()
-  {
-    if( OpenSSLBase::lockarray == 0 )
-      return;
-
-    int i;
-    
-    //std::cerr << "OpenSSLBase::kill_locks "  << std::endl;
-    CRYPTO_set_locking_callback( 0 );
-    for( i = 0; i < CRYPTO_num_locks(); i++ )
-    {
-      //std::cerr << "OpenSSLBase::kill_locks "  << i << std::endl;
-      if( OpenSSLBase::lockarray && OpenSSLBase::lockarray[i] )
-      {
-        pthread_mutex_destroy( OpenSSLBase::lockarray[i] );
-        OPENSSL_free( OpenSSLBase::lockarray[i] );
-        OpenSSLBase::lockarray[i] = 0;
-        //std::cerr << "OpenSSLBase::kill_locks OK "  << i << std::endl;
-      }
-    }
-    
-    if( OpenSSLBase::lockarray )
-    {
-      OPENSSL_free( OpenSSLBase::lockarray );
-      OpenSSLBase::lockarray = 0;
-    }
-  }
-#endif // HAVE_PTHREAD
 
   bool OpenSSLBase::init( const std::string& clientKey,
                           const std::string& clientCerts,
@@ -156,11 +59,13 @@ namespace gloox
       SSL_library_init();
 #endif // OPENSSL_VERSION_NUMBER < 0x10100000
 
+#ifndef OPENSSL_NO_COMP
     SSL_COMP_add_compression_method( 193, COMP_zlib() );
+#endif // OPENSSL_NO_COMP
 
     OpenSSL_add_all_algorithms();
 
-    if( !createCTX() )
+    if( !setType() ) //inits m_ctx
       return false;
 
     setClientCert( clientKey, clientCerts );
@@ -172,8 +77,6 @@ namespace gloox
     m_ssl = SSL_new( m_ctx );
     if( !m_ssl )
       return false;
-
-    SSL_CTX_set_verify( m_ctx, SSL_VERIFY_PEER, 0 );
 
     if( !BIO_new_bio_pair( &m_ibio, 0, &m_nbio, 0 ) )
       return false;
@@ -284,9 +187,6 @@ namespace gloox
           ret = SSL_write( m_ssl, m_sendBuffer.c_str(), static_cast<int>( m_sendBuffer.length() ) );
           break;
         case TLSRead:
-          m_buf[0] = static_cast<char>( 0xAA );
-          m_buf[1] = static_cast<char>( 0xAA );
-          m_buf[2] = static_cast<char>( 0xAA );
           ret = SSL_read( m_ssl, m_buf, m_bufsize );
           break;
       }
@@ -306,25 +206,6 @@ namespace gloox
             m_handler->handleDecryptedData( this, std::string( m_buf, ret ) );
           pushFunc();
           break;
-        case SSL_ERROR_SSL:
-//           std::cerr << "OpenSSLBase::doTLSOperation SSL_ERROR_SSL occured"<< std::endl;
-          break;
-        case SSL_ERROR_WANT_X509_LOOKUP:
-//           std::cerr << "OpenSSLBase::doTLSOperation SSL_ERROR_WANT_X509_LOOKUP occured"<< std::endl;
-          break;
-        case SSL_ERROR_SYSCALL:
-          /**
-           * look at error stack/returnued errno
-           */
-          //std::cerr << "OpenSSLBase::doTLSOperation SSL_ERROR_SYSCALL occured : "<< ERR_get_error() << std::endl;
-          ERR_print_errors_fp( stderr );
-          ERR_clear_error();
-          break;
-        case SSL_ERROR_ZERO_RETURN:
-//           std::cerr << "OpenSSLBase::doTLSOperation SSL_ERROR_ZERO_RETURN occured : "<< std::endl;
-          break;
-        case SSL_ERROR_WANT_CONNECT:
-        case SSL_ERROR_WANT_ACCEPT:
         default:
           if( !m_secure )
             m_handler->handleHandshakeResult( this, false, m_certInfo );
@@ -418,7 +299,7 @@ namespace gloox
       if( res <= 0 ) // 0: verification failed; -1: internal error; -2 input is malformed
         m_certInfo.status |= CertWrongPeer;
 #else
-      if( validateHostname( m_server.c_str(), peer, m_certInfo.listSAN ) != OpenSSLBase::MatchFound )
+      if( p != m_server )
         m_certInfo.status |= CertWrongPeer;
 #endif // OPENSSL_VERSION_NUMBER >= 0x10002000
 
@@ -446,25 +327,19 @@ namespace gloox
       switch( SSL_SESSION_get_protocol_version( sess ) )
       {
         case TLS1_VERSION:
-          m_certInfo.protocol = TLSv1;
+          m_certInfo.protocol = "TLSv1.0";
           break;
         case TLS1_1_VERSION:
-          m_certInfo.protocol = TLSv1_1;
+          m_certInfo.protocol = "TLSv1.1";
           break;
         case TLS1_2_VERSION:
-          m_certInfo.protocol = TLSv1_2;
+          m_certInfo.protocol = "TLSv1.2";
           break;
         case TLS1_3_VERSION:
-          m_certInfo.protocol = TLSv1_3;
-          break;
-        case DTLS1_VERSION:
-          m_certInfo.protocol = DTLSv1;
-          break;
-        case DTLS1_2_VERSION:
-          m_certInfo.protocol = DTLSv1_2;
+          m_certInfo.protocol = "TLSv1.3";
           break;
         default:
-          m_certInfo.protocol = TLSInvalid;
+          m_certInfo.protocol = "Unknown TLS version";
           break;
       }
     }
@@ -496,7 +371,7 @@ namespace gloox
 
       frombio = BIO_read( m_nbio, m_buf, wantwrite );
 
-      if( frombio > 0 && m_handler )
+      if( m_handler )
         m_handler->handleEncryptedData( this, std::string( m_buf, frombio ) );
     }
 
@@ -513,169 +388,6 @@ namespace gloox
     }
   }
 
-  void OpenSSLBase::fillSubjectAlternativeName( StringList& list, const X509 *serverCert )
-  {
-    int i;
-    int sanNamesNb = -1;
-    STACK_OF( GENERAL_NAME ) *sanNames = 0;
-    
-    // Try to extract the names within the SAN extension from the certificate
-    sanNames = static_cast<stack_st_GENERAL_NAME *>( X509_get_ext_d2i(
-                                                                static_cast<const X509*>( serverCert ),
-                                                                NID_subject_alt_name, 0, 0 )
-                                                    );
-    if( sanNames == 0 )
-    {
-      return;
-    }
-    sanNamesNb = sk_GENERAL_NAME_num( sanNames );
-    
-    // Check each name within the extension
-    for( i = 0; i < sanNamesNb; i++ )
-    {
-      const GENERAL_NAME *currentName = sk_GENERAL_NAME_value( sanNames, i );
-
-      if( currentName->type == GEN_DNS )
-      {
-        // Current name is a DNS name, let's check it
-        char *dnsName = reinterpret_cast<char *>( ASN1_STRING_data( currentName->d.dNSName ) );
-
-        // Make sure there isn't an embedded NUL character in the DNS name
-        if( ASN1_STRING_length( currentName->d.dNSName ) == static_cast<int>( strlen( dnsName ) ) )
-        {
-          list.push_back( dnsName );
-        }
-      }
-    }
-    
-    sk_GENERAL_NAME_pop_free( sanNames, GENERAL_NAME_free );
-  }
-
-
-  OpenSSLBase::HostnameValidationResult OpenSSLBase::matchesCommonName( const char *hostname,
-                                                                        const X509 *serverCert )
-  {
-    int commonNameLoc = -1;
-    X509_NAME_ENTRY* commonNameEntry = 0;
-    ASN1_STRING* commonNameASN1 = 0;
-    unsigned char* commonNameStr = 0;
-    
-    // Find the position of the CN field in the Subject field of the certificate
-    commonNameLoc = X509_NAME_get_index_by_NID( X509_get_subject_name( static_cast<const X509*>( serverCert ) ),
-                                                      NID_commonName, -1 );
-    if( commonNameLoc < 0 )
-    {
-      return OpenSSLBase::Error;
-    }
-    
-    // Extract the CN field
-    commonNameEntry = X509_NAME_get_entry( X509_get_subject_name( static_cast<const X509*>( serverCert ) ),
-                                              commonNameLoc );
-    if( commonNameEntry == 0 )
-    {
-      return OpenSSLBase::Error;
-    }
-    
-    // Convert the CN field to a C string
-    commonNameASN1 = X509_NAME_ENTRY_get_data( commonNameEntry );
-    if( commonNameASN1 == 0 )
-    {
-      return OpenSSLBase::Error;
-    }
-    commonNameStr = static_cast<unsigned char*>( ASN1_STRING_data( commonNameASN1 ) );
-    
-    // Make sure there isn't an embedded NUL character in the CN
-    if( ASN1_STRING_length( commonNameASN1 ) != ( static_cast<int>( strlen( reinterpret_cast<char*>( commonNameStr ) ) ) ) )
-    {
-      return OpenSSLBase::MalformedCertificate;
-    }
-    
-    // Compare expected hostname with the CN
-    if( strcasecmp( hostname, reinterpret_cast<char*>( commonNameStr ) ) == 0 )
-    {
-      return OpenSSLBase::MatchFound;
-    }
-    else
-    {
-      return OpenSSLBase::MatchNotFound;
-    }
-  }
-
-  OpenSSLBase::HostnameValidationResult OpenSSLBase::matchesSubjectAlternativeName( const char *hostname,
-                                                                                    const X509 *serverCert )
-  {
-    OpenSSLBase::HostnameValidationResult result = MatchNotFound;
-    int i;
-    int sanNamesNb = -1;
-    STACK_OF( GENERAL_NAME ) *sanNames = 0;
-    
-    // Try to extract the names within the SAN extension from the certificate
-    sanNames = static_cast<stack_st_GENERAL_NAME *>( X509_get_ext_d2i( static_cast<const X509*>( serverCert ),
-                                                                       NID_subject_alt_name,
-                                                                       0, 0 ) );
-    if( sanNames == 0 )
-    {
-      return OpenSSLBase::NoSANPresent;
-    }
-    sanNamesNb = sk_GENERAL_NAME_num( sanNames );
-    
-    // Check each name within the extension
-    for( i = 0; i < sanNamesNb; i++ )
-    {
-      const GENERAL_NAME *currentName = sk_GENERAL_NAME_value( sanNames, i );
-      
-      if( currentName->type == GEN_DNS )
-      {
-        // Current name is a DNS name, let's check it
-        char *dnsName = reinterpret_cast<char *>( ASN1_STRING_data( currentName->d.dNSName ) );
-
-        // Make sure there isn't an embedded NUL character in the DNS name
-        if( ASN1_STRING_length( currentName->d.dNSName ) != static_cast<int>( strlen( dnsName ) ) )
-        {
-          result = OpenSSLBase::MalformedCertificate;
-          break;
-        }
-        else
-        { // Compare expected hostname with the DNS name
-          //std::cerr << "validate hostname found SAN" << dnsName  <<  std::endl;
-          if( strcasecmp( hostname, dnsName ) == 0 )
-          {
-            result = OpenSSLBase::MatchFound;
-            break;
-          }
-        }
-      }
-    }
-    
-    sk_GENERAL_NAME_pop_free( sanNames, GENERAL_NAME_free );
-    
-    return result;
-  }
-
-  OpenSSLBase::HostnameValidationResult OpenSSLBase::validateHostname( const char *hostname,
-                                                                       const X509 *serverCert,
-                                                                       StringList& listSAN )
-  {
-    OpenSSLBase::HostnameValidationResult result;
-    
-    if( ( hostname == 0 ) || ( serverCert == 0 ) )
-      return OpenSSLBase::Error;
-    
-    // First try the Subject Alternative Names extension
-    result = matchesSubjectAlternativeName( hostname, serverCert );
-    if( result == OpenSSLBase::NoSANPresent )
-    {
-      // Extension was not found: try the Common Name
-      //std::cerr << "validate hostname NoSANPresent" << std::endl;
-      result = matchesCommonName( hostname, serverCert );
-    }
-    else
-    {
-      fillSubjectAlternativeName( listSAN, serverCert );
-    }
-    
-    return result;
-  }
 }
 
 #endif // HAVE_OPENSSL

@@ -37,11 +37,8 @@ namespace gloox
        * @param server The server to use in certificate verification.
        */
       TLSBase( TLSHandler* th, const std::string server )
-        : m_handler( th ), m_server( server ), m_tlsVersion( TLSv1 ),
-          m_secure( false ), m_valid( false ), m_initLib( true )
-      {
-        m_certInfo.protocol = TLSInvalid;
-      }
+        : m_handler( th ), m_server( server ), m_secure( false ), m_valid( false ), m_initLib( true )
+      {}
 
       /**
        * Virtual destructor.
@@ -69,13 +66,6 @@ namespace gloox
        * @param init Whether or not to intialize the underlying TLS library.
        */
       void setInitLib( bool init ) { m_initLib = init; }
-
-      /**
-       * This function is used to set the minimum required/requested TLS version. Default is to use
-       * at least TLS v1. This should be called before init() is called.
-       * @param tlsVersion The TLS version.
-       */
-      void setTLSVersion( TLSVersion tlsVersion ) { m_tlsVersion = tlsVersion; }
 
       /**
        * Use this function to feed unencrypted data to the encryption implementation.
@@ -115,8 +105,7 @@ namespace gloox
       virtual bool isSecure() const { return m_secure; }
 
       /**
-       * This function indicates whether the underlying TLS implementation supports channel binding
-       * (used in e.g. SASL SCRAM-SHA-1-PLUS).
+       * This function indicates whether the underlying TLS implementation supports channel binding (used in e.g. SASL SCRAM-SHA-1-PLUS).
        * @return @b True if channel binding is supported, @b false otherwise.
        */
       virtual bool hasChannelBinding() const { return false; }
@@ -126,6 +115,12 @@ namespace gloox
        * @return The channel binding data, if any, or the empty string.
        */
       virtual const std::string channelBinding() const { return EmptyString; }
+
+      /**
+       * Returns the type of channel binding to be used with SCRAM-SHA-1-PLUS.
+       * @return The channel binding type, @default is "tls-unique".
+       */
+      virtual const std::string channelBindingType() const { return "tls-unique"; }
 
       /**
        * Use this function to set a number of trusted root CA certificates which shall be
@@ -161,9 +156,6 @@ namespace gloox
       std::string m_server;
       CertInfo m_certInfo;
       util::Mutex m_mutex;
-      util::Mutex m_mutexCryptOp;
-      util::Mutex m_mutexDeCryptOp;
-      TLSVersion m_tlsVersion;
       bool m_secure;
       bool m_valid;
       bool m_initLib;

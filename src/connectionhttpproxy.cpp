@@ -12,8 +12,6 @@
 
 
 
-#if !defined( GLOOX_MINIMAL ) || defined( WANT_CONNECTIONHTTPPROXY )
-
 #include "gloox.h"
 
 #include "connectionhttpproxy.h"
@@ -76,13 +74,12 @@ namespace gloox
     m_connection = connection;
   }
 
-  ConnectionError ConnectionHTTPProxy::connect( int timeout )
+  ConnectionError ConnectionHTTPProxy::connect()
   {
-    m_timeout = timeout;
     if( m_connection && m_handler )
     {
       m_state = StateConnecting;
-      return m_connection->connect( timeout );
+      return m_connection->connect();
     }
 
     return ConnNotConnected;
@@ -108,11 +105,6 @@ namespace gloox
   bool ConnectionHTTPProxy::send( const std::string& data )
   {
     return m_connection && m_connection->send( data );
-  }
-
-  bool ConnectionHTTPProxy::send( const char* data, const size_t len )
-  {
-    return m_connection && m_connection->send( data, len);
   }
 
   void ConnectionHTTPProxy::cleanup()
@@ -152,24 +144,13 @@ namespace gloox
       }
       else if( !m_proxyHandshakeBuffer.compare( 9, 3, "407" ) )
       {
-        m_logInstance.dbg( LogAreaClassConnectionHTTPProxy,
-                           "HTTP proxy requires authentication" );
         m_handler->handleDisconnect( this, ConnProxyAuthRequired );
         m_connection->disconnect();
       }
       else if( !m_proxyHandshakeBuffer.compare( 9, 3, "403" )
             || !m_proxyHandshakeBuffer.compare( 9, 3, "404" ) )
       {
-        m_logInstance.dbg( LogAreaClassConnectionHTTPProxy,
-                           "HTTP proxy authentication failed" );
         m_handler->handleDisconnect( this, ConnProxyAuthFailed );
-        m_connection->disconnect();
-      }
-      else if( !m_proxyHandshakeBuffer.compare( 9, 3, "504" ) )
-      {
-        m_logInstance.dbg( LogAreaClassConnectionHTTPProxy,
-                             "HTTP proxy Gateway Timeout" );
-        m_handler->handleDisconnect( this, ConnProxyGatewayTimeout );
         m_connection->disconnect();
       }
     }
@@ -232,5 +213,3 @@ namespace gloox
   }
 
 }
-
-#endif // GLOOX_MINIMAL

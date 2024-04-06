@@ -53,9 +53,12 @@ namespace gloox
       // reimplemented from TLSBase
       virtual const std::string channelBinding() const;
 
+      // reimplemented from TLSBase
+      virtual const std::string channelBindingType() const;
+
   private:
-      // reimplemented from TLSOpenSSLBase
-      virtual bool createCTX();
+      // reimplemented from OpenSSLBase
+      virtual bool setType();
 
       // reimplemented from OpenSSLBase
       virtual int handshakeFunction();

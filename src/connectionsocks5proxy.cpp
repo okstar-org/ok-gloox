@@ -12,8 +12,6 @@
 
 
 
-#if !defined( GLOOX_MINIMAL ) || defined( WANT_CONNECTIONSOCKS5PROXY )
-
 #include "config.h"
 
 #include "gloox.h"
@@ -30,11 +28,13 @@
 
 #include <string.h>
 
-#if !defined( _WIN32 ) && !defined( _WIN32_WCE )
+#if ( !defined( _WIN32 ) && !defined( _WIN32_WCE ) ) || defined( __SYMBIAN32__ )
 # include <netinet/in.h>
 #endif
 
-#if defined( _WIN32 ) || defined( _WIN32_WCE ) || defined( __MINGW32__ )
+#if defined( _WIN32 ) && !defined( __SYMBIAN32__ )
+# include <winsock.h>
+#elif defined( _WIN32_WCE )
 # include <winsock2.h>
 #endif
 
@@ -92,9 +92,8 @@ namespace gloox
     m_connection = connection;
   }
 
-  ConnectionError ConnectionSOCKS5Proxy::connect( int timeout )
+  ConnectionError ConnectionSOCKS5Proxy::connect()
   {
-    m_timeout = timeout;
 // FIXME CHECKME
     if( m_connection && m_connection->state() == StateConnected && m_handler )
     {
@@ -107,7 +106,7 @@ namespace gloox
     {
       m_state = StateConnecting;
       m_s5state = S5StateConnecting;
-      return m_connection->connect( timeout );
+      return m_connection->connect();
     }
 
     return ConnNotConnected;
@@ -321,7 +320,7 @@ namespace gloox
       strncpy( d + pos, m_server.c_str(), m_server.length() );
       pos += m_server.length();
     }
-    int nport = htons( static_cast<short unsigned int>( port ) );
+    int nport = htons( port );
     d[pos++] = static_cast<char>( nport );
     d[pos++] = static_cast<char>( nport >> 8 );
 
@@ -385,5 +384,3 @@ namespace gloox
   }
 
 }
-
-#endif // GLOOX_MINIMAL

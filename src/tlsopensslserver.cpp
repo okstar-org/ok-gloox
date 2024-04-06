@@ -16,6 +16,8 @@
 
 #ifdef HAVE_OPENSSL
 
+#ifndef __SYMBIAN32__
+
 #ifndef HEADER_DH_H
 #include <openssl/dh.h>
 #endif
@@ -32,65 +34,14 @@ namespace gloox
   {
   }
 
-  bool OpenSSLServer::createCTX()
+  bool OpenSSLServer::setType()
   {
-    int ret = 0;
-    switch( m_tlsVersion )
-    {
-// #ifndef OPENSSL_NO_SSL3_METHOD
-//       case SSLv3:
-//         m_ctx =  SSL_CTX_new( TLS_server_method() );
-//         ret = static_cast<int>( SSL_CTX_set_min_proto_version( m_ctx, SSL3_VERSION ) );
-//         break;
-// #endif // OPENSSL_NO_SSL3_METHOD
-#ifndef OPENSSL_NO_TLS1_METHOD
-      case TLSv1:
-        m_ctx =  SSL_CTX_new( TLS_server_method() );
-        ret = static_cast<int>( SSL_CTX_set_min_proto_version( m_ctx, TLS1_VERSION ) );
-        break;
-#endif // OPENSSL_NO_TLS1_METHOD
-#ifndef OPENSSL_NO_TLS1_1_METHOD
-      case TLSv1_1:
-        m_ctx =  SSL_CTX_new( TLS_server_method() );
-        ret = static_cast<int>( SSL_CTX_set_min_proto_version( m_ctx, TLS1_1_VERSION ) );
-        break;
-#endif // OPENSSL_NO_TLS1_1_METHOD
-#ifndef OPENSSL_NO_TLS1_2_METHOD
-      case TLSv1_2:
-        m_ctx =  SSL_CTX_new( TLS_server_method() );
-        ret = static_cast<int>( SSL_CTX_set_min_proto_version( m_ctx, TLS1_2_VERSION ) );
-        break;
-#endif // OPENSSL_NO_TLS1_2_METHOD
-#ifndef OPENSSL_NO_TLS1_3_METHOD
-      case TLSv1_3:
-        m_ctx =  SSL_CTX_new( TLS_server_method() );
-        ret = static_cast<int>( SSL_CTX_set_min_proto_version( m_ctx, TLS1_3_VERSION ) );
-        break;
-#endif // OPENSSL_NO_TLS1_3_METHOD
-      case DTLSv1:
-        m_ctx =  SSL_CTX_new( DTLS_server_method() );
-        ret = static_cast<int>( SSL_CTX_set_min_proto_version( m_ctx, DTLS1_VERSION ) );
-        break;
-      case DTLSv1_2:
-        m_ctx =  SSL_CTX_new( DTLS_server_method() );
-        ret = static_cast<int>( SSL_CTX_set_min_proto_version( m_ctx, DTLS1_2_VERSION ) );
-        break;
-      default:
-        return false;
-        break;
-    }
-
-    // Refuse connecting if SSL_CTX_set_min_proto_version() fails
-    // FIXME: This fact should somehow be passed on the the caller
-    if( !ret )
-    {
-      SSL_CTX_free( m_ctx );
-      m_ctx = 0;
-    }
-
+    m_ctx = SSL_CTX_new( SSLv23_server_method() );
     if( !m_ctx )
       return false;
 
+    SSL_CTX_set_options( m_ctx, SSL_OP_NO_SSLv3 );
+    
     return true;
   }
 
@@ -346,5 +297,7 @@ namespace gloox
   }
 
 }
+
+#endif // __SYMBIAN32__
 
 #endif // HAVE_OPENSSL

@@ -21,18 +21,19 @@
 #include "mutexguard.h"
 #include "util.h"
 
-#if !defined( _WIN32 ) && !defined( _WIN32_WCE )
+#ifdef __MINGW32__
+# include <winsock.h>
+#endif
+
+#if ( !defined( _WIN32 ) && !defined( _WIN32_WCE ) ) || defined( __SYMBIAN32__ )
 # include <sys/types.h>
 # include <sys/socket.h>
 # include <sys/select.h>
 # include <unistd.h>
 # include <string.h>
 # include <errno.h>
-#endif
-
-#if defined( _WIN32 ) || defined( __MINGW32__ )
-# include <winsock2.h>
-# include <ws2tcpip.h>
+#elif ( defined( _WIN32 ) || defined( _WIN32_WCE ) ) && !defined( __SYMBIAN32__ )
+# include <winsock.h>
 #endif
 
 #include <cstdlib>
@@ -63,9 +64,8 @@ namespace gloox
     return new ConnectionTCPClient( m_handler, m_logInstance, m_server, m_port );
   }
 
-  ConnectionError ConnectionTCPClient::connect( int timeout )
+  ConnectionError ConnectionTCPClient::connect()
   {
-    m_timeout = timeout;
     m_sendMutex.lock();
 // FIXME CHECKME
     if( !m_handler )
@@ -85,9 +85,9 @@ namespace gloox
     if( m_socket < 0 )
     {
       if( m_port == -1 )
-        m_socket = DNS::connect( m_server, m_logInstance, timeout );
+        m_socket = DNS::connect( m_server, m_logInstance );
       else
-        m_socket = DNS::connect( m_server, m_port, m_logInstance, timeout );
+        m_socket = DNS::connect( m_server, m_port, m_logInstance );
     }
 
     m_sendMutex.unlock();
@@ -103,10 +103,6 @@ namespace gloox
         case -ConnDnsError:
           m_logInstance.err( LogAreaClassConnectionTCPClient,
                              m_server + ": host not found" );
-          break;
-        case -ConnAttemptTimeout:
-          m_logInstance.err( LogAreaClassConnectionTCPClient,
-                             "Connection attempt to host " + m_server + ": timed out" );
           break;
         default:
           m_logInstance.err( LogAreaClassConnectionTCPClient,
@@ -142,7 +138,7 @@ namespace gloox
       return ConnNoError;
     }
 
-#if defined( _WIN32 )
+#if defined( _WIN32 ) && !defined( __SYMBIAN32__ )
     int size = static_cast<int>( ::recv( m_socket, m_buf, m_bufsize, 0 ) );
 #else
     int size = static_cast<int>( ::recv( m_socket, m_buf, m_bufsize, MSG_DONTWAIT ) );
@@ -157,19 +153,15 @@ namespace gloox
       if( size == -1 )
       {
 
-        // Non-blocking socket error processing
-#if defined( _WIN32 )
-        int lastError = WSAGetLastError();
-        if( lastError == WSAEWOULDBLOCK  && timeout != -1 )
-#else
-        if( ( errno == EAGAIN || errno == EWOULDBLOCK ) && timeout != -1 )
+#if defined(__unix__)
+      if( errno == EAGAIN || errno == EWOULDBLOCK )
+        return ConnNoError;
 #endif
-          return ConnNoError;
 
         // recv() failed for an unexpected reason
         std::string message = "recv() failed. "
-#if defined( _WIN32 )
-          "WSAGetLastError: " + util::int2string( WSAGetLastError() );
+#if defined( _WIN32 ) && !defined( __SYMBIAN32__ )
+          "WSAGetLastError: " + util::int2string( ::WSAGetLastError() );
 #else
           "errno: " + util::int2string( errno ) + ": " + strerror( errno );
 #endif
@@ -185,12 +177,7 @@ namespace gloox
     m_buf[size] = '\0';
 
     if( m_handler )
-    {
-      if( size )
-        m_handler->handleReceivedData( this, std::string( m_buf, size ) );
-      else
-        m_logInstance.dbg( LogAreaClassConnectionTCPClient, "recv()ed empty data." );
-    }
+      m_handler->handleReceivedData( this, std::string( m_buf, size ) );
 
     return ConnNoError;
   }
