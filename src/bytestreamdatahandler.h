@@ -11,8 +11,6 @@
 */
 
 
-#if !defined( GLOOX_MINIMAL ) || defined( WANT_BYTESTREAM )
-
 #ifndef BYTESTREAMDATAHANDLER_H__
 #define BYTESTREAMDATAHANDLER_H__
 
@@ -64,7 +62,7 @@ namespace gloox
        * @param bs The bytestream.
        * @since 1.0.20
        */
-      virtual void handleBytestreamDataAck( Bytestream* bs ) = 0;
+      virtual void handleBytestreamDataAck( Bytestream* bs ) {}
       
       /**
        * Notifies about an error occuring while using a bytestream.
@@ -92,5 +90,3 @@ namespace gloox
 }
 
 #endif // BYTESTREAMDATAHANDLER_H__
-
-#endif // GLOOX_MINIMAL

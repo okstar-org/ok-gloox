@@ -1124,7 +1124,7 @@ namespace gloox
     int date_to;                    /**< The date up to which the certificate is valid
                                      * (UNIX timestamp; UTC).
                                      * @todo Change type to time_t or long? */
-    TLSVersion protocol;            /**< The encryption protocol used for the connection. */
+    std::string protocol;            /**< The encryption protocol used for the connection. */
     std::string cipher;             /**< The cipher used for the connection. */
     std::string mac;                /**< The MAC used for the connection. */
     std::string compression;        /**< The compression used for the connection. */
