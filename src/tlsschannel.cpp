@@ -559,9 +559,9 @@ namespace gloox
     DWORD csizeServerName;
 
     LPTSTR Usages[] = {
-      szOID_PKIX_KP_SERVER_AUTH,
-      szOID_SERVER_GATED_CRYPTO,
-      szOID_SGC_NETSCAPE
+      (LPTSTR)szOID_PKIX_KP_SERVER_AUTH,
+      (LPTSTR)szOID_SERVER_GATED_CRYPTO,
+      (LPTSTR)szOID_SGC_NETSCAPE
     };
     DWORD cUsages = sizeof( Usages ) / sizeof( LPTSTR );
 
