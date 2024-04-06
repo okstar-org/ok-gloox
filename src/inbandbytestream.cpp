@@ -11,8 +11,6 @@
 */
 
 
-#if !defined( GLOOX_MINIMAL ) || defined( WANT_BYTESTREAM )
-
 #include "inbandbytestream.h"
 #include "base64.h"
 #include "bytestreamdatahandler.h"
@@ -101,8 +99,7 @@ namespace gloox
   InBandBytestream::InBandBytestream( ClientBase* clientbase, LogSink& logInstance, const JID& initiator,
                                       const JID& target, const std::string& sid )
     : Bytestream( Bytestream::IBB, logInstance, initiator, target, sid ),
-      m_clientbase( clientbase ), m_blockSize( 4096 ), m_sequence( -1 ), m_lastChunkReceived( -1 ),
-      m_logInstance( logInstance )
+      m_clientbase( clientbase ), m_blockSize( 4096 ), m_sequence( -1 ), m_lastChunkReceived( -1 )
   {
     if( m_clientbase )
     {
@@ -129,7 +126,7 @@ namespace gloox
     }
   }
 
-  bool InBandBytestream::connect( int /*timeout*/ )
+  bool InBandBytestream::connect()
   {
     if( !m_clientbase )
       return false;
@@ -138,7 +135,7 @@ namespace gloox
       return true;
 
     const std::string& id = m_clientbase->getID();
-    IQ iq( IQ::Set, m_clientbase->jid() == m_target ? m_initiator : m_target, id );
+    IQ iq( IQ::Set, m_target, id );
     iq.addExtension( new IBB( m_sid, m_blockSize ) );
     m_clientbase->send( iq, this, IBBOpen );
     return true;
@@ -158,13 +155,9 @@ namespace gloox
         {
           m_handler->handleBytestreamDataAck( this );
         }
-        else if( context == IBBClose && m_handler )
-        {
-          m_handler->handleBytestreamClose( this );
-        }
         break;
       case IQ::Error:
-        error( iq );
+        closed();
         break;
       default:
         break;
@@ -283,14 +276,6 @@ namespace gloox
     return true;
   }
 
-  void InBandBytestream::error( const IQ& iq )
-  {
-    m_open = false;
-
-    if( m_handler )
-      m_handler->handleBytestreamError( this, iq);
-  }
-
   void InBandBytestream::closed()
   {
     if( !m_open )
@@ -310,11 +295,12 @@ namespace gloox
       return;
 
     const std::string& id = m_clientbase->getID();
-    IQ iq( IQ::Set, m_clientbase->jid() == m_target ? m_initiator : m_target, id );
+    IQ iq( IQ::Set, m_target, id );
     iq.addExtension( new IBB( m_sid ) );
     m_clientbase->send( iq, this, IBBClose );
+
+    if( m_handler )
+      m_handler->handleBytestreamClose( this );
   }
 
 }
-
-#endif // GLOOX_MINIMAL

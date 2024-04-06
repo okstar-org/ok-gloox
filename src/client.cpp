@@ -610,10 +610,10 @@ namespace gloox
       r->addAttribute( "previd", m_smId );
       send( r );
       m_smContext = CtxSMResume;
-    } 
+    }
     else
       disconnect();
- 
+
   }
 
   void Client::ackStreamManagement()
@@ -699,27 +699,37 @@ namespace gloox
   void Client::disableRoster()
   {
     m_manageRoster = false;
-    delete m_rosterManager;
-    m_rosterManager = 0;
+    if(m_rosterManager){
+      delete m_rosterManager;
+      m_rosterManager = 0;
+    }
   }
 
+  RosterManager * Client::enableRoster() {
+    if(m_rosterManager){
+      return m_rosterManager;
+    }
+
+    m_rosterManager = new RosterManager(this);
+    notifyStreamEvent( StreamEventRoster );
+    m_rosterManager->fill();
+    m_manageRoster = true;
+    return m_rosterManager;
+  }
+
+#if !defined( GLOOX_MINIMAL ) || defined( WANT_NONSASLAUTH )
   void Client::nonSaslLogin()
   {
     if( !m_auth )
       m_auth = new NonSaslAuth( this );
     m_auth->doAuth( m_sid );
   }
+#endif // GLOOX_MINIMAL
 
   void Client::connected()
   {
     if( m_authed && m_smContext != CtxSMResumed )
     {
-      if( m_manageRoster )
-      {
-        notifyStreamEvent( StreamEventRoster );
-        m_rosterManager->fill();
-      }
-      else
         rosterFilled();
     }
     else
