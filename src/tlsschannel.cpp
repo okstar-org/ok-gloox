@@ -558,12 +558,12 @@ namespace gloox
     PWSTR uServerName = NULL;
     DWORD csizeServerName;
 
-    LPTSTR Usages[] = {
-      (LPTSTR)szOID_PKIX_KP_SERVER_AUTH,
-      (LPTSTR)szOID_SERVER_GATED_CRYPTO,
-      (LPTSTR)szOID_SGC_NETSCAPE
+    LPSTR Usages[] = {
+      const_cast<LPSTR>( szOID_PKIX_KP_SERVER_AUTH ),
+      const_cast<LPSTR>( szOID_SERVER_GATED_CRYPTO ),
+      const_cast<LPSTR>( szOID_SGC_NETSCAPE )
     };
-    DWORD cUsages = sizeof( Usages ) / sizeof( LPTSTR );
+    DWORD cUsages = sizeof( Usages ) / sizeof( LPSTR );
 
     do
     {
