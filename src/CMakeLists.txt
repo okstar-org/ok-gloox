@@ -13,14 +13,14 @@ endif ()
 
 # 添加库文件的安装操作
 install(
-        TARGETS ok-gloox
+        TARGETS gloox
         LIBRARY DESTINATION lib
         ARCHIVE DESTINATION lib
         RUNTIME DESTINATION bin)
 
 # 添加头文件的安装操作
 install(
-        DIRECTORY ${ok-gloox_SOURCE_DIR}
+        DIRECTORY ${gloox_SOURCE_DIR}
         DESTINATION include
         FILES_MATCHING
         PATTERN "*.h"
