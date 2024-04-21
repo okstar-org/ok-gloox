@@ -29,6 +29,7 @@ endif()
 #    if(OpenSSL_FOUND)
 #        message(STATUS "Find OpenSSL=${OPENSSL_SSL_LIBRARY}")
 #        set(LIBS ${LIBS} ${OPENSSL_SSL_LIBRARY} ${OPENSSL_CRYPTO_LIBRARY})
+#        write_file( ${CMAKE_CURRENT_SOURCE_DIR}/config.h "#define HAVE_OPENSSL 1" APPEND)
 #    endif ()
 #endif ()
 
