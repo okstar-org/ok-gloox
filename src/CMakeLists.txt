@@ -20,7 +20,7 @@ install(
 
 # 添加头文件的安装操作
 install(
-        DIRECTORY ${gloox_SOURCE_DIR}
+        DIRECTORY ${gloox_SOURCE_DIR}/src
         DESTINATION include
         FILES_MATCHING
         PATTERN "*.h"
