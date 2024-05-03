@@ -10,9 +10,6 @@
  * This software is distributed without any warranty.
  */
 
-
-#if !defined( GLOOX_MINIMAL ) || defined( WANT_CONNECTIONBOSH )
-
 #include "config.h"
 
 #include "gloox.h"
@@ -103,9 +100,8 @@ namespace gloox
                                m_boshHost, m_server, m_port );
   }
 
-  ConnectionError ConnectionBOSH::connect( int timeout )
+  ConnectionError ConnectionBOSH::connect()
   {
-    m_timeout = timeout;
     if( m_state >= StateConnecting )
       return ConnNoError;
 
@@ -118,7 +114,7 @@ namespace gloox
                        ( ( m_connMode == ModePipelining ) ? std::string( "Pipelining" )
                          : ( ( m_connMode == ModeLegacyHTTP ) ? std::string( "LegacyHTTP" )
                                                               : std::string( "PersistentHTTP" ) ) ) );
-    getConnection( timeout );
+    getConnection();
     return ConnNoError; // FIXME?
   }
 
@@ -327,15 +323,9 @@ namespace gloox
     std::string::size_type fp = ci_find( m_bufferHeader, "\r\n" + field + ": " );
 
     if( fp == std::string::npos )
-    {
-      fp = ci_find( m_bufferHeader, "\r\n" + field + ":" );
-      if( fp == std::string::npos )
-        return EmptyString;
-      else
-        fp += field.length() + 3;
-    }
-    else
-      fp += field.length() + 4;
+      return EmptyString;
+
+    fp += field.length() + 4;
 
     const std::string::size_type fp2 = m_bufferHeader.find( "\r\n", fp );
     if( fp2 == std::string::npos )
@@ -364,37 +354,6 @@ namespace gloox
   {
     util::ForEach( m_activeConnections, &ConnectionBase::getStatistics, totalIn, totalOut );
     util::ForEach( m_connectionPool, &ConnectionBase::getStatistics, totalIn, totalOut );
-  }
-
-  std::string htmlEntitiesDecode( std::string str )
-  {
-    std::string subs[] = {
-      "&quot;",
-      "&apos;",
-      "&amp;",
-      "&lt;",
-      "&gt;",
-    };
-    
-    std::string reps[] = {
-      "\"",
-      "'",
-      "&",
-      "<",
-      ">",
-    };
-    
-    size_t found;
-    for( int j = 0; j < 5; j++ )
-    {
-      do
-      {
-        found = str.find( subs[j] );
-        if( found != std::string::npos )
-          str.replace( found, subs[j].length(), reps[j] );
-      } while( found != std::string::npos );
-    }
-    return str;
   }
 
   void ConnectionBOSH::handleReceivedData( const ConnectionBase* /*connection*/,
@@ -432,8 +391,7 @@ namespace gloox
       {
         putConnection();
         --m_openRequests;
-        std::string xml = htmlEntitiesDecode( m_buffer.substr( headerLength + 4, m_bufferContentLength ) );
-        m_logInstance.dbg( LogAreaClassConnectionBOSH, "parsing " + xml);
+        std::string xml = m_buffer.substr( headerLength + 4, m_bufferContentLength );
         m_parser.feed( xml );
         m_buffer.erase( 0, headerLength + 4 + m_bufferContentLength );
         m_bufferContentLength = 0;
@@ -587,7 +545,7 @@ namespace gloox
       m_handler->handleReceivedData( this, (*it)->xml() );
   }
 
-  ConnectionBase* ConnectionBOSH::getConnection( int timeout )
+  ConnectionBase* ConnectionBOSH::getConnection()
   {
     if( m_openRequests > 0 && m_openRequests >= m_maxOpenRequests )
     {
@@ -630,7 +588,7 @@ namespace gloox
           conn = m_activeConnections.front()->newInstance();
           conn->registerConnectionDataHandler( this );
           m_connectionPool.push_back( conn );
-          conn->connect( timeout );
+          conn->connect();
         }
         else
           m_logInstance.warn( LogAreaClassConnectionBOSH,
@@ -641,7 +599,7 @@ namespace gloox
     return 0;
   }
 
-  ConnectionBase* ConnectionBOSH::activateConnection( int timeout )
+  ConnectionBase* ConnectionBOSH::activateConnection()
   {
     ConnectionBase* conn = m_connectionPool.front();
     m_connectionPool.pop_front();
@@ -653,7 +611,7 @@ namespace gloox
 
     m_logInstance.dbg( LogAreaClassConnectionBOSH, "Connecting pooled connection." );
     m_connectionPool.push_back( conn );
-    conn->connect( timeout );
+    conn->connect();
     return 0;
   }
 
@@ -683,5 +641,3 @@ namespace gloox
   }
 
 }
-
-#endif // GLOOX_MINIMAL

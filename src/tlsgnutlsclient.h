@@ -28,7 +28,7 @@ namespace gloox
 {
 
   /**
-   * @brief This class implements a TLS client backend using GnuTLS.
+   * @brief This class implements a TLS backend using GnuTLS.
    *
    * You should not need to use this class directly.
    *

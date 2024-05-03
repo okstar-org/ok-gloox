@@ -77,7 +77,6 @@ namespace gloox
     protected:
       virtual void getCertInfo() {}
 
-      int setPrios( const std::string& additional  = EmptyString );
       void getCommonCertInfo();
 
       gnutls_session_t* m_session;

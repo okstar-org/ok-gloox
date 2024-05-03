@@ -11,8 +11,6 @@
 */
 
 
-#if !defined( GLOOX_MINIMAL ) || defined( WANT_BYTESTREAM )
-
 #include "bytestreamhandler.h"
 #include "socks5bytestreammanager.h"
 #include "socks5bytestreamserver.h"
@@ -431,7 +429,6 @@ namespace gloox
                                                       (*it).second );
                   s5b->setStreamHosts( StreamHostList( 1, *sh ) );
                 }
-                s5b->setIsInitiator( true );
                 m_s5bMap[(*it).second] = s5b;
                 m_socks5BytestreamHandler->handleOutgoingBytestream( s5b );
                 if( selfProxy )
@@ -487,5 +484,3 @@ namespace gloox
   }
 
 }
-
-#endif // GLOOX_MINIMAL

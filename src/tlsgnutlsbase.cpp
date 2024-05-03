@@ -119,35 +119,6 @@ namespace gloox
     m_mutex.unlock();
   }
 
-  int GnuTLSBase::setPrios( const std::string& additional )
-  {
-    std::string prios = "SECURE128:+PFS:+COMP-ALL:+MAC-ALL:+GROUP-ALL:+SIGN-ALL:";
-    switch( m_tlsVersion )
-    {
-      default:
-      case TLSv1:
-        prios += "+VERS-TLS-ALL:-VERS-SSL3.0";
-        break;
-      case TLSv1_1:
-        prios += "+VERS-TLS-ALL:-VERS-TLS1.0:-VERS-SSL3.0";
-        break;
-      case TLSv1_2:
-        prios += "+VERS-TLS-ALL:+GOST:-VERS-TLS1.1:-VERS-TLS1.0:-VERS-SSL3.0";
-        break;
-      case TLSv1_3:
-        prios += "+VERS-TLS-ALL:+GOST:-VERS-TLS1.2:-VERS-TLS1.1:-VERS-TLS1.0:-VERS-SSL3.0";
-        break;
-      case DTLSv1:
-        prios += "+VERS-DTLS-ALL:";
-        break;
-      case DTLSv1_2:
-        prios += "+VERS-DTLS-ALL:-VERS-DTLS1.0";
-        break;
-    }
-    prios += additional;
-    return gnutls_priority_set_direct( *m_session, prios.c_str(), 0 );
-  }
-
   bool GnuTLSBase::handshake()
   {
     if( !m_handler )
@@ -192,7 +163,7 @@ namespace gloox
     int rc;
     rc = gnutls_session_channel_binding( *m_session,
 #ifdef GNUTLS_CB_TLS_EXPORTER
-                                         ( m_certInfo.protocol == TLSv1_3 ) ? GNUTLS_CB_TLS_EXPORTER : GNUTLS_CB_TLS_UNIQUE,
+                                         ( m_certInfo.protocol == "TLSv1.3" ) ? GNUTLS_CB_TLS_EXPORTER : GNUTLS_CB_TLS_UNIQUE,
 #else
                                          GNUTLS_CB_TLS_UNIQUE,
 #endif
@@ -259,25 +230,25 @@ namespace gloox
       //   m_certInfo.protocol = SSL3;
       //   break;
       case GNUTLS_TLS1_0:
-        m_certInfo.protocol = TLSv1;
+        m_certInfo.protocol = "TLSv1";
         break;
       case GNUTLS_TLS1_1:
-        m_certInfo.protocol = TLSv1_1;
+        m_certInfo.protocol = "TLSv1.1";
         break;
       case GNUTLS_TLS1_2:
-        m_certInfo.protocol = TLSv1_2;
+        m_certInfo.protocol = "TLSv1.2";
         break;
       case GNUTLS_TLS1_3:
-        m_certInfo.protocol = TLSv1_3;
+        m_certInfo.protocol = "TLSv1.3";
         break;
       case GNUTLS_DTLS1_0:
-        m_certInfo.protocol = DTLSv1;
+        m_certInfo.protocol = "DTLSv1";
         break;
       case GNUTLS_DTLS1_2:
-        m_certInfo.protocol = DTLSv1_2;
+        m_certInfo.protocol = "DTLSv1.2";
         break;
       default:
-        m_certInfo.protocol = TLSInvalid;
+        m_certInfo.protocol = "Unknown protocol";
         break;
     }
   }

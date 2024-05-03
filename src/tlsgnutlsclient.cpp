@@ -48,14 +48,32 @@ namespace gloox
     if( gnutls_certificate_allocate_credentials( &m_credentials ) < 0 )
       return false;
 
-    if( gnutls_init( m_session, GNUTLS_CLIENT | GNUTLS_NONBLOCK ) != 0 )
+    if( gnutls_init( m_session, GNUTLS_CLIENT ) != 0 )
     {
       gnutls_certificate_free_credentials( m_credentials );
       return false;
     }
 
-    if( setPrios() != GNUTLS_E_SUCCESS )
+#if GNUTLS_VERSION_NUMBER >= 0x020600
+    int ret = gnutls_priority_set_direct( *m_session, "SECURE128:+PFS:+COMP-ALL:+VERS-TLS-ALL:-VERS-SSL3.0:+SIGN-ALL:+CURVE-ALL", 0 );
+    if( ret != GNUTLS_E_SUCCESS )
       return false;
+#else
+    const int protocolPriority[] = {
+      GNUTLS_TLS1_3,
+      GNUTLS_TLS1_2,
+      GNUTLS_TLS1_1, GNUTLS_TLS1, 0 };
+    const int kxPriority[]       = { GNUTLS_KX_RSA, GNUTLS_KX_DHE_RSA, GNUTLS_KX_DHE_DSS, 0 };
+    const int cipherPriority[]   = { GNUTLS_CIPHER_AES_256_CBC, GNUTLS_CIPHER_AES_128_CBC,
+                                     GNUTLS_CIPHER_3DES_CBC, GNUTLS_CIPHER_ARCFOUR, 0 };
+    const int compPriority[]     = { GNUTLS_COMP_ZLIB, GNUTLS_COMP_NULL, 0 };
+    const int macPriority[]      = { GNUTLS_MAC_SHA, GNUTLS_MAC_MD5, 0 };
+    gnutls_protocol_set_priority( *m_session, protocolPriority );
+    gnutls_cipher_set_priority( *m_session, cipherPriority );
+    gnutls_compression_set_priority( *m_session, compPriority );
+    gnutls_kx_set_priority( *m_session, kxPriority );
+    gnutls_mac_set_priority( *m_session, macPriority );
+#endif
 
     gnutls_certificate_set_x509_system_trust( m_credentials );
     gnutls_credentials_set( *m_session, GNUTLS_CRD_CERTIFICATE, m_credentials );

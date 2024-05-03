@@ -4,6 +4,16 @@ project( gloox )
 
 if (WIN32)
     set(CMAKE_CXX_FALGS ${CMAKE_CXX_FALGS} /utf-8)
+    add_definitions(-D_WIN -DUNICODE)
+
+    if (CMAKE_BUILD_TYPE STREQUAL Debug)
+        set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MTd /utf-8")
+        add_definitions(-D_ITERATOR_DEBUG_LEVEL=0)
+    endif ()
+
+    if(CMAKE_BUILD_TYPE STREQUAL Release)
+        set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /DNDEBUG /MT /utf-8")
+    endif()
     add_definitions(/UNICODE)
 endif()
 
@@ -18,8 +28,8 @@ endif( ZLIB_FOUND)
 if (UNIX)
     find_package(OpenSSL)
     if(OpenSSL_FOUND)
-        message(STATUS "Find OpenSSL")
-        set(LIBS ${LIBS} ${OpenSSL_LIBRARIES})
+        message(STATUS "Find OpenSSL=${OPENSSL_SSL_LIBRARY}")
+        set(LIBS ${LIBS} ${OPENSSL_SSL_LIBRARY} ${OPENSSL_CRYPTO_LIBRARY})
     endif ()
 endif ()
 
@@ -33,6 +43,8 @@ if( SETSOCKOPT_EXISTS )
 endif( SETSOCKOPT_EXISTS )
 
 message(STATUS "CMAKE_CXX_FALGS=${CMAKE_CXX_FALGS}")
+message(STATUS "CMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}")
+
 add_subdirectory( src )
 
 

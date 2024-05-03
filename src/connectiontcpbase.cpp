@@ -21,7 +21,12 @@
 #include "mutexguard.h"
 #include "util.h"
 
-#if !defined( _WIN32 ) && !defined( _WIN32_WCE )
+#ifdef __MINGW32__
+# include <winsock2.h>
+# include <ws2tcpip.h>
+#endif
+
+#if ( !defined( _WIN32 ) && !defined( _WIN32_WCE ) ) || defined( __SYMBIAN32__ )
 # include <arpa/inet.h>
 # include <sys/types.h>
 # include <sys/socket.h>
@@ -31,9 +36,7 @@
 # include <string.h>
 # include <errno.h>
 # include <netdb.h>
-#endif
-
-#if defined( _WIN32 ) || defined( __MINGW32__ )
+#elif ( defined( _WIN32 ) || defined( _WIN32_WCE ) ) && !defined( __SYMBIAN32__ )
 # include <winsock2.h>
 # include <ws2tcpip.h>
 typedef int socklen_t;
@@ -102,18 +105,8 @@ namespace gloox
     tv.tv_sec = timeout / 1000000;
     tv.tv_usec = timeout % 1000000;
 
-    if( FD_ISSET( m_socket, &fds ) != 0 )
-    {
-      return ( select( m_socket + 1, &fds, 0, 0, timeout == -1 ? 0 : &tv ) > 0 );
-    }
-    else
-    {
-      return false;
-    }
-    /*
-        return ( ( select( m_socket + 1, &fds, 0, 0, timeout == -1 ? 0 : &tv ) > 0 )
+    return ( ( select( m_socket + 1, &fds, 0, 0, timeout == -1 ? 0 : &tv ) > 0 )
              && FD_ISSET( m_socket, &fds ) != 0 );
-    */
   }
 
   ConnectionError ConnectionTCPBase::receive()
@@ -127,141 +120,34 @@ namespace gloox
     return err == ConnNoError ? ConnNotConnected : err;
   }
 
-  /**
-  * @brief Indicates whether a socket is ready for reading/writing.
-  * @param readop Indicates whether this is a read operation (@b true) or not (@b false, write operation).
-  * @return Returns 1 if socket is ready, 0 if timed out, else -errno.
-  *
-  */
-  int ConnectionTCPBase::waitForSocketReady( bool readop )
-  {
-    struct timeval tv, *tvptr;
-    fd_set fdset;
-    int sres;
-
-    int timeout = this->timeout();
-    int lastError;
-
-    do
-    {
-        FD_ZERO( &fdset );
-        FD_SET( m_socket, &fdset );
-        if( timeout < 0 )
-        {
-          tvptr = 0;
-        }
-        else
-        {
-          tv.tv_sec = timeout / 1000;
-          tv.tv_usec = ( timeout % 1000 ) * 1000;
-          tvptr = &tv;
-        }
-        sres = select( m_socket + 1,
-                       readop ? &fdset : 0,
-                       readop ? 0 : &fdset,
-                       0,
-                       tvptr );
-#if defined( _WIN32 )
-        lastError = WSAGetLastError();
-      } while( sres == -1 && lastError == WSAEINTR );
-#else
-        lastError = errno;
-      } while( sres == -1 && lastError == EINTR );
-#endif
-
-    // Timeout
-    if( sres == 0 )
-    {
-        return 0;
-    }
-    else if( sres < 0 )
-    {
-        return -lastError;
-    }
-    return 1;
-  }
-
   bool ConnectionTCPBase::send( const std::string& data )
-  {
-    if( data.empty() )
-      return false;
-
-    return send( data.c_str(), data.length() );
-  }
-
-  bool ConnectionTCPBase::send( const char* data, const size_t length )
   {
     m_sendMutex.lock();
 
-    if( !length || !data || ( m_socket < 0 ) )
+    if( data.empty() || ( m_socket < 0 ) )
     {
-        m_sendMutex.unlock();
-        return false;
+      m_sendMutex.unlock();
+      return false;
     }
 
     int sent = 0;
-    size_t num = 0;
-    size_t len = length;
-    size_t count = 0; // number of send failures
-
-    do
+    for( size_t num = 0, len = data.length(); sent != -1 && num < len; num += sent )
     {
-      sent = static_cast<int>( ::send( m_socket, data + num, static_cast<int>( len - num ), 0 ) );
-      if( sent > 0 )
-        num += sent;
-    } while( num < len && sent != -1 );
-
-    // Non-blocking (timeout value !=1) socket processing
-#if defined( _WIN32 )
-    int lastError = WSAGetLastError();
-    if (sent == -1 && lastError == WSAEWOULDBLOCK  && timeout() != -1)
-#else
-    int lastError = errno;
-    if( sent == -1 && ( lastError == EAGAIN || lastError == EWOULDBLOCK ) && timeout() != -1 )
-#endif
-    {
-      // Wait for socket
-      int waitStatus = waitForSocketReady( false );
-
-      while( waitStatus != 1 && count < 5 )
-      {
-        m_logInstance.err( LogAreaClassConnectionTCPBase, "ConnectionTCPBase::send(): retrying to wait socket, waitstatus="
-                              + util::int2string( waitStatus ) + " retry number=" + util::int2string( static_cast<int>( count ) ) );
-
-        waitStatus = waitForSocketReady( false );
-        count++;
-      }
-
-      // Socket is ready now, we send packets
-      if( waitStatus == 1 )
-      {
-        do
-        {
-          sent = static_cast<int>( ::send( m_socket, data + num, static_cast<int>( len - num ), 0 ) );
-          if( sent > 0 )
-            num += sent;
-        } while( num < len && sent != -1 );
-      }
-      else
-      {
-        m_logInstance.err( LogAreaClassConnectionTCPBase, "ConnectionTCPBase::send(): Socket unavailable, lastError="
-                              + util:: int2string( lastError ) + " waitstatus=" + util::int2string( waitStatus )
-                              + " number of retries=" + util::int2string( static_cast<int>( count ) ) );
-      }
+      sent = static_cast<int>( ::send( m_socket, (data.c_str()+num), static_cast<int>( len - num ), 0 ) );
     }
 
-    m_totalBytesOut +=num;
+    m_totalBytesOut += data.length();
 
     m_sendMutex.unlock();
 
     if( sent == -1 )
     {
-      // send() failed for an unexpected reason
-      std::string message = "send() failed. "
-#if defined( _WIN32 )
-        "WSAGetLastError: " + util::int2string( lastError );
+        // send() failed for an unexpected reason
+        std::string message = "send() failed. "
+#if defined( _WIN32 ) && !defined( __SYMBIAN32__ )
+          "WSAGetLastError: " + util::int2string( ::WSAGetLastError() );
 #else
-        "errno: " + util::int2string( lastError ) + ": " + strerror( lastError );
+          "errno: " + util::int2string( errno ) + ": " + strerror( errno );
 #endif
       m_logInstance.err( LogAreaClassConnectionTCPBase, message );
 

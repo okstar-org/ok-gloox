@@ -11,8 +11,6 @@
 */
 
 
-#if !defined( GLOOX_MINIMAL ) || defined( WANT_BYTESTREAM )
-
 #ifndef INBANDBYTESTREAM_H__
 #define INBANDBYTESTREAM_H__
 
@@ -74,7 +72,7 @@ namespace gloox
       bool send( const std::string& data );
 
       // reimplemented from Bytestream
-      virtual bool connect( int timeout = -1 );
+      virtual bool connect();
 
       // reimplemented from Bytestream
       virtual void close();
@@ -88,10 +86,8 @@ namespace gloox
       // reimplemented from MessageHandler
       virtual void handleMessage( const Message& msg, MessageSession* session = 0 );
 
-//    private:
-//#ifdef INBANDBYTESTREAM_TEST
     public:
-//#endif
+
       enum IBBType
       {
         IBBOpen,
@@ -202,7 +198,6 @@ namespace gloox
                         const JID& target, const std::string& sid );
       InBandBytestream& operator=( const InBandBytestream& );
       void closed(); // by remote entity
-      void error( const IQ& iq ); // by remote entity
       void returnResult( const JID& to, const std::string& id );
       void returnError( const JID& to, const std::string& id, StanzaErrorType type, StanzaError error );
 
@@ -210,12 +205,9 @@ namespace gloox
       int m_blockSize;
       int m_sequence;
       int m_lastChunkReceived;
-      const LogSink& m_logInstance;
 
   };
 
 }
 
 #endif // INBANDBYTESTREAM_H__
-
-#endif // GLOOX_MINIMAL

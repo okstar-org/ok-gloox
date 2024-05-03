@@ -17,15 +17,11 @@
 
 #include "macros.h"
 #include "gloox.h"
-// #include "connectionbase.h"
 #include "eventdispatcher.h"
 #include "iqhandler.h"
 #include "jid.h"
 #include "logsink.h"
 #include "mutex.h"
-#if !defined( GLOOX_MINIMAL ) || defined( WANT_PING )
-#include "pinghandler.h"
-#endif // GLOOX_MINIMAL
 #include "taghandler.h"
 #include "statisticshandler.h"
 #include "tlshandler.h"
@@ -33,13 +29,12 @@
 #include "connectiondatahandler.h"
 #include "parser.h"
 #include "atomicrefcount.h"
-#include "incominghandler.h"
 
 #include <string>
 #include <list>
 #include <map>
 
-#if defined( _WIN32 )
+#if defined( _WIN32 ) && !defined( __SYMBIAN32__ )
 #include <windows.h>
 #define SECURITY_WIN32
 #include <security.h>
@@ -56,17 +51,13 @@ namespace gloox
   class Message;
   class Presence;
   class Subscription;
+  class MessageSessionHandler;
   class ConnectionListener;
   class MessageHandler;
-#if !defined( GLOOX_MINIMAL ) || defined( WANT_MESSAGESESSION )
   class MessageSession;
-  class MessageSessionHandler;
-#endif // GLOOX_MINIMAL
   class PresenceHandler;
   class SubscriptionHandler;
-#if !defined( GLOOX_MINIMAL ) || defined( WANT_MUC )
   class MUCInvitationHandler;
-#endif // GLOOX_MINIMAL
   class TagHandler;
   class TLSBase;
   class ConnectionBase;
@@ -84,11 +75,8 @@ namespace gloox
    */
   class GLOOX_API ClientBase : public TagHandler, public ConnectionDataHandler,
                                public CompressionDataHandler, public TLSHandler,
-#if !defined( GLOOX_MINIMAL ) || defined( WANT_PING )
-                               public PingHandler,
-#endif // GLOOX_MINIMAL
                                public IqHandler
-                               {
+  {
 
     friend class RosterManager;
 
@@ -127,18 +115,17 @@ namespace gloox
        * immediately. If you choose the latter, its your responsibility to call @ref recv() every now
        * and then to actually receive data from the socket and to feed the parser.
        * @param block @b True for blocking, @b false for non-blocking connect. Defaults to @b true.
-       * @param timeout The timeout in microseconds to use for select(). Default of -1 means blocking.
        * @return @b False if prerequisits are not met (server not set) or if the connection was refused,
        * @b true otherwise.
        * @note Since 0.9 @link ConnectionListener::onDisconnect() onDisconnect() @endlink is called
        * in addition to a return value of @b false.
        */
-      bool connect( bool block = true, int timeout = -1 );
+      bool connect( bool block = true );
 
       /**
        * Use this periodically to receive data from the socket and to feed the parser. You need to use
        * this only if you chose to connect in non-blocking mode.
-       * @param timeout The timeout in microseconds to use for select. Default of -1 means blocking.
+       * @param timeout The timeout in microseconds to use for select. Default of -1 means blocking
        * until data was available.
        * @return The state of the connection.
        */
@@ -159,14 +146,6 @@ namespace gloox
        */
       const JID& jid() { return m_authzid ? m_authzid : m_jid; }
 
-#if !defined( GLOOX_MINIMAL ) || defined( WANT_WEBSOCKET )
-      /**
-       * Switches usage of websocket transport on/off. Default: off. 
-       * @param ws Whether to switch websocket transport usage on or off.
-       */
-      void setWebsocket( bool ws ) { m_websocket = ws; }
-#endif // GLOOX_MINIMAL
-
       /**
        * Switches usage of SASL on/off. Default: on. SASL should only be disabled if there are
        * problems with using it, and if an alternative authentication method exists.
@@ -176,12 +155,10 @@ namespace gloox
 
       /**
        * Sets the TLS policy. Default: TLS will be used if available. TLS should only be
-       * disabled if there are problems with using it. Also sets the minimum required/requested
-       * TLS version for the connection.
+       * disabled if there are problems with using it.
        * @param tls The TLS policy.
-       * @param tlsVersion The minimum TLS version to require/request. Default: TLS 1.0.
        */
-      void setTls( TLSPolicy tls, TLSVersion tlsVersion = TLSv1 ) { m_tls = tls; m_tlsVersion = tlsVersion; }
+      void setTls( TLSPolicy tls ) { m_tls = tls; }
 
       /**
        * Switches usage of Stream Compression on/off (if available). Default: on if available. Stream
@@ -231,12 +208,6 @@ namespace gloox
       TLSPolicy tls() const { return m_tls; }
 
       /**
-       * Returns the minimum required TLS version (not necessarily the one in use).
-       * @return The TLS version.
-       */
-      TLSVersion tlsVersion() const { return m_tlsVersion; }
-
-      /**
        * Returns whether Stream Compression is currently enabled (not necessarily used).
        * @return The current Stream Compression status.
        */
@@ -255,13 +226,11 @@ namespace gloox
        */
       virtual const std::string& password() const { return m_password; }
 
-#if !defined( GLOOX_MINIMAL ) || defined( WANT_DISCO )
       /**
        * This function gives access to the @c Disco object.
        * @return A pointer to the Disco object.
        */
       virtual Disco* disco() const { return m_disco; }
-#endif // GLOOX_MINIMAL
 
       /**
        * Creates a string which is unique in the current instance and
@@ -388,7 +357,6 @@ namespace gloox
        */
       void setCompressionImpl( CompressionBase* cb );
 
-#if !defined( GLOOX_MINIMAL ) || defined( WANT_PING )
       /**
        * Sends a whitespace ping to the server.
        * @since 0.9
@@ -402,7 +370,6 @@ namespace gloox
        * @since 0.9
        */
       void xmppPing( const JID& to, EventHandler* eh );
-#endif // GLOOX_MINIMAL
 
       /**
        * Use this function to set an authorization ID (authzid). Provided the server supports it
@@ -486,20 +453,6 @@ namespace gloox
        */
       void removeMessageHandler( MessageHandler* mh );
 
-#if !defined( GLOOX_MINIMAL ) || defined( WANT_PING )
-      /**
-       * Registers @c ph as object that receives Ping stanza notifications.
-       * @param ph The object to receive Ping stanza notifications.
-       */
-      void registerPingHandler( PingHandler* ph );
-
-      /**
-       * Clears the current ping handler. The ping handler does not get deleted.
-       */
-      void removePingHandler();
-#endif // GLOOX_MINIMAL
-
-#if !defined( GLOOX_MINIMAL ) || defined( WANT_MESSAGESESSION )
       /**
        * Registers the given MessageSession to receive Messages incoming from the session's
        * target JID.
@@ -516,19 +469,6 @@ namespace gloox
        * @param session The MessageSession to be deleted.
        */
       void disposeMessageSession( MessageSession* session );
-
-      /**
-       * Use this function to register a MessageSessionHandler with the Client.
-       * Optionally the MessageSessionHandler can receive only MessageSessions with a given
-       * message type. There can be only one handler per message type.<br>
-       * A MessageSession will be created for every incoming
-       * message stanza if there is no MessageHandler registered for the originating JID.
-       * @param msh The MessageSessionHandler that will receive the newly created MessageSession.
-       * @param types ORed StanzaSubType's that describe the desired message types the handler
-       * shall receive. Only StanzaMessage* types are valid. A value of 0 means any type (default).
-       */
-      void registerMessageSessionHandler( MessageSessionHandler* msh, int types = 0 );
-#endif // GLOOX_MINIMAL
 
       /**
        * Registers @c ph as object that receives Presence stanza notifications.
@@ -562,8 +502,6 @@ namespace gloox
        */
       void registerTagHandler( TagHandler* th, const std::string& tag,
                                                const std::string& xmlns );
-
-      void registerIncomingHandler(IncomingHandler* th);
 
       /**
        * Registers @c sh as object that receives up-to-date connection statistics each time
@@ -643,6 +581,18 @@ namespace gloox
       void setClientCert( const std::string& clientKey, const std::string& clientCerts );
 
       /**
+       * Use this function to register a MessageSessionHandler with the Client.
+       * Optionally the MessageSessionHandler can receive only MessageSessions with a given
+       * message type. There can be only one handler per message type.<br>
+       * A MessageSession will be created for every incoming
+       * message stanza if there is no MessageHandler registered for the originating JID.
+       * @param msh The MessageSessionHandler that will receive the newly created MessageSession.
+       * @param types ORed StanzaSubType's that describe the desired message types the handler
+       * shall receive. Only StanzaMessage* types are valid. A value of 0 means any type (default).
+       */
+      void registerMessageSessionHandler( MessageSessionHandler* msh, int types = 0 );
+
+      /**
        * Returns the LogSink instance for this ClientBase and all related objects.
        * @return The LogSink instance used in the current ClientBase.
        */
@@ -696,7 +646,6 @@ namespace gloox
        */
       StatisticsStruct getStatistics();
 
-#if !defined( GLOOX_MINIMAL ) || defined( WANT_MUC )
       /**
        * Registers a MUCInvitationHandler with the ClientBase.
        * @param mih The MUCInvitationHandler to register.
@@ -707,7 +656,6 @@ namespace gloox
        * Removes the currently registered MUCInvitationHandler.
        */
       void removeMUCInvitationHandler();
-#endif // GLOOX_MINIMAL
 
       /**
        * Adds a StanzaExtension that will be sent with every Presence stanza
@@ -767,13 +715,8 @@ namespace gloox
       // reimplemented from TLSHandler
       virtual void handleHandshakeResult( const TLSBase* base, bool success, CertInfo &certinfo );
 
-#if !defined( GLOOX_MINIMAL ) || defined( WANT_PING )
-      // reimplemented from PingHandler
-      virtual void handlePing( const PingType type, const std::string& body );
-#endif // GLOOX_MINIMAL
 
-    public:
-
+  public:
       /**
        * This function is called when resource binding yieled an error.
        * @param error A pointer to an Error object that contains more
@@ -820,6 +763,10 @@ namespace gloox
        */
       virtual void disconnect( ConnectionError reason );
 
+      /**
+       * Sends the stream header.
+       */
+      void header();
 
       /**
        * Tells ClientBase that authentication was successful (or not).
@@ -853,8 +800,8 @@ namespace gloox
        * Verifies the server response after successful authentication (if applicable) and
        * releases SASL related resources (if applicable).
        * @param payload The server's verification string.
-       * @return @b True if verification is not supported by the chosen SASL mechanism or could be
-       * completed successfully, @b false if verification failed.
+       * @return @b True if verification is not supported by the chosen SASL mechanism or could be completed successfully,
+       * @b false if verification failed.
        */
       bool processSASLSuccess( const std::string& payload );
 
@@ -922,13 +869,15 @@ namespace gloox
       ConnectionBase* m_connection;      /**< The transport connection. */
       TLSBase* m_encryption;             /**< Used for connection encryption. */
       CompressionBase* m_compression;    /**< Used for connection compression. */
-#if !defined( GLOOX_MINIMAL ) || defined( WANT_DISCO )
       Disco* m_disco;                    /**< The local Service Discovery client. */
-#endif // GLOOX_MINIMAL
 
       /** A list of permanent presence extensions. */
       StanzaExtensionList m_presenceExtensions;
 
+      GLOOX_DEPRECATED std::string m_selectedResource; /**< The currently selected resource.
+                                          * See Client::selectResource() and Client::bindRessource().
+                                          * @deprecated Not used anymore. Will be removed for 1.1.
+                                          * @todo Remove for 1.1 */
       std::string m_clientCerts;         /**< TLS client certificates. */
       std::string m_clientKey;           /**< TLS client private key. */
       std::string m_namespace;           /**< Default namespace. */
@@ -947,11 +896,7 @@ namespace gloox
       bool m_resourceBound;              /**< Whether resource binding has been completed successfully. */
       bool m_block;                      /**< Whether blocking connection is wanted. */
       bool m_sasl;                       /**< Whether SASL authentication is wanted. */
-#if !defined( GLOOX_MINIMAL ) || defined( WANT_WEBSOCKET )
-      bool m_websocket;                  /**< Whether connection is done over websocket. */
-#endif // GLOOX_MINIMAL
       TLSPolicy m_tls;                   /**< The current TLS policy. */
-      TLSVersion m_tlsVersion;           /**< The minimum TLS version to require/request. */
       int m_port;                        /**< The port to connect to, if not to be determined
                                           * by querying the server's SRV records. */
 
@@ -975,10 +920,9 @@ namespace gloox
                                           * You should NOT mess with this. */
 
     private:
-#if defined( CLIENTBASE_TEST ) || defined( ENABLE_SEND_RAW_XML )
+#ifdef CLIENTBASE_TEST
     public:
 #endif
-#if !defined( GLOOX_MINIMAL ) || defined( WANT_PING )
       /**
        * @brief This is an implementation of an XMPP Ping (@xep{0199}).
        *
@@ -1022,14 +966,9 @@ namespace gloox
           }
 
       };
-#endif // GLOOX_MINIMAL
 
-  private:
       ClientBase( const ClientBase& );
       ClientBase& operator=( const ClientBase& );
-#if defined( CLIENTBASE_TEST ) || defined( ENABLE_SEND_RAW_XML )
-    public:
-#endif
 
       /**
        * This function is called right after the opening &lt;stream:stream&gt; was received.
@@ -1104,9 +1043,7 @@ namespace gloox
       typedef std::map<const std::string, TrackStruct>     IqTrackMap;
       typedef std::map<const std::string, MessageHandler*> MessageHandlerMap;
       typedef std::map<int, Tag*>                          SMQueueMap;
-#if !defined( GLOOX_MINIMAL ) || defined( WANT_MESSAGESESSION )
       typedef std::list<MessageSession*>                   MessageSessionList;
-#endif // GLOOX_MINIMAL
       typedef std::list<MessageHandler*>                   MessageHandlerList;
       typedef std::list<PresenceHandler*>                  PresenceHandlerList;
       typedef std::list<JidPresHandlerStruct>              PresenceJidHandlerList;
@@ -1118,6 +1055,7 @@ namespace gloox
       IqHandlerMap             m_iqExtHandlers;
       IqTrackMap               m_iqIDHandlers;
       SMQueueMap               m_smQueue;
+      MessageSessionList       m_messageSessions;
       MessageHandlerList       m_messageHandlers;
       PresenceHandlerList      m_presenceHandlers;
       PresenceJidHandlerList   m_presenceJidHandlers;
@@ -1125,20 +1063,11 @@ namespace gloox
       TagHandlerList           m_tagHandlers;
       StringList               m_cacerts;
       StatisticsHandler      * m_statisticsHandler;
-      IncomingHandler        * m_incomingHandler;
-#if !defined( GLOOX_MINIMAL ) || defined( WANT_MUC )
       MUCInvitationHandler   * m_mucInvitationHandler;
-#endif // GLOOX_MINIMAL
-#if !defined( GLOOX_MINIMAL ) || defined( WANT_MESSAGESESSION )
-      MessageSessionList       m_messageSessions;
       MessageSessionHandler  * m_messageSessionHandlerChat;
       MessageSessionHandler  * m_messageSessionHandlerGroupchat;
       MessageSessionHandler  * m_messageSessionHandlerHeadline;
       MessageSessionHandler  * m_messageSessionHandlerNormal;
-#endif // GLOOX_MINIMAL
-#if !defined( GLOOX_MINIMAL ) || defined( WANT_PING )
-      PingHandler            * m_pingHandler;
-#endif // GLOOX_MINIMAL
 
       util::Mutex m_iqHandlerMapMutex;
       util::Mutex m_iqExtHandlerMapMutex;
@@ -1170,7 +1099,7 @@ namespace gloox
 
       int m_smSent;
 
-#if defined( _WIN32 )
+#if defined( _WIN32 ) && !defined( __SYMBIAN32__ )
       CredHandle m_credHandle;
       CtxtHandle m_ctxtHandle;
 #endif

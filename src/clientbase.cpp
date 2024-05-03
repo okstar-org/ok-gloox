@@ -61,7 +61,7 @@
 
 #include <string.h> // for memset()
 
-#if defined( _WIN32 )
+#if defined( _WIN32 ) && !defined( __SYMBIAN32__ )
 #include <tchar.h>
 # ifdef __MINGW32__
 #  ifndef SecureZeroMemory
@@ -73,7 +73,6 @@
 namespace gloox
 {
 
-#if !defined( GLOOX_MINIMAL ) || defined( WANT_PING )
   // ---- ClientBase::Ping ----
   ClientBase::Ping::Ping()
     : StanzaExtension( ExtPing )
@@ -90,33 +89,17 @@ namespace gloox
     return filter;
   }
   // ---- ~ClientBase::Ping ----
-#endif // GLOOX_MINIMAL
 
   // ---- ClientBase ----
   ClientBase::ClientBase( const std::string& ns, const std::string& server, int port )
-    : m_connection( 0 ), m_encryption( 0 ), m_compression( 0 ),
-#if !defined( GLOOX_MINIMAL ) || defined( WANT_DISCO )
-      m_disco( 0 ),
-#endif // GLOOX_MINIMAL
-      m_namespace( ns ),
+    : m_connection( 0 ), m_encryption( 0 ), m_compression( 0 ), m_disco( 0 ), m_namespace( ns ),
       m_xmllang( "en" ), m_server( server ), m_compressionActive( false ), m_encryptionActive( false ),
       m_compress( true ), m_authed( false ), m_resourceBound( false ), m_block( false ), m_sasl( true ),
-#if !defined( GLOOX_MINIMAL ) || defined( WANT_WEBSOCKET )
-      m_websocket( false ),
-#endif // GLOOX_MINIMAL
-      m_tls( TLSOptional ), m_tlsVersion( TLSv1 ), m_port( port ),
+      m_tls( TLSOptional ), m_port( port ),
       m_availableSaslMechs( SaslMechAll ), m_smContext( CtxSMInvalid ), m_smHandled( 0 ),
-      m_statisticsHandler( 0 ),
-#if !defined( GLOOX_MINIMAL ) || defined( WANT_MUC )
-      m_mucInvitationHandler( 0 ),
-#endif // GLOOX_MINIMAL
-#if !defined( GLOOX_MINIMAL ) || defined( WANT_MESSAGESESSION )
+      m_statisticsHandler( 0 ), m_mucInvitationHandler( 0 ),
       m_messageSessionHandlerChat( 0 ), m_messageSessionHandlerGroupchat( 0 ),
       m_messageSessionHandlerHeadline( 0 ), m_messageSessionHandlerNormal( 0 ),
-#endif // GLOOX_MINIMAL
-#if !defined( GLOOX_MINIMAL ) || defined( WANT_PING )
-      m_pingHandler( 0 ),
-#endif // GLOOX_MINIMAL
       m_parser( this ), m_seFactory( 0 ), m_authError( AuthErrorUndefined ),
       m_streamError( StreamErrorUndefined ), m_streamErrorAppCondition( 0 ),
       m_selectedSaslMech( SaslMechNone ), m_customConnection( false ),
@@ -127,30 +110,15 @@ namespace gloox
 
   ClientBase::ClientBase( const std::string& ns, const std::string& password,
                           const std::string& server, int port )
-  : m_connection( 0 ), m_encryption( 0 ), m_compression( 0 ),
-#if !defined( GLOOX_MINIMAL ) || defined( WANT_DISCO )
-      m_disco( 0 ),
-#endif // GLOOX_VERSION
-      m_namespace( ns ),
+    : m_connection( 0 ), m_encryption( 0 ), m_compression( 0 ), m_disco( 0 ), m_namespace( ns ),
       m_password( password ),
       m_xmllang( "en" ), m_server( server ), m_compressionActive( false ), m_encryptionActive( false ),
       m_compress( true ), m_authed( false ), m_resourceBound( false ), m_block( false ), m_sasl( true ),
-#if !defined( GLOOX_MINIMAL ) || defined( WANT_WEBSOCKET )
-      m_websocket( false ),
-#endif // GLOOX_MINIMAL
-      m_tls( TLSOptional ), m_tlsVersion( TLSv1 ), m_port( port ),
+      m_tls( TLSOptional ), m_port( port ),
       m_availableSaslMechs( SaslMechAll ), m_smContext( CtxSMInvalid ), m_smHandled( 0 ),
-      m_statisticsHandler( 0 ), m_incomingHandler ( 0 ),
-#if !defined( GLOOX_MINIMAL ) || defined( WANT_MUC )
-      m_mucInvitationHandler( 0 ),
-#endif // GLOOX_MINIMAL
-#if !defined( GLOOX_MINIMAL ) || defined( WANT_MESSAGESESSION )
+      m_statisticsHandler( 0 ), m_mucInvitationHandler( 0 ),
       m_messageSessionHandlerChat( 0 ), m_messageSessionHandlerGroupchat( 0 ),
       m_messageSessionHandlerHeadline( 0 ), m_messageSessionHandlerNormal( 0 ),
-#endif // GLOOX_MINIMAL
-#if !defined( GLOOX_MINIMAL ) || defined( WANT_PING )
-      m_pingHandler( 0 ),
-#endif // GLOOX_MINIMAL
       m_parser( this ), m_seFactory( 0 ), m_authError( AuthErrorUndefined ),
       m_streamError( StreamErrorUndefined ), m_streamErrorAppCondition( 0 ),
       m_selectedSaslMech( SaslMechNone ), m_customConnection( false ),
@@ -167,21 +135,16 @@ namespace gloox
     sha.feed( util::int2string( rand() ) );
     m_uniqueBaseId = sha.hex();
 
-#if !defined( GLOOX_MINIMAL ) || defined( WANT_DISCO )
     if( !m_disco )
     {
       m_disco = new Disco( this );
       m_disco->setVersion( "based on gloox", GLOOX_VERSION );
       m_disco->addFeature( XMLNS_XMPP_PING );
     }
-#endif // GLOOX_MINIMAL
 
     registerStanzaExtension( new Error() );
-
-#if !defined( GLOOX_MINIMAL ) || defined( WANT_PING )
     registerStanzaExtension( new Ping() );
     registerIqHandler( this, ExtPing );
-#endif // GLOOX_MINIMAL
 
     m_streamError = StreamErrorUndefined;
     m_block = false;
@@ -207,14 +170,10 @@ namespace gloox
     setCompressionImpl( 0 );
     delete m_seFactory;
     m_seFactory = 0; // to avoid usage when Disco gets deleted below
-#if !defined( GLOOX_MINIMAL ) || defined( WANT_DISCO )
     delete m_disco;
     m_disco = 0;
-#endif // GLOOX_MINIMAL
 
-#if !defined( GLOOX_MINIMAL ) || defined( WANT_MESSAGESESSION )
     util::clearList( m_messageSessions );
-#endif // GLOOX_MINIMAL
 
     PresenceJidHandlerList::const_iterator it1 = m_presenceJidHandlers.begin();
     for( ; it1 != m_presenceJidHandlers.end(); ++it1 )
@@ -229,7 +188,7 @@ namespace gloox
     return m_connection->recv( timeout );
   }
 
-  bool ClientBase::connect( bool block, int timeout )
+  bool ClientBase::connect( bool block )
   {
     if( m_server.empty() )
       return false;
@@ -249,7 +208,7 @@ namespace gloox
     m_logInstance.dbg( LogAreaClassClientbase, "This is gloox " + GLOOX_VERSION + ", connecting to "
                                                + m_server + ( ( m_customConnection )?( " using a custom connection" ):( m_port > 0 ? ( ":" + util::int2string( m_port ) ) : EmptyString ) ) + "..." );
     m_block = block;
-    ConnectionError ret = m_connection->connect( timeout );
+    ConnectionError ret = m_connection->connect();
     if( ret != ConnNoError )
       return false;
 
@@ -267,8 +226,6 @@ namespace gloox
       disconnect( ConnStreamClosed );
       return;
     }
-
-    m_incomingHandler->handleIncoming(tag);
 
     logInstance().dbg( LogAreaXmlIncoming, tag->xml() );
     ++m_stats.totalStanzasReceived;
@@ -379,7 +336,7 @@ namespace gloox
     if( m_connection )
       m_connection->send( data );
     else
-      m_logInstance.err( LogAreaClassClientbase, "Encryption finished, but connection chain broken" );
+      m_logInstance.err( LogAreaClassClientbase, "Encryption finished, but chain broken" );
   }
 
   void ClientBase::handleDecryptedData( const TLSBase* /*base*/, const std::string& data )
@@ -401,11 +358,8 @@ namespace gloox
       }
       else
       {
-        logInstance().dbg( LogAreaClassClientbase, "Connection encryption active" );
-        if( m_connection )
-          send( m_connection->header( m_jid.server(), m_namespace, m_xmllang ) );
-        else
-          logInstance().err( LogAreaClassClientbase, "Connection chain broken" );
+        logInstance().dbg( LogAreaClassClientbase, "connection encryption active" );
+        header();
       }
     }
     else
@@ -425,18 +379,9 @@ namespace gloox
       parse( data );
   }
 
-#if !defined( GLOOX_MINIMAL ) || defined( WANT_PING )
-  void ClientBase::handlePing( const PingType type, const std::string& body )
-  {
-    if( m_pingHandler )
-      m_pingHandler->handlePing( type, body );
-  }
-#endif // GLOOX_MINIMAL
-
   void ClientBase::handleConnect( const ConnectionBase* /*connection*/ )
   {
-    if( m_connection )
-      send( m_connection->header( m_jid.server(), m_namespace, m_xmllang ) );
+    header();
   }
 
   void ClientBase::handleDisconnect( const ConnectionBase* /*connection*/, ConnectionError reason )
@@ -464,7 +409,6 @@ namespace gloox
     if( reason != ConnTlsFailed )
       send( "</stream:stream>" );
 
-    notifyOnDisconnect( reason );
     m_connection->disconnect();
     m_connection->cleanup();
 
@@ -477,6 +421,8 @@ namespace gloox
     m_encryptionActive = false;
     m_compressionActive = false;
     m_smSent = 0;
+
+    notifyOnDisconnect( reason );
 
 #ifdef CLIENTBASE_TEST
     m_nextId.reset();
@@ -498,6 +444,15 @@ namespace gloox
       send( e );
       disconnect( ConnParseError );
     }
+  }
+
+  void ClientBase::header()
+  {
+    std::string head = "<?xml version='1.0' ?>";
+    head += "<stream:stream to='" + m_jid.server() + "' xmlns='" + m_namespace + "' ";
+    head += "xmlns:stream='http://etherx.jabber.org/streams'  xml:lang='" + m_xmllang + "' ";
+    head += "version='" + XMPP_STREAM_VERSION_MAJOR + "." + XMPP_STREAM_VERSION_MINOR + "'>";
+    send( head );
   }
 
   bool ClientBase::hasTls()
@@ -548,11 +503,7 @@ namespace gloox
         }
         else // SaslMechScramSha1Plus
         {
-          if( m_encryption && ( m_encryption->fetchTLSInfo().protocol >= TLSv1_3 ) )
-            m_gs2Header = "p=tls-exporter,";
-          else
-            m_gs2Header = "p=tls-unique,";
-
+          m_gs2Header = "p=" + m_encryption->channelBindingType() + ",";
           a->addAttribute( "mechanism", "SCRAM-SHA-1-PLUS" );
         }
 
@@ -603,7 +554,7 @@ namespace gloox
        break;
       case SaslMechGssapi:
       {
-#if defined( _WIN32 )
+#if defined( _WIN32 ) && !defined( __SYMBIAN32__ )
         a->addAttribute( "mechanism", "GSSAPI" );
 // The client calls GSS_Init_sec_context, passing in 0 for
 // input_context_handle (initially) and a targ_name equal to output_name
@@ -624,7 +575,7 @@ namespace gloox
       }
       case SaslMechNTLM:
       {
-#if defined( _WIN32 )
+#if defined( _WIN32 ) && !defined( __SYMBIAN32__ )
         a->addAttribute( "mechanism", "NTLM" );
         SEC_WINNT_AUTH_IDENTITY_W identity, *ident = 0;
         memset( &identity, 0, sizeof( identity ) );
@@ -798,7 +749,7 @@ namespace gloox
         unsigned char clientProof[20]; // ck XOR clientSignature
         memcpy( clientProof, ck.c_str(), 20 );
         for( int i = 0; i < 20; ++i )
-          clientProof[i] ^= static_cast<unsigned char>( clientSignature.c_str()[i] );
+          clientProof[i] ^= clientSignature.c_str()[i];
         std::string serverKey = hmac( saltedPwd, "Server Key" );
         m_serverSignature = hmac( serverKey, authMessage );
 
@@ -889,7 +840,7 @@ namespace gloox
         break;
       }
       case SaslMechGssapi:
-#if defined( _WIN32 )
+#if defined( _WIN32 ) && !defined( __SYMBIAN32__ )
         // see gssapi-sasl-draft.txt
 #else
         m_logInstance.err( LogAreaClassClientbase,
@@ -898,7 +849,7 @@ namespace gloox
         break;
       case SaslMechNTLM:
       {
-#if defined( _WIN32 )
+#if defined( _WIN32 ) && !defined( __SYMBIAN32__ )
         bool type1 = ( decoded.length() < 7 ) ? true : false;
 
         SecBuffer bufferIn = { type1 ? 0 : (unsigned long)decoded.length(),
@@ -965,7 +916,7 @@ namespace gloox
     else if( tag->hasChild( "temporary-auth-failure" ) )
       m_authError = SaslTemporaryAuthFailure;
 
-#if defined( _WIN32 )
+#if defined( _WIN32 ) && !defined( __SYMBIAN32__ )
     if( m_selectedSaslMech == SaslMechNTLM )
     {
       FreeCredentialsHandle( &m_credHandle );
@@ -976,7 +927,7 @@ namespace gloox
 
   bool ClientBase::processSASLSuccess( const std::string& payload )
   {
-#if defined( _WIN32 )
+#if defined( _WIN32 ) && !defined( __SYMBIAN32__ )
     if( m_selectedSaslMech == SaslMechNTLM )
     {
       FreeCredentialsHandle( &m_credHandle );
@@ -1135,11 +1086,10 @@ namespace gloox
 
   void ClientBase::addFrom( Tag* tag )
   {
-    if( !m_authed /* for IQ Auth */ || ( !m_resourceBound && m_authzid.bare().empty() ) /* for resource binding */
-        || !tag || tag->hasAttribute( "from" ) )
+    if( !m_authed /* for IQ Auth */ || !m_resourceBound /* for resource binding */ || !tag || tag->hasAttribute( "from" ) )
       return;
 
-    tag->addAttribute( "from", jid().full() );
+    tag->addAttribute( "from", m_jid.full() );
   }
 
   void ClientBase::addNamespace( Tag* tag )
@@ -1179,7 +1129,6 @@ namespace gloox
     return m_connection ? m_connection->state() : StateDisconnected;
   }
 
-#if !defined( GLOOX_MINIMAL ) || defined( WANT_PING )
   void ClientBase::whitespacePing()
   {
     send( " " );
@@ -1193,11 +1142,9 @@ namespace gloox
     m_dispatcher.registerEventHandler( eh, id );
     send( iq, this, XMPPPing );
   }
-#endif // GLOOX_MINIMAL
 
   bool ClientBase::handleIq( const IQ& iq )
   {
-#if !defined( GLOOX_MINIMAL ) || defined( WANT_PING )
     const Ping* p = iq.findExtension<Ping>( ExtPing );
     if( !p || iq.subtype() != IQ::Get )
       return false;
@@ -1207,20 +1154,15 @@ namespace gloox
     send( re );
 
     return true;
-#else
-    return false;
-#endif // GLOOX_MINIMAL
   }
 
   void ClientBase::handleIqID( const IQ& iq, int context )
   {
-#if !defined( GLOOX_MINIMAL ) || defined( WANT_PING )
     if( context == XMPPPing )
       m_dispatcher.dispatch( Event( ( iq.subtype() == IQ::Result ) ? Event::PingPong
                                                                    : Event::PingError, iq ),
                              iq.id(), true );
     else
-#endif // GLOOX_MINIMAL
       handleIqIDForward( iq, context );
   }
 
@@ -1361,7 +1303,6 @@ namespace gloox
     return ( it != m_streamErrorText.end() ) ? (*it).second : EmptyString;
   }
 
-#if !defined( GLOOX_MINIMAL ) || defined( WANT_MESSAGESESSION )
   void ClientBase::registerMessageSessionHandler( MessageSessionHandler* msh, int types )
   {
     if( types & Message::Chat || types == 0 )
@@ -1376,40 +1317,6 @@ namespace gloox
     if( types & Message::Headline || types == 0 )
       m_messageSessionHandlerHeadline = msh;
   }
-
-  void ClientBase::registerMessageSession( MessageSession* session )
-  {
-    if( session )
-      m_messageSessions.push_back( session );
-  }
-
-  void ClientBase::disposeMessageSession( MessageSession* session )
-  {
-    if( !session )
-      return;
-
-    MessageSessionList::iterator it = std::find( m_messageSessions.begin(),
-                                                 m_messageSessions.end(),
-                                                 session );
-    if( it != m_messageSessions.end() )
-    {
-      delete (*it);
-      m_messageSessions.erase( it );
-    }
-  }
-#endif // GLOOX_MINIMAL
-
-#if !defined( GLOOX_MINIMAL ) || defined( WANT_PING )
-void ClientBase::registerPingHandler( PingHandler* ph )
-  {
-    m_pingHandler = ph;
-  }
-
-  void ClientBase::removePingHandler()
-  {
-    m_pingHandler = 0;
-  }
-#endif // GLOOX_MINIMAL
 
   void ClientBase::registerPresenceHandler( PresenceHandler* ph )
   {
@@ -1500,6 +1407,27 @@ void ClientBase::registerPingHandler( PingHandler* ph )
     }
   }
 
+  void ClientBase::registerMessageSession( MessageSession* session )
+  {
+    if( session )
+      m_messageSessions.push_back( session );
+  }
+
+  void ClientBase::disposeMessageSession( MessageSession* session )
+  {
+    if( !session )
+      return;
+
+    MessageSessionList::iterator it = std::find( m_messageSessions.begin(),
+                                                 m_messageSessions.end(),
+                                                 session );
+    if( it != m_messageSessions.end() )
+    {
+      delete (*it);
+      m_messageSessions.erase( it );
+    }
+  }
+
   void ClientBase::registerMessageHandler( MessageHandler* mh )
   {
     if( mh )
@@ -1536,10 +1464,6 @@ void ClientBase::registerPingHandler( PingHandler* ph )
     }
   }
 
-  void ClientBase::registerIncomingHandler(gloox::IncomingHandler *th) {
-    m_incomingHandler = th;
-  }
-
   void ClientBase::removeTagHandler( TagHandler* th, const std::string& tag, const std::string& xmlns )
   {
     if( th )
@@ -1574,26 +1498,20 @@ void ClientBase::registerPingHandler( PingHandler* ph )
     m_statisticsHandler = 0;
   }
 
-#if !defined( GLOOX_MINIMAL ) || defined( WANT_MUC )
   void ClientBase::registerMUCInvitationHandler( MUCInvitationHandler* mih )
   {
     if( mih )
     {
       m_mucInvitationHandler = mih;
- #if !defined( GLOOX_MINIMAL ) || defined( WANT_DISCO )
       m_disco->addFeature( XMLNS_MUC );
- #endif // GLOOX_MINIMAL
     }
   }
 
   void ClientBase::removeMUCInvitationHandler()
   {
     m_mucInvitationHandler = 0;
- #if !defined( GLOOX_MINIMAL ) || defined( WANT_DISCO )
     m_disco->removeFeature( XMLNS_MUC );
- #endif // GLOOX_MINIMAL
   }
-#endif // GLOOX_MINIMAL
 
   void ClientBase::registerConnectionListener( ConnectionListener* cl )
   {
@@ -1663,12 +1581,26 @@ void ClientBase::registerPingHandler( PingHandler* ph )
     if( match )
       return;
 
-    util::ForEach( m_presenceHandlers, &PresenceHandler::handlePresence, pres );
+    // FIXME remove this for() for 1.1:
+    PresenceHandlerList::const_iterator it = m_presenceHandlers.begin();
+    for( ; it != m_presenceHandlers.end(); ++it )
+    {
+      (*it)->handlePresence( pres );
+    }
+      // FIXME and reinstantiate this:
+//     util::ForEach( m_presenceHandlers, &PresenceHandler::handlePresence, pres );
   }
 
   void ClientBase::notifySubscriptionHandlers( Subscription& s10n )
   {
-    util::ForEach( m_subscriptionHandlers, &SubscriptionHandler::handleSubscription, s10n );
+    // FIXME remove this for() for 1.1:
+    SubscriptionHandlerList::const_iterator it = m_subscriptionHandlers.begin();
+    for( ; it != m_subscriptionHandlers.end(); ++it )
+    {
+      (*it)->handleSubscription( s10n );
+    }
+      // FIXME and reinstantiate this:
+//     util::ForEach( m_subscriptionHandlers, &SubscriptionHandler::handleSubscription, s10n );
   }
 
   void ClientBase::notifyIqHandlers( IQ& iq )
@@ -1676,16 +1608,17 @@ void ClientBase::registerPingHandler( PingHandler* ph )
     m_iqHandlerMapMutex.lock();
     IqTrackMap::iterator it_id = m_iqIDHandlers.find( iq.id() );
     bool haveIdHandler = ( it_id != m_iqIDHandlers.end() );
+    m_iqHandlerMapMutex.unlock();
     if( haveIdHandler && ( iq.subtype() == IQ::Result || iq.subtype() == IQ::Error ) )
     {
       (*it_id).second.ih->handleIqID( iq, (*it_id).second.context );
       if( (*it_id).second.del )
         delete (*it_id).second.ih;
+      m_iqHandlerMapMutex.lock();
       m_iqIDHandlers.erase( it_id );
       m_iqHandlerMapMutex.unlock();
       return;
     }
-    m_iqHandlerMapMutex.unlock();
 
     if( iq.extensions().empty() )
     {
@@ -1728,23 +1661,6 @@ void ClientBase::registerPingHandler( PingHandler* ph )
 
     if( !handled && ( iq.subtype() == IQ::Get || iq.subtype() == IQ::Set ) )
     {
-      // To debug empty handler bug
-
-      m_iqExtHandlerMapMutex.lock();
-
-      const StanzaExtensionList& sel2 = iq.extensions();
-      itse = sel2.begin();
-      for( ; !handled && itse != sel2.end(); ++itse )
-      {
-        std::pair<IQci, IQci> g = m_iqExtHandlers.equal_range( (*itse)->extensionType() );
-        for( IQci it = g.first; !handled && it != g.second; ++it )
-        {
-          if( (*it).second->handleIq( iq ) )
-            handled = true;
-        }
-      }
-      m_iqExtHandlerMapMutex.unlock();
-
       IQ re( IQ::Error, iq.from(), iq.id() );
       re.addExtension( new Error( StanzaErrorTypeCancel, StanzaErrorServiceUnavailable ) );
       send( re );
@@ -1753,7 +1669,6 @@ void ClientBase::registerPingHandler( PingHandler* ph )
 
   void ClientBase::notifyMessageHandlers( Message& msg )
   {
-#if !defined( GLOOX_MINIMAL ) || defined( WANT_MUC )
     if( m_mucInvitationHandler )
     {
       const MUCRoom::MUCUser* mu = msg.findExtension<MUCRoom::MUCUser>( ExtMUCUser );
@@ -1770,9 +1685,7 @@ void ClientBase::registerPingHandler( PingHandler* ph )
         return;
       }
     }
-#endif // GLOOX_MINIMAL
 
-#if !defined( GLOOX_MINIMAL ) || defined( WANT_MESSAGESESSION )
     MessageSessionList::const_iterator it1 = m_messageSessions.begin();
     for( ; it1 != m_messageSessions.end(); ++it1 )
     {
@@ -1831,7 +1744,6 @@ void ClientBase::registerPingHandler( PingHandler* ph )
     }
     else
     {
-#endif // GLOOX_MINIMAL
       // FIXME remove this for() for 1.1:
       MessageHandlerList::const_iterator it = m_messageHandlers.begin();
       for( ; it != m_messageHandlers.end(); ++it )
@@ -1840,9 +1752,7 @@ void ClientBase::registerPingHandler( PingHandler* ph )
       }
       // FIXME and reinstantiate this:
 //       util::ForEach( m_messageHandlers, &MessageHandler::handleMessage, msg ); // FIXME remove for 1.1
-#if !defined( GLOOX_MINIMAL ) || defined( WANT_MESSAGESESSION )
     }
-#endif // GLOOX_MINIMAL
   }
 
   void ClientBase::notifyTagHandlers( Tag* tag )
@@ -1909,7 +1819,6 @@ void ClientBase::registerPingHandler( PingHandler* ph )
       return 0;
 
     TLSDefault* tls = new TLSDefault( this, m_server );
-    tls->setTLSVersion( m_tlsVersion );
     if( tls->init( m_clientKey, m_clientCerts, m_cacerts ) )
       return tls;
     else

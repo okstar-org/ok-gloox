@@ -18,7 +18,6 @@
 #include "config.h"
 
 #ifdef HAVE_WINTLS
-
 #include <ctime>
 
 #define SECURITY_WIN32
@@ -100,7 +99,6 @@ namespace gloox
       size_t m_trailer_max;
 
       std::string m_buffer;
-      std::string m_bufferDecrypt;
 
       bool m_cleanedup;
 

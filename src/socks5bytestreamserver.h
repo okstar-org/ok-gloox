@@ -11,8 +11,6 @@
 */
 
 
-#if !defined( GLOOX_MINIMAL ) || defined( WANT_BYTESTREAM )
-
 #ifndef SOCKS5BYTESTREAMSERVER_H__
 #define SOCKS5BYTESTREAMSERVER_H__
 
@@ -149,5 +147,3 @@ namespace gloox
 }
 
 #endif // SOCKS5BYTESTREAMSERVER_H__
-
-#endif // GLOOX_MINIMAL

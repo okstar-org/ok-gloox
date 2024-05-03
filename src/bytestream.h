@@ -11,8 +11,6 @@
 */
 
 
-#if !defined( GLOOX_MINIMAL ) || defined( WANT_BYTESTREAM )
-
 #ifndef BYTESTREAM_H__
 #define BYTESTREAM_H__
 
@@ -75,8 +73,6 @@ namespace gloox
 
       /**
        * This function starts the connection process.
-       * @param timeout The timeout to use for select() in microseconds. Default of -1 means blocking.
-       * This parameter has no effect in IBB modes.
        * @return @b True if a connection to a remote entity could be established, @b false
        * otherwise.
        * @note If @b false is returned you should pass this Bytestream object
@@ -84,7 +80,7 @@ namespace gloox
        * @note Make sure you have a BytestreamDataHandler registered (using
        * registerBytestreamDataHandler()) before calling this function.
        */
-      virtual bool connect( int timeout = -1 ) = 0;
+      virtual bool connect() = 0;
 
       /**
        * Closes the bytestream.
@@ -182,5 +178,3 @@ namespace gloox
 }
 
 #endif // BYTESTREAM_H__
-
-#endif // GLOOX_MINIMAL

@@ -11,8 +11,6 @@
 */
 
 
-#if !defined( GLOOX_MINIMAL ) || defined( WANT_BYTESTREAM )
-
 #include "socks5bytestream.h"
 #include "bytestreamdatahandler.h"
 #include "clientbase.h"
@@ -28,7 +26,7 @@ namespace gloox
                                       LogSink& logInstance, const JID& initiator, const JID& target,
                                       const std::string& sid )
     : Bytestream( Bytestream::S5B, logInstance, initiator, target, sid ),
-      m_manager( manager ), m_connection( 0 ), m_socks5( 0 ), m_connected( false ), m_isInitiator( false )
+      m_manager( manager ), m_connection( 0 ), m_socks5( 0 ), m_connected( false )
   {
     if( connection && connection->state() == StateConnected )
       m_open = true;
@@ -59,7 +57,7 @@ namespace gloox
     m_socks5 = new ConnectionSOCKS5Proxy( this, connection, m_logInstance, sha.hex(), 0 );
   }
 
-  bool SOCKS5Bytestream::connect( int timeout )
+  bool SOCKS5Bytestream::connect()
   {
     if( !m_connection || !m_socks5 || !m_manager )
       return false;
@@ -74,7 +72,7 @@ namespace gloox
         m_connected = true;
       --it; // FIXME ++it followed by --it is kinda ugly
       m_connection->setServer( (*it).host, (*it).port );
-      if( m_socks5->connect( timeout ) == ConnNoError )
+      if( m_socks5->connect() == ConnNoError )
       {
         m_proxy = (*it).jid;
         m_connected = true;
@@ -109,21 +107,6 @@ namespace gloox
       m_handler->handleBytestreamOpen( this );
   }
 
-  bool SOCKS5Bytestream::isInitiator() const
-  {
-    return m_isInitiator;
-  }
-
-  void SOCKS5Bytestream::setIsInitiator( bool isInitiator)
-  {
-    m_isInitiator = isInitiator;
-  }
-
-  StreamHostList SOCKS5Bytestream::hosts() const
-  {
-    return m_hosts;
-  }
-
   void SOCKS5Bytestream::close()
   {
     if( m_open && m_handler )
@@ -140,7 +123,7 @@ namespace gloox
     if( !m_handler )
       return;
 
-    if( !m_open && !m_isInitiator )
+    if( !m_open )
     {
       m_open = true;
       m_handler->handleBytestreamOpen( this );
@@ -175,5 +158,3 @@ namespace gloox
   }
 
 }
-
-#endif // GLOOX_MINIMAL

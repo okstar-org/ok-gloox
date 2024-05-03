@@ -11,8 +11,6 @@
 */
 
 
-#if !defined( GLOOX_MINIMAL ) || defined( WANT_BYTESTREAM )
-
 #ifndef BYTESTREAMHANDLER_H__
 #define BYTESTREAMHANDLER_H__
 
@@ -90,5 +88,3 @@ namespace gloox
 }
 
 #endif // BYTESTREAMHANDLER_H__
-
-#endif // GLOOX_MINIMAL

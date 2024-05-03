@@ -21,7 +21,8 @@ namespace gloox
 
   ConnectionTLS::ConnectionTLS( ConnectionDataHandler* cdh, ConnectionBase* conn, const LogSink& log )
     : ConnectionBase( cdh ),
-      m_connection( conn ), m_tls( 0 ), m_tlsHandler( 0 ), m_log( log )
+      m_connection( conn ), m_tls( 0 ), m_tlsHandler( 0 ),
+      m_log( log )
   {
     if( m_connection )
       m_connection->registerConnectionDataHandler( this );
@@ -55,10 +56,8 @@ namespace gloox
       m_connection->registerConnectionDataHandler( this );
   }
 
-  ConnectionError ConnectionTLS::connect( int timeout )
+  ConnectionError ConnectionTLS::connect()
   {
-    m_timeout = timeout;
-
     if( !m_connection )
       return ConnNotConnected;
 
@@ -71,8 +70,6 @@ namespace gloox
     if( !m_tls )
       return ConnTlsNotAvailable;
 
-    m_tls->setTLSVersion( m_tlsVersion );
-
     if( !m_tls->init( m_clientKey, m_clientCerts, m_cacerts ) )
       return ConnTlsFailed;
 
@@ -82,9 +79,8 @@ namespace gloox
     m_state = StateConnecting;
 
     if( m_connection->state() != StateConnected )
-      return m_connection->connect( timeout );
+      return m_connection->connect();
 
-    m_log.log( LogLevelDebug, LogAreaClassConnectionTLS, "Starting TLS handshake" );
     if( m_tls->handshake() )
       return ConnNoError;
     else
@@ -103,12 +99,6 @@ namespace gloox
 
     m_tls->encrypt( data );
     return true;
-  }
-
-  bool ConnectionTLS::send( const char* data, const size_t len )
-  {
-    const std::string s( data, len );
-    return send( s );
   }
 
   ConnectionError ConnectionTLS::receive()
