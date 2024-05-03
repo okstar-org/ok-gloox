@@ -20,8 +20,8 @@ install(
 
 # 添加头文件的安装操作
 install(
-        DIRECTORY ${gloox_SOURCE_DIR}/src
-        DESTINATION include
+        DIRECTORY ${gloox_SOURCE_DIR}/src/
+        DESTINATION include/ok-gloox
         FILES_MATCHING
         PATTERN "*.h"
         PATTERN ".git" EXCLUDE
