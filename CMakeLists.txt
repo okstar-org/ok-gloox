@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.22)
 
-project( gloox )
+project( ok-gloox )
 
 if (WIN32)
     set(CMAKE_CXX_FALGS ${CMAKE_CXX_FALGS} /utf-8)
