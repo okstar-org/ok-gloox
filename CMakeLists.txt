@@ -13,6 +13,7 @@ if (WIN32)
     if(CMAKE_BUILD_TYPE STREQUAL Release)
         set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /DNDEBUG /MT /utf-8")
     endif()
+    add_definitions(/UNICODE)
 endif()
 
 include( FindZLIB )
