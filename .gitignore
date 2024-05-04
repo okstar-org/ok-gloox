@@ -36,3 +36,8 @@
 build
 .vscode
 .cache
+
+out
+cmake-build-*
+.libs
+.deps

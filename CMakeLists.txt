@@ -8,7 +8,6 @@ if (WIN32)
 
     if (CMAKE_BUILD_TYPE STREQUAL Debug)
         set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MTd /utf-8")
-        add_definitions(-D_ITERATOR_DEBUG_LEVEL=0)
     endif ()
 
     if(CMAKE_BUILD_TYPE STREQUAL Release)
@@ -45,6 +44,62 @@ endif( SETSOCKOPT_EXISTS )
 message(STATUS "CMAKE_CXX_FALGS=${CMAKE_CXX_FALGS}")
 message(STATUS "CMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}")
 
+include_directories(.)
 add_subdirectory( src )
 
 
+get_filename_component(proj_loc "src" REALPATH)
+
+set(proj_inc_dir ${CMAKE_INSTALL_INCLUDEDIR}/ok-gloox)
+
+target_include_directories(ok-gloox
+PUBLIC
+    $<BUILD_INTERFACE:${proj_loc}>
+    $<INSTALL_INTERFACE:${proj_inc_dir}>
+)
+
+configure_file(
+        ${PROJECT_SOURCE_DIR}/cmake/${PROJECT_NAME}Config.cmake
+        ${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
+        @ONLY
+)
+
+include(GNUInstallDirs)
+# 添加库文件的安装操作
+install(
+        TARGETS ${PROJECT_NAME}
+        LIBRARY DESTINATION lib
+        ARCHIVE DESTINATION lib
+        RUNTIME DESTINATION bin)
+
+# 添加头文件的安装操作
+install(
+        DIRECTORY ${PROJECT_SOURCE_DIR}/src/
+        DESTINATION include/${PROJECT_NAME}
+        FILES_MATCHING
+        PATTERN "*.h"
+        PATTERN ".git" EXCLUDE
+        PATTERN "src/tests" EXCLUDE
+        PATTERN "build" EXCLUDE
+        PATTERN "ideas" EXCLUDE)
+
+
+install(
+        TARGETS ${PROJECT_NAME}
+        EXPORT ${PROJECT_NAME}Targets
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+        INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)
+
+install(
+        EXPORT ${PROJECT_NAME}Targets
+        NAMESPACE ok-gloox::
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
+)
+
+install(
+        FILES ${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
+)
