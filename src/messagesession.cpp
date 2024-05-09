@@ -62,12 +62,12 @@ namespace gloox
       m_messageHandler->handleMessage( msg, this );
   }
 
-  void MessageSession::send( const std::string& message )
+  std::string MessageSession::send( const std::string& message )
   {
-    send( message, EmptyString );
+    return send( message, EmptyString );
   }
 
-  void MessageSession::send( const std::string& message, const std::string& subject, const StanzaExtensionList& sel )
+  std::string MessageSession::send( const std::string& message, const std::string& subject, const StanzaExtensionList& sel )
   {
     if( !m_hadMessages )
     {
@@ -87,6 +87,7 @@ namespace gloox
     }
 
     m_parent->send( m );
+    return m.id();
   }
 
   void MessageSession::send( const Message& msg )

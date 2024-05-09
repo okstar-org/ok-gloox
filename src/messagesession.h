@@ -224,8 +224,9 @@ namespace gloox
       /**
        * A convenience function to quickly send a message.
        * @param message The message to send.
+       * @return message id
        */
-      virtual void send( const std::string& message );
+      virtual std::string send( const std::string& message );
 
       /**
        * A convenience function to quickly send a message (optionally with subject). This is
@@ -234,8 +235,9 @@ namespace gloox
        * @param subject The optional subject to send.
        * @param sel An optional list of StanzaExtensions. The extensions will be owned by the message-to-be-sent;
        * do not attempt to re-use or delete them.
+       * @return message id
        */
-      virtual void send( const std::string& message, const std::string& subject,
+      virtual std::string send( const std::string& message, const std::string& subject,
                          const StanzaExtensionList& sel = StanzaExtensionList() );
 
       /**

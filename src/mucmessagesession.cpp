@@ -38,12 +38,12 @@ namespace gloox
       m_messageHandler->handleMessage( msg );
   }
 
-  void MUCMessageSession::send( const std::string& message )
+  std::string MUCMessageSession::send( const std::string& message )
   {
-    send( message, EmptyString );
+    return send( message, EmptyString );
   }
 
-  void MUCMessageSession::send( const std::string& message, const std::string& subject, const StanzaExtensionList& sel )
+  std::string MUCMessageSession::send(const std::string& message, const std::string& subject, const StanzaExtensionList& sel )
   {
     if( !m_hadMessages )
     {
@@ -63,6 +63,9 @@ namespace gloox
     }
 
     MessageSession::send( m );
+
+    return m.id();
+
   }
 
   void MUCMessageSession::setSubject( const std::string& subject )
