@@ -417,7 +417,7 @@ namespace gloox
        * Sends a chat message to the room.
        * @param message The message to send.
        */
-      void send( const std::string& message );
+      std::string send( const std::string& message );
 
       /**
        * Sends a chat message to the room, including the given subject and list of StanzaExtensions.
@@ -425,7 +425,7 @@ namespace gloox
        * @param subject The message's subject
        * @param sel The list of StanzaExtensions to include.
        */
-      void send( const std::string& message, const std::string& subject, const StanzaExtensionList& sel = StanzaExtensionList() );
+      std::string send( const std::string& message, const std::string& subject, const StanzaExtensionList& sel = StanzaExtensionList() );
 
       /**
        * Sets the subject of the room to the given string.
