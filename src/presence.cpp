@@ -21,7 +21,7 @@ namespace gloox
 
   static const char* msgTypeStringValues[] =
   {
-    "available", "", "", "", "", "unavailable", "probe", "error"
+    "available", "", "", "", "", "unavailable", "probe", "error","invalid", "unsubscribe"
   };
 
   static inline const std::string typeString( Presence::PresenceType type )
@@ -31,7 +31,7 @@ namespace gloox
 
   static const char* msgShowStringValues[] =
   {
-    "", "chat", "away", "dnd", "xa", "", "", ""
+    "", "chat", "away", "dnd", "xa", "", "", "", "", ""
   };
 
   static inline const std::string showString( Presence::PresenceType type )

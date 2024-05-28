@@ -145,6 +145,8 @@ namespace gloox
        */
       const Resource* highestResource() const;
 
+      RosterItemData* data()const{return m_data;}
+
     protected:
       /**
        * Sets the current presence of the resource.
@@ -190,6 +192,7 @@ namespace gloox
        * one. The RosterItem will own the RosterItemData instance.
        */
       void setData( const RosterItemData& rid );
+
 
     private:
       RosterItemData* m_data;

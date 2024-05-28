@@ -51,7 +51,8 @@ namespace gloox
         Unavailable,                /**< The entity is offline. */
         Probe,                      /**< This is a presence probe. */
         Error,                      /**< This is a presence error. */
-        Invalid                     /**< The stanza is invalid. */
+        Invalid,                     /**< The stanza is invalid. */
+        Unsubscribe
       };
 
       /**

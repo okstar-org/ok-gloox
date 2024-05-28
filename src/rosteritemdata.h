@@ -66,8 +66,10 @@ namespace gloox
        */
       RosterItemData( const RosterItemData& right )
         : RosterItemBase( right ),
-          m_subscription( right.m_subscription ), m_remove( right.m_remove )
-      {}
+          m_subscription( right.m_subscription ), m_remove( right.m_remove ), m_ask(right.ask()), m_sub(right.sub())
+      {
+
+      }
 
       /**
        * Virtual destructor.
@@ -139,6 +141,14 @@ namespace gloox
           i->addAttribute( "ask", m_ask );
         }
         return i;
+      }
+
+      const std::string& sub() const {
+          return m_sub;
+      }
+
+      const std::string& ask() const {
+          return m_ask;
       }
 
     protected:
