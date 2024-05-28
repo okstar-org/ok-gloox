@@ -149,6 +149,10 @@ namespace gloox
         return m_encrypted;
       }
 
+      bool hasSubject() const {
+          return has_subject;
+      }
+
     private:
 #ifdef MESSAGE_TEST
     public:
@@ -162,6 +166,7 @@ namespace gloox
       MessageType m_subtype;
       std::string m_body;
       std::string m_subject;
+      bool has_subject;
       StringMap* m_bodies;
       StringMap* m_subjects;
       std::string m_thread;

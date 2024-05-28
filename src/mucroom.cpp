@@ -705,13 +705,14 @@ namespace gloox
   {
     if( m_session && m_joined )
         return  m_session->send( message );
-    return "";
+    return {};
   }
 
-    std::string MUCRoom::send( const std::string& message, const std::string& subject, const StanzaExtensionList& sel )
+  std::string MUCRoom::send( const std::string& message, const std::string& subject, const StanzaExtensionList& sel )
   {
     if( m_session && m_joined )
-      m_session->send( message, subject, sel );
+      return m_session->send( message, subject, sel );
+    return {};
   }
 
   void MUCRoom::setSubject( const std::string& subject )
@@ -1091,7 +1092,7 @@ namespace gloox
         return;
       }
 
-      if( !msg.subject().empty() )
+      if( msg.hasSubject() )
       {
         m_roomHandler->handleMUCSubject( this, msg.from().resource(), msg.subject() );
       }

@@ -27,7 +27,7 @@ namespace gloox
   }
 
   Message::Message( Tag* tag )
-    : Stanza( tag ), m_subtype( Invalid ), m_bodies( 0 ), m_subjects( 0 ),
+    : Stanza( tag ), m_subtype( Invalid ), m_bodies( 0 ), has_subject(false), m_subjects( 0 ),
       m_encrypted(0),m_encryption(0)
   {
     if( !tag || tag->name() != "message" )
@@ -45,9 +45,10 @@ namespace gloox
     {
       if( (*it)->name() == "body" )
         setLang( &m_bodies, m_body, (*it) );
-      else if( (*it)->name() == "subject" )
-        setLang( &m_subjects, m_subject, (*it) );
-      else if( (*it)->name() == "thread" )
+      else if( (*it)->name() == "subject" ) {
+          has_subject = true;
+          setLang(&m_subjects, m_subject, (*it));
+      }else if( (*it)->name() == "thread" )
         m_thread = (*it)->cdata();
     }
 
@@ -59,7 +60,7 @@ namespace gloox
   Message::Message( MessageType type, const JID& to,
                     const std::string& body, const std::string& subject,
                     const std::string& thread, const std::string& xmllang )
-    : Stanza( to ), m_subtype( type ), m_bodies( 0 ), m_subjects( 0 ), m_thread( thread ),
+    : Stanza( to ), m_subtype( type ), m_bodies( 0 ), has_subject(false), m_subjects( 0 ), m_thread( thread ),
       m_encrypted(0),m_encryption(0)
   {
     setLang( &m_bodies, m_body, body, xmllang );

@@ -93,8 +93,6 @@ namespace gloox
                         const std::string& data,
                         const std::string& xmllang )
   {
-    if( data.empty() )
-      return;
 
     if( xmllang.empty() )
       defaultLang = data;
