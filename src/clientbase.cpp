@@ -1697,7 +1697,7 @@ namespace gloox
             ( (*it1)->types() & msg.subtype() || (*it1)->types() == 0 ) )
       {
         (*it1)->handleMessage( msg );
-        return;
+//        return;
       }
     }
 
@@ -1712,7 +1712,7 @@ namespace gloox
             ( (*it1)->types() & msg.subtype() || (*it1)->types() == 0 ) )
       {
         (*it1)->handleMessage( msg );
-        return;
+//        return;
       }
     }
 
@@ -1742,8 +1742,8 @@ namespace gloox
       msHandler->handleMessageSession( session );
       session->handleMessage( msg );
     }
-    else
-    {
+//    else
+//    {
       // FIXME remove this for() for 1.1:
       MessageHandlerList::const_iterator it = m_messageHandlers.begin();
       for( ; it != m_messageHandlers.end(); ++it )
@@ -1752,7 +1752,7 @@ namespace gloox
       }
       // FIXME and reinstantiate this:
 //       util::ForEach( m_messageHandlers, &MessageHandler::handleMessage, msg ); // FIXME remove for 1.1
-    }
+//    }
   }
 
   void ClientBase::notifyTagHandlers( Tag* tag )
