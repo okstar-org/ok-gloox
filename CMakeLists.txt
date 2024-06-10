@@ -51,12 +51,10 @@ add_subdirectory( src )
 
 get_filename_component(proj_loc "src" REALPATH)
 
-set(proj_inc_dir ${CMAKE_INSTALL_INCLUDEDIR}/ok-gloox)
-
 target_include_directories(ok-gloox
 PUBLIC
     $<BUILD_INTERFACE:${proj_loc}>
-    $<INSTALL_INTERFACE:${proj_inc_dir}>
+    $<INSTALL_INTERFACE:${CMAKE_INSTALL_PREFIX}/include/${PROJECT_NAME}>
 )
 
 configure_file(
