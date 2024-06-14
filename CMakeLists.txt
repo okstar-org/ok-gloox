@@ -51,13 +51,6 @@ add_subdirectory( src )
 
 get_filename_component(proj_loc "src" REALPATH)
 
-set(proj_includedir ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME})
-
-target_include_directories(ok-gloox
-PUBLIC
-    $<BUILD_INTERFACE:${proj_loc}>
-    $<INSTALL_INTERFACE:${proj_includedir}>
-)
 
 configure_file(
         ${PROJECT_SOURCE_DIR}/cmake/${PROJECT_NAME}Config.cmake
@@ -66,6 +59,15 @@ configure_file(
 )
 
 include(GNUInstallDirs)
+
+set(proj_includedir ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME})
+
+target_include_directories(ok-gloox
+        PUBLIC
+        $<BUILD_INTERFACE:${proj_loc}>
+        $<INSTALL_INTERFACE:${proj_includedir}>
+)
+
 # 添加库文件的安装操作
 install(
         TARGETS ${PROJECT_NAME}
