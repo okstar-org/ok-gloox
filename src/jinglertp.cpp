@@ -110,6 +110,8 @@ namespace gloox {
         }
 
         void RTP::addSsrcGroup(Tag *r) const {
+            if(m_ssrcGroup.ssrcs.empty())
+                return;
             Tag *f = new Tag(r, "ssrc-group");
             f->setXmlns(XMLNS_JINGLE_APPS_RTP_SSMA);
             f->addAttribute("semantics", m_ssrcGroup.semantics);
