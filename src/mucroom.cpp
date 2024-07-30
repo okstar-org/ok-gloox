@@ -701,18 +701,18 @@ namespace gloox
     m_parent->send( iq, this, DestroyRoom );
   }
 
-  std::string MUCRoom::send( const std::string& message )
+  bool MUCRoom::send( const std::string& message, const std::string &id )
   {
     if( m_session && m_joined )
-        return  m_session->send( message );
-    return {};
+        return  m_session->send( message, id );
+    return false;
   }
 
-  std::string MUCRoom::send( const std::string& message, const std::string& subject, const StanzaExtensionList& sel )
+  bool MUCRoom::send( const std::string& message, const std::string &id, const std::string& subject, const StanzaExtensionList& sel )
   {
     if( m_session && m_joined )
-      return m_session->send( message, subject, sel );
-    return {};
+      return m_session->send( message, id, subject, sel );
+    return false;
   }
 
   void MUCRoom::setSubject( const std::string& subject )

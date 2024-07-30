@@ -411,13 +411,14 @@ namespace gloox
        * Leave this room.
        * @param msg An optional msg indicating the reason for leaving the room. Default: empty.
        */
-      void leave( const std::string& msg = EmptyString );
+      void leave( const std::string& msg = EmptyString);
 
       /**
        * Sends a chat message to the room.
        * @param message The message to send.
+       * @param id The message id.
        */
-      std::string send( const std::string& message );
+      bool send( const std::string& message, const std::string &id );
 
       /**
        * Sends a chat message to the room, including the given subject and list of StanzaExtensions.
@@ -425,7 +426,7 @@ namespace gloox
        * @param subject The message's subject
        * @param sel The list of StanzaExtensions to include.
        */
-      std::string send( const std::string& message, const std::string& subject, const StanzaExtensionList& sel = StanzaExtensionList() );
+      bool send( const std::string& message, const std::string &id , const std::string& subject, const StanzaExtensionList& sel = StanzaExtensionList() );
 
       /**
        * Sets the subject of the room to the given string.

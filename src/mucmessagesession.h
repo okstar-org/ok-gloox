@@ -50,8 +50,8 @@ namespace gloox
        * Use this function to send a message to all room occupants.
        * @param message The message to send.
        */
-      virtual std::string send( const std::string& message );
-      virtual std::string send(const std::string& message, const std::string& subject, const StanzaExtensionList& sel = StanzaExtensionList() );
+      virtual bool send( const std::string& message, const std::string &id );
+      virtual bool send(const std::string& message, const std::string &id, const std::string& subject, const StanzaExtensionList& sel = StanzaExtensionList() );
 
       /**
        * Use this function to set a new room subject.

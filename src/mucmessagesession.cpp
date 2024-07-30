@@ -38,12 +38,12 @@ namespace gloox
       m_messageHandler->handleMessage( msg );
   }
 
-  std::string MUCMessageSession::send( const std::string& message )
+  bool  MUCMessageSession::send( const std::string& message, const std::string &id )
   {
-    return send( message, EmptyString );
+    return send( message, id, EmptyString );
   }
 
-  std::string MUCMessageSession::send(const std::string& message, const std::string& subject, const StanzaExtensionList& sel )
+  bool MUCMessageSession::send(const std::string& message, const std::string &id, const std::string& subject, const StanzaExtensionList& sel )
   {
     if( !m_hadMessages )
     {
@@ -52,7 +52,7 @@ namespace gloox
     }
 
     Message m( Message::Groupchat, m_target.bare(), message, subject, m_thread );
-    m.setID( m_parent->getID() );
+    m.setID( id );
     decorate( m );
 
     if( sel.size() )
@@ -64,7 +64,7 @@ namespace gloox
 
     MessageSession::send( m );
 
-    return m.id();
+    return true;
 
   }
 
