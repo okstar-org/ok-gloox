@@ -16,7 +16,7 @@
 #undef HAVE_GCC_ATOMIC_BUILTINS
 
 /* Define to 1 if you have the `getaddrinfo' function. */
-#undef HAVE_GETADDRINFO
+//#undef HAVE_GETADDRINFO
 
 /* Define to 1 if you want TLS support (GnuTLS). Undefine HAVE_OPENSSL. */
 #undef HAVE_GNUTLS
