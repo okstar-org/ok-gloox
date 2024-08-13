@@ -68,13 +68,6 @@ target_include_directories(ok-gloox
         $<INSTALL_INTERFACE:${proj_includedir}>
 )
 
-# 添加库文件的安装操作
-install(
-        TARGETS ${PROJECT_NAME}
-        LIBRARY DESTINATION lib
-        ARCHIVE DESTINATION lib
-        RUNTIME DESTINATION bin)
-
 # 添加头文件的安装操作
 install(
         DIRECTORY ${PROJECT_SOURCE_DIR}/src/
@@ -86,19 +79,22 @@ install(
         PATTERN "build" EXCLUDE
         PATTERN "ideas" EXCLUDE)
 
+if (UNIX)
+    set(CONFIGURATIONS Debug;Release)
+elseif (WIN32)
+    set(CONFIGURATIONS Debug;Release;MinSizeRel;RelWithDebInfo)
+endif ()
 
-install(
-        TARGETS ${PROJECT_NAME}
+install(TARGETS ${PROJECT_NAME}
         EXPORT ${PROJECT_NAME}Targets
-        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+        CONFIGURATIONS ${CONFIGURATIONS}
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}/${CMAKE_BUILD_TYPE}
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}/${CMAKE_BUILD_TYPE}
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}/${CMAKE_BUILD_TYPE}
         INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
 )
 
-install(
-        EXPORT ${PROJECT_NAME}Targets
-        NAMESPACE ok-gloox::
+install(EXPORT ${PROJECT_NAME}Targets
         DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
 )
 
