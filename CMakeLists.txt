@@ -71,7 +71,7 @@ target_include_directories(ok-gloox
 # 添加头文件的安装操作
 install(
         DIRECTORY ${PROJECT_SOURCE_DIR}/src/
-        DESTINATION include/${PROJECT_NAME}
+        DESTINATION ${proj_includedir}
         FILES_MATCHING
         PATTERN "*.h"
         PATTERN ".git" EXCLUDE
