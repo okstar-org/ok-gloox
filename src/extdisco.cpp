@@ -26,9 +26,11 @@ namespace gloox {
         return;
       }
 
-      TagList tags = tag->findChildren("service");
-      TagList::const_iterator it = tags.begin();
-      for (; it != tags.end(); ++it) {
+      const Tag *tags = tag->findTag(filterString());
+      TagList srvs = tags->findChildren("service");
+
+      TagList::const_iterator it = srvs.begin();
+      for (; it != srvs.end(); ++it) {
         Service srv;
         srv.host = (*it)->findAttribute("host");
         srv.port = std::atoi((*it)->findAttribute("port").data());
