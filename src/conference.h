@@ -31,16 +31,17 @@ namespace gloox {
         virtual const std::string &filterString() const;
 
         virtual StanzaExtension *newInstance(const Tag *tag) const {
-          return new Conference(tag);
+            return new Conference(tag);
         }
 
         virtual StanzaExtension *clone() const { return new Conference(*this); }
 
-
-        const JID &jid()const{ return m_jid; }
+        const JID &jid() const { return m_jid; }
 
     private:
         JID m_jid;
+        std::string uid;
+        std::map<std::string , std::string> properties;
     };
 } // namespace gloox
 
