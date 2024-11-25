@@ -73,6 +73,7 @@ namespace gloox
 
   const std::string XMLNS_X_CONFERENCE      = "jabber:x:conference";
   const std::string XMLNS_JITSI_FOCUS       = "http://jitsi.org/protocol/focus";
+  const std::string XMLNS_JITSI_MEET       = "https://jitsi.org/jitsi-meet";
   const std::string XMLNS_MUC               = "http://jabber.org/protocol/muc";
   const std::string XMLNS_MUC_USER          = "http://jabber.org/protocol/muc#user";
   const std::string XMLNS_MUC_ADMIN         = "http://jabber.org/protocol/muc#admin";

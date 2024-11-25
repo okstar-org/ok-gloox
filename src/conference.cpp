@@ -19,6 +19,12 @@ namespace gloox {
         m_valid = true;
     }
 
+    Conference::Conference(const gloox::JID &m_jid_, const std::string &uid_,
+                           const std::map<std::string, std::string> &properties_)
+            : StanzaExtension(ExtConference), m_jid(m_jid_), uid(uid_) {
+        properties = properties_;
+    }
+
     Conference::Conference(const Tag *tag) : StanzaExtension(ExtConference) {
         if (!(tag && tag->name() == "conference" && tag->xmlns() == XMLNS_JITSI_FOCUS))
             return;
@@ -37,20 +43,6 @@ namespace gloox {
         TagList props = tag->findChildren("property");
         TagList::const_iterator it = props.begin();
         for (; it != props.end(); ++it) {
-//            auto sam = (*it)->findAttribute("startAudioMuted");
-//            if(!sam.empty()){
-//                startAudioMuted = std::stoi(sam);
-//            }
-//            auto svm = (*it)->findAttribute("startVideoMuted");
-//            if(!svm.empty()){
-//                startVideoMuted = std::stoi(svm);
-//            }
-//
-//            auto rse = (*it)->findAttribute("rtcstatsEnabled");
-//            if(!rse.empty()){
-//                rtcStatsEnabled = rse == "true";
-//            }
-//
             auto name = (*it)->findAttribute("name");
             if (!name.empty()) {
                 properties.insert(std::pair(name, (*it)->findAttribute("value")));
@@ -69,7 +61,7 @@ namespace gloox {
         x->addAttribute("machine-uid", uid);
 
         //properties
-        std::map<std::string , std::string>::const_iterator it = properties.begin();
+        std::map<std::string, std::string>::const_iterator it = properties.begin();
         for (; it != properties.end(); ++it) {
             Tag *t = new Tag("property");
             t->addAttribute("name", it->first);

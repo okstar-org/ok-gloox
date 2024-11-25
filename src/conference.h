@@ -18,12 +18,27 @@ See the Mulan PubL v2 for more details.
 
 namespace gloox {
 
+
     class Conference : public StanzaExtension {
     public:
+        struct SourceInfo {
 
-        Conference();
+        };
 
-        Conference(const Tag *tag);
+        struct Participant {
+            std::string region;
+            std::string codecType;
+            std::string avatarUrl;
+            std::string email;
+            std::string nick;
+        };
+
+
+        explicit Conference();
+
+        explicit Conference(const JID &m_jid, const std::string &uid, const std::map<std::string, std::string> &properties);
+
+        explicit Conference(const Tag *tag);
 
 
         virtual Tag *tag() const override;
@@ -38,10 +53,14 @@ namespace gloox {
 
         const JID &jid() const { return m_jid; }
 
+        const std::map<std::string, std::string> &getProperties() const {
+            return properties;
+        }
+
     private:
         JID m_jid;
         std::string uid;
-        std::map<std::string , std::string> properties;
+        std::map<std::string, std::string> properties;
     };
 } // namespace gloox
 
