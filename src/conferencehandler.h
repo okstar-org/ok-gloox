@@ -11,7 +11,11 @@
 namespace gloox {
     class GLOOX_API ConferenceHandler {
     public:
-        virtual bool handleMUCRoomCreation(bool ready, std::map<std::string, std::string> props) = 0;
+        virtual void handleCreation(const JID &jid, bool ready, std::map<std::string, std::string> props) = 0;
+
+        virtual void handleParticipant(const Conference::Participant &participant) = 0;
+
+        virtual void handleStatsId(const std::string& statsId) = 0;
     };
 }
 

@@ -37,20 +37,6 @@ namespace gloox {
         TagList props = tag->findChildren("property");
         TagList::const_iterator it = props.begin();
         for (; it != props.end(); ++it) {
-//            auto sam = (*it)->findAttribute("startAudioMuted");
-//            if(!sam.empty()){
-//                startAudioMuted = std::stoi(sam);
-//            }
-//            auto svm = (*it)->findAttribute("startVideoMuted");
-//            if(!svm.empty()){
-//                startVideoMuted = std::stoi(svm);
-//            }
-//
-//            auto rse = (*it)->findAttribute("rtcstatsEnabled");
-//            if(!rse.empty()){
-//                rtcStatsEnabled = rse == "true";
-//            }
-//
             auto name = (*it)->findAttribute("name");
             if (!name.empty()) {
                 properties.insert(std::pair(name, (*it)->findAttribute("value")));

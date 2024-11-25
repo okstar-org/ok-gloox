@@ -6,6 +6,8 @@
 #include "gloox.h"
 #include "iqhandler.h"
 #include "clientbase.h"
+#include "conferencehandler.h"
+#include "presencehandler.h"
 
 
 #ifndef CONFERENCEMANAGER_H
@@ -13,15 +15,26 @@
 
 namespace gloox {
 
-    class ConferenceHandler;
-
-    class GLOOX_API ConferenceManager : public IqHandler {
+    class GLOOX_API ConferenceManager : public IqHandler, public PresenceHandler {
     public:
         ConferenceManager(ClientBase *parent);
 
         ~ConferenceManager();
 
+
         void registerHandler(ConferenceHandler *handler);
+
+        void createConference(const Conference &conference);
+
+    protected:
+        //IqHandler
+        bool handleIq(const IQ &iq) override;
+
+        void handleIqID(const IQ &iq, int context) override;
+
+        //PresenceHandler
+        void handlePresence(const Presence &presence) override;
+
 
     private:
         ConferenceHandler *m_handler;
