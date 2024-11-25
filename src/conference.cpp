@@ -29,15 +29,6 @@ namespace gloox {
         if (!(tag && tag->name() == "conference" && tag->xmlns() == XMLNS_JITSI_FOCUS))
             return;
 
-        /**
-         *  <conference machine-uid=\"cc1bc7f4469a0a0071ab2ec72a7667bc\"
-                room=\"test@conference.meet.chuanshaninfo.com\"
-                xmlns=\"http://jitsi.org/protocol/focus\">
-                <property name=\"startAudioMuted\" value=\"9\"/>
-                <property name=\"startVideoMuted\" value=\"9\"/>
-                <property name=\"rtcstatsEnabled\" value=\"false\"/>
-                </conference>
-         */
         m_jid = JID(tag->findAttribute("room"));
         uid = tag->findAttribute("machine-uid");
         TagList props = tag->findChildren("property");
