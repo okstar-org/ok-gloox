@@ -11,7 +11,7 @@
 namespace gloox {
     class GLOOX_API MeetHandler {
     public:
-        virtual void handleCreation(const JID &jid, bool ready, std::map<std::string, std::string> props) = 0;
+        virtual void handleCreation(const JID &jid, bool ready, const std::map<std::string, std::string>& props) = 0;
 
         virtual void handleParticipant(const Meet::Participant &participant) = 0;
 

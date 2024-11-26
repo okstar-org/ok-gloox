@@ -65,8 +65,7 @@ namespace gloox {
     }
 
     const std::string &Meet::filterString() const {
-        static const std::string filter =
-                "/conference[@xmlns='" + XMLNS_JITSI_FOCUS + "']";
+        static const std::string filter = "/iq/conference[@xmlns='" + XMLNS_JITSI_FOCUS + "']";
         return filter;
     }
 
