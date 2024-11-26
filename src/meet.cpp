@@ -37,7 +37,7 @@ namespace gloox {
         for (; it != props.end(); ++it) {
             auto name = (*it)->findAttribute("name");
             if (!name.empty()) {
-                properties.insert(std::pair(name, (*it)->findAttribute("value")));
+                properties.insert(std::make_pair(name, (*it)->findAttribute("value")));
             }
         }
 
