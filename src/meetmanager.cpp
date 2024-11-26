@@ -53,6 +53,7 @@ namespace gloox {
         IQ iq(IQ::Set, to, m_parent->getID());
 
         Tag *a = iq.tag();
+        a->setXmlns(XMLNS_CLIENT);
         a->addChild(tag);
         m_parent->send(a);
     }
