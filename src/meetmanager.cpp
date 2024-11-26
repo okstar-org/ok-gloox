@@ -2,31 +2,31 @@
 // Created by gaojie on 24-11-25.
 //
 
-#include "conference.h"
-#include "conferencemanager.h"
+#include "meet.h"
+#include "meetmanager.h"
 #include "disco.h"
 #include "capabilities.h"
 
 namespace gloox {
-    ConferenceManager::ConferenceManager(ClientBase *parent) : m_handler(nullptr), m_parent(parent) {
+    MeetManager::MeetManager(ClientBase *parent) : m_handler(nullptr), m_parent(parent) {
         if (m_parent) {
             m_parent->disco()->addFeature(XMLNS_JITSI_FOCUS);
-            m_parent->registerIqHandler(this, ExtJitsiConference);
+            m_parent->registerIqHandler(this, ExtMeet);
         }
     }
 
-    ConferenceManager::~ConferenceManager() {
+    MeetManager::~MeetManager() {
         if (m_parent) {
-            m_parent->removeIqHandler(this, ExtJitsiConference);
+            m_parent->removeIqHandler(this, ExtMeet);
         }
     }
 
-    void ConferenceManager::registerHandler(gloox::ConferenceHandler *handler) {
+    void MeetManager::registerHandler(gloox::MeetHandler *handler) {
         m_handler = handler;
     }
 
-    bool ConferenceManager::handleIq(const IQ &iq) {
-        const Conference *c = iq.findExtension<Conference>(ExtJitsiConference);
+    bool MeetManager::handleIq(const IQ &iq) {
+        const Meet *c = iq.findExtension<Meet>(ExtMeet);
         if (c && m_handler) {
             std::map<std::string, std::string>::const_iterator f = c->getProperties().find("ready");
             bool ready = false;
@@ -40,20 +40,28 @@ namespace gloox {
         return true;
     }
 
-    void ConferenceManager::createConference(const Conference &conference) {
+    void MeetManager::createMeet(const Meet &meet) {
         if (!m_parent)
             return;
 
-        Tag *t = conference.tag();
-        t->addAttribute("id", m_parent->getID());
-        m_parent->send(t);
+        Tag *tag = meet.tag();
+        if (!tag)
+            return;
+
+
+        JID to(MEET_FOCUS + "." + m_parent->server());
+        IQ iq(IQ::Set, to, m_parent->getID());
+
+        Tag *a = iq.tag();
+        a->addChild(tag);
+        m_parent->send(a);
     }
 
-    void ConferenceManager::handleIqID(const IQ &iq, int context) {
+    void MeetManager::handleIqID(const IQ &iq, int context) {
 
     }
 
-    void ConferenceManager::handlePresence(const Presence &presence) {
+    void MeetManager::handlePresence(const Presence &presence) {
         if (presence.subtype() == Presence::Error)
             return;
 
@@ -70,7 +78,7 @@ namespace gloox {
             return;
         }
 
-        Conference::Participant participant = {
+        Meet::Participant participant = {
                 .region = t->findChild("jitsi_participant_region")->cdata(),
                 .codecType = t->findChild("jitsi_participant_codecType")->cdata(),
                 .avatarUrl = t->findChild("avatar-url")->cdata(),

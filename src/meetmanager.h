@@ -6,25 +6,24 @@
 #include "gloox.h"
 #include "iqhandler.h"
 #include "clientbase.h"
-#include "conferencehandler.h"
+#include "meethandler.h"
 #include "presencehandler.h"
 
 
-#ifndef CONFERENCEMANAGER_H
-#define CONFERENCEMANAGER_H
+#ifndef MEET_MANAGER_H
+#define MEET_MANAGER_H
 
 namespace gloox {
-
-    class GLOOX_API ConferenceManager : public IqHandler, public PresenceHandler {
+    static const std::string MEET_FOCUS = "focus";
+    class GLOOX_API MeetManager : public IqHandler, public PresenceHandler {
     public:
-        ConferenceManager(ClientBase *parent);
+        explicit MeetManager(ClientBase *parent);
 
-        ~ConferenceManager();
+        ~MeetManager() override;
 
+        void registerHandler(MeetHandler *handler);
 
-        void registerHandler(ConferenceHandler *handler);
-
-        void createConference(const Conference &conference);
+        void createMeet(const Meet &meet);
 
     protected:
         //IqHandler
@@ -37,7 +36,7 @@ namespace gloox {
 
 
     private:
-        ConferenceHandler *m_handler;
+        MeetHandler *m_handler;
         ClientBase *m_parent;
     };
 

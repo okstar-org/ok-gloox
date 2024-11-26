@@ -111,6 +111,7 @@ namespace gloox
     ExtAddresses,         /** XEP-0033: Extended Stanza Addressing */
 
     ExtJitsiConference,
+    ExtMeet,
 
   };
 
