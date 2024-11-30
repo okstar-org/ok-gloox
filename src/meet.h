@@ -31,8 +31,9 @@ namespace gloox {
             std::string avatarUrl;
             std::string email;
             std::string nick;
+            std::string resource;
         };
-
+        typedef std::map<std::string, Participant> Participants;
 
         explicit Meet();
 
@@ -57,10 +58,28 @@ namespace gloox {
             return properties;
         }
 
+        inline const Participants &getParticipants() const {
+            return participants;
+        }
+
+        bool addParticipant(const Participant& p){
+            if(p.resource.empty())
+                return false;
+
+            // 使用 try_emplace 方法尝试插入元素
+            auto result = participants.try_emplace(p.resource, p);
+            // 检查是否成功插入新元素
+            if (result.second) {
+                return true;
+            }
+            return false;
+        }
+
     private:
         JID m_jid;
         std::string uid;
         std::map<std::string, std::string> properties;
+        Participants participants;
     };
 } // namespace gloox
 

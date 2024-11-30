@@ -282,6 +282,14 @@ namespace gloox
       return long2string( value );
     }
 
+    static inline const std::string getRandom()
+        {
+            char cn[4*8+1];
+            for( int i = 0; i < 4; ++i )
+                sprintf( cn + i*8, "%08x", rand() );
+            return std::string( cn, 4*8 );;
+        }
+
   }
 
 }

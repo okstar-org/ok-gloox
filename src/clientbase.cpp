@@ -1792,10 +1792,7 @@ namespace gloox
 
   std::string ClientBase::getRandom()
   {
-    char cn[4*8+1];
-    for( int i = 0; i < 4; ++i )
-      sprintf( cn + i*8, "%08x", rand() );
-    return std::string( cn, 4*8 );;
+    return util::getRandom();
   }
 
   CompressionBase* ClientBase::getDefaultCompression()

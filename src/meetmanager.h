@@ -27,6 +27,8 @@ namespace gloox {
 
         void exitMeet(const JID &jid);
 
+        void join(Meet &meet, const Meet::Participant &participant);
+
     protected:
         //IqHandler
         bool handleIq(const IQ &iq) override;

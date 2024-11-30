@@ -12,6 +12,8 @@ See the Mulan PubL v2 for more details.
 
 #include "meet.h"
 #include "disco.h"
+#include "util.h"
+
 
 namespace gloox {
 
@@ -68,5 +70,6 @@ namespace gloox {
         static const std::string filter = "/iq/conference[@xmlns='" + XMLNS_JITSI_FOCUS + "']";
         return filter;
     }
+
 
 } // namespace gloox
