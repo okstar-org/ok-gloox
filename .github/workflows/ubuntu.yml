@@ -55,6 +55,8 @@ jobs:
   release:
     needs: build-and-artifact
     runs-on: ubuntu-latest
+    env:
+      IMAGE_TAG: ${{ github.event.ref_name }}
     strategy:
       matrix:
         arch: [ x64 ]
@@ -66,15 +68,19 @@ jobs:
       - name: Tar
         working-directory: libgloox-linux-${{ matrix.arch }}-${{ matrix.configuration }}
         run : tar -czvf libgloox-linux-${{ matrix.arch }}-${{ matrix.configuration }}.tar.gz libok-gloox.* include
-          
-      - name: Get Tag
-        id  : get_tag
-        run : echo "tag=${GITHUB_REF#refs/}" >> "$GITHUB_OUTPUT"
-        
+
+      - name: Set TAG to 'latest' if no tag is found
+        shell: bash
+        run: |
+          if [[ "$IMAGE_TAG" != v* ]]; then
+            echo "Setting IMAGE_TAG to latest"
+            echo "IMAGE_TAG=latest" >> $GITHUB_ENV
+          fi
+
       - name: Get Repo
         id  : get_repo
         run : echo "repo=${GITHUB_REPOSITORY}" >> "$GITHUB_OUTPUT"
-          
+
       - name: Get Upload URL
         id  : get_upload_url
         run : |
@@ -82,7 +88,7 @@ jobs:
           -H "X-GitHub-Api-Version: 2022-11-28" \
           -H "Accept: application/vnd.github+json" \
           -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-          https://api.github.com/repos/${{ steps.get_repo.outputs.repo }}/releases/${{ steps.get_tag.outputs.tag }} | jq -r '.upload_url'`" >> "$GITHUB_OUTPUT"
+          https://api.github.com/repos/${{ steps.get_repo.outputs.repo }}/releases/${{ env.IMAGE_TAG }} | jq -r '.upload_url'`" >> "$GITHUB_OUTPUT"
         env :
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -93,5 +99,5 @@ jobs:
         with:
           asset_content_type: application/gzip
           asset_name: libgloox-linux-${{ matrix.arch }}-${{ matrix.configuration }}.tar.gz
-          asset_path: libgloox-linux-${{ matrix.arch }}-${{ matrix.configuration }}/libgloox-linux-${{ matrix.arch }}-${{ matrix.configuration }}.tar.gz
+          asset_path: libgloox-linux
           upload_url: ${{ steps.get_upload_url.outputs.upload_url }}
