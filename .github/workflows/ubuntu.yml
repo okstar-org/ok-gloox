@@ -51,16 +51,14 @@ jobs:
             ${{ github.workspace }}/${{ matrix.configuration }}/libok-gloox.*
 
   release:
-
     needs: build-and-artifact
     runs-on: ubuntu-latest
-    
+    strategy:
+      matrix:
+        arch: [ x64 ]
     steps:
       - name: Download Artifact
         uses: actions/download-artifact@v3
-
-      - name: Install zip
-        uses: montudor/action-zip@v1
 
       - name: Tar
         working-directory: libgloox-linux-${{ matrix.arch }}
