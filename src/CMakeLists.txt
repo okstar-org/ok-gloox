@@ -2,8 +2,13 @@ file(GLOB gloox_SRCS *.cpp)
 
 include_directories(${gloox_SOURCE_DIR})
 
-message(STATUS "LIBS=${LIBS}")
-add_library(${PROJECT_NAME} STATIC ${gloox_SRCS})
+# default is OFF
+if (NOT BUILD_SHARED_LIBS)
+    set(BUILD_SHARED_LIBS OFF)
+endif ()
+
+add_library(${PROJECT_NAME} ${gloox_SRCS})
+
 target_link_libraries(${PROJECT_NAME} ${LIBS})
 
 if (WIN32)
