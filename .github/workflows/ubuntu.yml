@@ -83,4 +83,4 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           files: |
-            libgloox-linux-${{ matrix.arch }}-${{ matrix.configuration }}.tar.gz
+            libgloox-linux-${{ matrix.arch }}-${{ matrix.configuration }}-${{env.IMAGE_TAG}}.tar.gz
