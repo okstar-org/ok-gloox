@@ -28,6 +28,7 @@ namespace gloox {
         struct Participant {
             std::string region;
             std::string codecType;
+            //data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53M...
             std::string avatarUrl;
             std::string email;
             std::string nick;
@@ -66,13 +67,21 @@ namespace gloox {
             if(p.resource.empty())
                 return false;
 
-            // 使用 try_emplace 方法尝试插入元素
-            auto result = participants.try_emplace(p.resource, p);
-            // 检查是否成功插入新元素
-            if (result.second) {
-                return true;
+            Participants::const_iterator it = participants.find(p.resource);
+            if(it != participants.end()){
+                return false;
             }
-            return false;
+
+            participants.insert(std::make_pair(p.resource, p));
+            return true;
+
+            // 使用 try_emplace 方法尝试插入元素
+//            auto result = participants.try_emplace(p.resource, p);
+//            // 检查是否成功插入新元素
+//            if (result.second) {
+//                return true;
+//            }
+//            return false;
         }
 
     private:

@@ -38,15 +38,13 @@ jobs:
           cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.configuration }}
 
       - name: Package
-        if  : startsWith(matrix.os, 'windows') != true
         run : |
           mkdir ${{ github.workspace }}/${{ matrix.configuration }}
           mv ${{ steps.strings.outputs.build-output-dir }}/src/libok-gloox.* ${{ github.workspace }}/${{ matrix.configuration }}
 
       - name: Upload
         uses: actions/upload-artifact@v3
-        if  : startsWith(matrix.os, 'windows') != true
-        with: 
+        with:
           name: libgloox-linux-${{ matrix.arch }}
           path: |
             ${{ github.workspace }}/include
@@ -86,18 +84,8 @@ jobs:
           https://api.github.com/repos/${{ steps.get_repo.outputs.repo }}/releases/${{ steps.get_tag.outputs.tag }} | jq -r '.upload_url'`" >> "$GITHUB_OUTPUT"
         env :
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      
-      - name: Upload Release Asset on win
-        uses: actions/upload-release-asset@v1
-        env :
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          asset_name: libgloox-win-${{ matrix.arch }}.zip
-          asset_content_type: application/zip
-          asset_path: libgloox-win-${{ matrix.arch }}/libgloox-win-${{ matrix.arch }}.zip
-          upload_url: ${{ steps.get_upload_url.outputs.upload_url }}
 
-      - name: Upload Release Asset on ubuntu
+      - name: Upload
         uses: actions/upload-release-asset@v1
         env :
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
