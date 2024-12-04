@@ -15,7 +15,8 @@ jobs:
       fail-fast: false
       matrix:
         configuration: [ debug, release ]
-        os: [ ubuntu-latest, windows-latest ]
+        os: [ windows-latest ]
+        arch: [x64]
         BUILD_SHARED_LIBS: [OFF]
 
     steps:
@@ -23,17 +24,10 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Set output dir
-        shell: bash
-        run: |
-          echo "build-output-dir=${{ github.workspace }}/build/shared" >> "$GITHUB_OUTPUT"
-          echo "build-output-dir=$([[ ${{matrix.BUILD_SHARED_LIBS}} == OFF ]] && echo  || echo false)" >> $GITHUB_ENV
-
-      - name: Set output dir
         id: strings
-        if  : startsWith(matrix.BUILD_SHARED_LIBS, 'OFF')
         shell: bash
         run: |
-          echo "build-output-dir=${{ github.workspace }}/build/static" >> "$GITHUB_OUTPUT"
+          echo "build-output-dir=$([[ ${{matrix.BUILD_SHARED_LIBS}} == OFF ]] && echo ${{ github.workspace }}/build/static || echo ${{ github.workspace }}/build/shared)" >> $GITHUB_OUTPUT
 
       - name: Configure CMake
         run : |
@@ -47,35 +41,16 @@ jobs:
         if  : startsWith(matrix.os, 'windows')
         run : |
           mkdir ${{ github.workspace }}/${{ matrix.configuration }}
-          mv ${{ steps.strings.outputs.build-output-dir }}/src/${{ matrix.configuration }}/libok-gloox.lib ${{ github.workspace }}/${{ matrix.configuration }}
-          mv ${{ steps.strings.outputs.build-output-dir }}/src/${{ matrix.configuration }}/libok-gloox.dll ${{ github.workspace }}/${{ matrix.configuration }}
-
-      - name: Pack on ubuntu
-        if  : startsWith(matrix.os, 'windows') != true
-        run : |
-          mkdir ${{ github.workspace }}/${{ matrix.configuration }}
-          mv ${{ steps.strings.outputs.build-output-dir }}/src/libok-gloox.a ${{ github.workspace }}/${{ matrix.configuration }}
-          mv ${{ steps.strings.outputs.build-output-dir }}/src/libok-gloox.so ${{ github.workspace }}/${{ matrix.configuration }}
+          mv ${{ steps.strings.outputs.build-output-dir }}/src/${{ matrix.configuration }}/libok-gloox.* ${{ github.workspace }}/${{ matrix.configuration }}
 
       - name: Upload on win
         uses: actions/upload-artifact@v3
         if  : startsWith(matrix.os, 'windows')
         with: 
-          name: libgloox-win-x64
+          name: libgloox-win-${{ matrix.arch }}
           path: |
             ${{ github.workspace }}/include
-            ${{ github.workspace }}/${{ matrix.configuration }}/ok-gloox.lib
-            ${{ github.workspace }}/${{ matrix.configuration }}/ok-gloox.dll
-
-      - name: Upload on ubuntu
-        uses: actions/upload-artifact@v3
-        if  : startsWith(matrix.os, 'windows') != true
-        with: 
-          name: libgloox-linux-x64
-          path: |
-            ${{ github.workspace }}/include
-            ${{ github.workspace }}/${{ matrix.configuration }}/libok-gloox.a
-            ${{ github.workspace }}/${{ matrix.configuration }}/libok-gloox.so
+            ${{ github.workspace }}/${{ matrix.configuration }}/ok-gloox.*
 
   release:
 
@@ -90,12 +65,12 @@ jobs:
         uses: montudor/action-zip@v1
 
       - name: Zip
-        working-directory: libgloox-win-x64
-        run: zip -qq -r libgloox-win-x64.zip debug release include
+        working-directory: libgloox-win-${{ matrix.arch }}
+        run: zip -qq -r libgloox-win-${{ matrix.arch }}.zip debug release include
 
       - name: Tar
-        working-directory: libgloox-linux-x64
-        run : tar -czvf libgloox-linux-x64.tar.gz debug release include
+        working-directory: libgloox-linux-${{ matrix.arch }}
+        run : tar -czvf libgloox-linux-${{ matrix.arch }}.tar.gz debug release include
           
       - name: Get Tag
         id  : get_tag
@@ -121,9 +96,9 @@ jobs:
         env :
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          asset_name: libgloox-win-x64.zip
+          asset_name: libgloox-win-${{ matrix.arch }}.zip
           asset_content_type: application/zip
-          asset_path: libgloox-win-x64/libgloox-win-x64.zip
+          asset_path: libgloox-win-${{ matrix.arch }}/libgloox-win-${{ matrix.arch }}.zip
           upload_url: ${{ steps.get_upload_url.outputs.upload_url }}
 
       - name: Upload Release Asset on ubuntu
@@ -132,6 +107,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           asset_content_type: application/gzip
-          asset_name: libgloox-linux-x64.tar.gz
-          asset_path: libgloox-linux-x64/libgloox-linux-x64.tar.gz
+          asset_name: libgloox-linux-${{ matrix.arch }}.tar.gz
+          asset_path: libgloox-linux-${{ matrix.arch }}/libgloox-linux-${{ matrix.arch }}.tar.gz
           upload_url: ${{ steps.get_upload_url.outputs.upload_url }}
