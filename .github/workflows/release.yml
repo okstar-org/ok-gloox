@@ -16,19 +16,21 @@ jobs:
       matrix:
         configuration: [ debug, release ]
         os: [ ubuntu-latest, windows-latest ]
-        BUILD_SHARED_LIBS: [ON]
+        BUILD_SHARED_LIBS: [OFF]
 
     steps:
       - name: Checkout Code
         uses: actions/checkout@v2
 
       - name: Set output dir
-        if  : startsWith(matrix.BUILD_SHARED_LIBS, 'ON')
+        id: strings
+        if: startsWith(matrix.BUILD_SHARED_LIBS, 'ON')
         shell: bash
         run: |
           echo "build-output-dir=${{ github.workspace }}/build/shared" >> "$GITHUB_OUTPUT"
 
       - name: Set output dir
+        id: strings
         if  : startsWith(matrix.BUILD_SHARED_LIBS, 'OFF')
         shell: bash
         run: |
