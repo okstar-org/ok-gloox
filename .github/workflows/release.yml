@@ -23,11 +23,10 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Set output dir
-        id: strings
-        if: startsWith(matrix.BUILD_SHARED_LIBS, 'ON')
         shell: bash
         run: |
           echo "build-output-dir=${{ github.workspace }}/build/shared" >> "$GITHUB_OUTPUT"
+          echo "build-output-dir=$([[ ${{matrix.BUILD_SHARED_LIBS}} == OFF ]] && echo  || echo false)" >> $GITHUB_ENV
 
       - name: Set output dir
         id: strings
