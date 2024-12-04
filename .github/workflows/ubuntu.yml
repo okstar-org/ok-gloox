@@ -47,7 +47,7 @@ jobs:
       - name: Upload
         uses: actions/upload-artifact@v3
         with:
-          name: libgloox-linux-${{ matrix.arch }}
+          name: libgloox-linux-${{ matrix.arch }}-${{ matrix.configuration }}
           path: |
             ${{ github.workspace }}/${{ matrix.configuration }}/include
             ${{ github.workspace }}/${{ matrix.configuration }}/libok-gloox.*
@@ -63,8 +63,8 @@ jobs:
         uses: actions/download-artifact@v3
 
       - name: Tar
-        working-directory: libgloox-linux-${{ matrix.arch }}
-        run : tar -czvf libgloox-linux-${{ matrix.arch }}.tar.gz debug release include
+        working-directory: libgloox-linux-${{ matrix.arch }}-${{ matrix.configuration }}
+        run : tar -czvf libgloox-linux-${{ matrix.arch }}-${{ matrix.configuration }}.tar.gz libok-gloox.* include
           
       - name: Get Tag
         id  : get_tag
