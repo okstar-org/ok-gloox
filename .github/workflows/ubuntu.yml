@@ -58,6 +58,7 @@ jobs:
     strategy:
       matrix:
         arch: [ x64 ]
+        configuration: [ debug, release ]
     steps:
       - name: Download Artifact
         uses: actions/download-artifact@v3
@@ -91,6 +92,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           asset_content_type: application/gzip
-          asset_name: libgloox-linux-${{ matrix.arch }}.tar.gz
-          asset_path: libgloox-linux-${{ matrix.arch }}/libgloox-linux-${{ matrix.arch }}.tar.gz
+          asset_name: libgloox-linux-${{ matrix.arch }}-${{ matrix.configuration }}.tar.gz
+          asset_path: libgloox-linux-${{ matrix.arch }}-${{ matrix.configuration }}/libgloox-linux-${{ matrix.arch }}-${{ matrix.configuration }}.tar.gz
           upload_url: ${{ steps.get_upload_url.outputs.upload_url }}
