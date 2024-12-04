@@ -49,7 +49,7 @@ jobs:
         with:
           name: libgloox-win-${{ matrix.arch }}
           path: |
-            ${{ github.workspace }}/include
+            ${{ github.workspace }}/${{ matrix.configuration }}/include
             ${{ github.workspace }}/${{ matrix.configuration }}/ok-gloox.*
 
   release:
