@@ -40,7 +40,9 @@ jobs:
       - name: Package
         run : |
           mkdir ${{ github.workspace }}/${{ matrix.configuration }}
+          mkdir ${{ github.workspace }}/${{ matrix.configuration }}/include
           mv ${{ steps.strings.outputs.build-output-dir }}/src/libok-gloox.* ${{ github.workspace }}/${{ matrix.configuration }}
+          cp ${{ github.workspace }}/src/*.h ${{ github.workspace }}/${{ matrix.configuration }}/include
 
       - name: Upload
         uses: actions/upload-artifact@v3
