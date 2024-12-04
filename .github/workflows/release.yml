@@ -35,15 +35,15 @@ jobs:
         if  : startsWith(matrix.os, 'windows')
         run : |
           mkdir ${{ github.workspace }}/${{ matrix.configuration }}
-          mv ${{ github.workspace }}/build_static/src/${{ matrix.configuration }}/gloox.lib ${{ github.workspace }}/${{ matrix.configuration }}
-          mv ${{ github.workspace }}/build_shared/src/${{ matrix.configuration }}/gloox.dll ${{ github.workspace }}/${{ matrix.configuration }}
+          mv ${{ github.workspace }}/build_static/src/${{ matrix.configuration }}/libok-gloox.lib ${{ github.workspace }}/${{ matrix.configuration }}
+          mv ${{ github.workspace }}/build_shared/src/${{ matrix.configuration }}/libok-gloox.dll ${{ github.workspace }}/${{ matrix.configuration }}
 
       - name: Pack on ubuntu
         if  : startsWith(matrix.os, 'windows') != true
         run : |
           mkdir ${{ github.workspace }}/${{ matrix.configuration }}
-          mv ${{ github.workspace }}/build_static/src/libgloox.a ${{ github.workspace }}/${{ matrix.configuration }}
-          mv ${{ github.workspace }}/build_shared/src/libgloox.so ${{ github.workspace }}/${{ matrix.configuration }}
+          mv ${{ github.workspace }}/build_static/src/libok-gloox.a ${{ github.workspace }}/${{ matrix.configuration }}
+          mv ${{ github.workspace }}/build_shared/src/libok-gloox.so ${{ github.workspace }}/${{ matrix.configuration }}
 
       - name: Upload on win
         uses: actions/upload-artifact@v3
@@ -52,8 +52,8 @@ jobs:
           name: libgloox-win-x64
           path: |
             ${{ github.workspace }}/include
-            ${{ github.workspace }}/${{ matrix.configuration }}/gloox.lib
-            ${{ github.workspace }}/${{ matrix.configuration }}/gloox.dll
+            ${{ github.workspace }}/${{ matrix.configuration }}/ok-gloox.lib
+            ${{ github.workspace }}/${{ matrix.configuration }}/ok-gloox.dll
 
       - name: Upload on ubuntu
         uses: actions/upload-artifact@v3
@@ -62,8 +62,8 @@ jobs:
           name: libgloox-linux-x64
           path: |
             ${{ github.workspace }}/include
-            ${{ github.workspace }}/${{ matrix.configuration }}/libgloox.a
-            ${{ github.workspace }}/${{ matrix.configuration }}/libgloox.so
+            ${{ github.workspace }}/${{ matrix.configuration }}/libok-gloox.a
+            ${{ github.workspace }}/${{ matrix.configuration }}/libok-gloox.so
 
   release:
 
