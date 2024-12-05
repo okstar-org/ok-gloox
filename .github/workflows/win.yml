@@ -74,9 +74,12 @@ jobs:
             echo "IMAGE_TAG=latest" >> $GITHUB_ENV
           fi
 
-      - name: Zip
-        working-directory: libgloox-win-${{ matrix.arch }}-${{ matrix.configuration }}
-        run: zip -qq -r libgloox-win-${{ matrix.arch }}.zip libok-gloox.* include
+      - name: Archive Release
+        uses: thedoctor0/zip-release@0.7.5
+        with:
+          type: 'zip'
+          path: libgloox-linux-${{ matrix.arch }}-${{ matrix.configuration }}
+          filename: libgloox-win-${{ matrix.arch }}-${{ matrix.configuration }}.zip
 
       - name: Upload
         uses: softprops/action-gh-release@v1
