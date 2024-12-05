@@ -80,7 +80,7 @@ jobs:
         uses: thedoctor0/zip-release@0.7.5
         with:
           type: 'zip'
-          path: libgloox-linux-${{ matrix.arch }}-${{ matrix.configuration }}
+          path: libgloox-win-${{ matrix.arch }}-${{ matrix.configuration }}
           filename: libgloox-win-${{ matrix.arch }}-${{ matrix.configuration }}.zip
 
       - name: Upload
