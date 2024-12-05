@@ -65,10 +65,6 @@ jobs:
       - name: Download Artifact
         uses: actions/download-artifact@v3
 
-      - name: Tar
-        working-directory: libgloox-linux-${{ matrix.arch }}-${{ matrix.configuration }}
-        run : tar -czvf libgloox-linux-${{ matrix.arch }}-${{ matrix.configuration }}.tar.gz libok-gloox.* include
-
       - name: Set TAG to 'latest' if no tag is found
         shell: bash
         run: |
@@ -76,6 +72,10 @@ jobs:
             echo "Setting IMAGE_TAG to latest"
             echo "IMAGE_TAG=latest" >> $GITHUB_ENV
           fi
+
+      - name: Tar
+        working-directory: libgloox-linux-${{ matrix.arch }}-${{ matrix.configuration }}
+        run : tar -czvf libgloox-linux-${{ matrix.arch }}-${{ matrix.configuration }}-${{env.IMAGE_TAG}}.tar.gz libok-gloox.* include
 
       - name: Upload
         uses: softprops/action-gh-release@v1
