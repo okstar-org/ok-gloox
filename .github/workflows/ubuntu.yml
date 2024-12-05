@@ -79,7 +79,7 @@ jobs:
 
       - name: Upload
         uses: softprops/action-gh-release@v1
-        if: ${{env.IMAGE_TAG != ''}}
+        if: ${{ startsWith(github.ref, 'refs/tags/') }}
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           files: |
