@@ -74,9 +74,6 @@ jobs:
             echo "IMAGE_TAG=latest" >> $GITHUB_ENV
           fi
 
-      - name: Install zip
-        uses: montudor/action-zip@v1
-
       - name: Zip
         working-directory: libgloox-win-${{ matrix.arch }}-${{ matrix.configuration }}
         run: zip -qq -r libgloox-win-${{ matrix.arch }}.zip libok-gloox.* include
