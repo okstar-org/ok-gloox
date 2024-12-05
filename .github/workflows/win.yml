@@ -1,4 +1,4 @@
-name: Release
+name: Build on Windows
 
 on:
   push:
@@ -47,55 +47,44 @@ jobs:
       - name: Upload
         uses: actions/upload-artifact@v3
         with:
-          name: libgloox-win-${{ matrix.arch }}
+          name: libgloox-win-${{ matrix.arch }}-${{ matrix.configuration }}
           path: |
             ${{ github.workspace }}/${{ matrix.configuration }}/include
             ${{ github.workspace }}/${{ matrix.configuration }}/ok-gloox.*
 
   release:
-
     needs: build-and-artifact
     runs-on: windows-latest
+    env:
+      IMAGE_TAG: ${{ github.event.ref_name }}
     strategy:
       matrix:
         arch: [ x64 ]
+        configuration: [ debug, release ]
 
     steps:
       - name: Download Artifact
         uses: actions/download-artifact@v3
 
+      - name: Set TAG to 'latest' if no tag is found
+        shell: bash
+        run: |
+          if [[ "$IMAGE_TAG" != v* ]]; then
+            echo "Setting IMAGE_TAG to latest"
+            echo "IMAGE_TAG=latest" >> $GITHUB_ENV
+          fi
+
       - name: Install zip
         uses: montudor/action-zip@v1
 
       - name: Zip
-        working-directory: libgloox-win-${{ matrix.arch }}
-        run: zip -qq -r libgloox-win-${{ matrix.arch }}.zip debug release include
+        working-directory: libgloox-win-${{ matrix.arch }}-${{ matrix.configuration }}
+        run: zip -qq -r libgloox-win-${{ matrix.arch }}.zip libok-gloox.* include
 
-      - name: Get Tag
-        id  : get_tag
-        run : echo "tag=${GITHUB_REF#refs/}" >> "$GITHUB_OUTPUT"
-        
-      - name: Get Repo
-        id  : get_repo
-        run : echo "repo=${GITHUB_REPOSITORY}" >> "$GITHUB_OUTPUT"
-          
-      - name: Get Upload URL
-        id  : get_upload_url
-        run : |
-          echo "upload_url=`curl -L -s \
-          -H "X-GitHub-Api-Version: 2022-11-28" \
-          -H "Accept: application/vnd.github+json" \
-          -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-          https://api.github.com/repos/${{ steps.get_repo.outputs.repo }}/releases/${{ steps.get_tag.outputs.tag }} | jq -r '.upload_url'`" >> "$GITHUB_OUTPUT"
-        env :
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      
       - name: Upload
-        uses: actions/upload-release-asset@v1
-        env :
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: softprops/action-gh-release@v1
+        if: ${{ startsWith(github.ref, 'refs/tags/') }}
         with:
-          asset_name: libgloox-win-${{ matrix.arch }}.zip
-          asset_content_type: application/zip
-          asset_path: libgloox-win-${{ matrix.arch }}/libgloox-win-${{ matrix.arch }}.zip
-          upload_url: ${{ steps.get_upload_url.outputs.upload_url }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          files: |
+            libgloox-linux-${{ matrix.arch }}-${{ matrix.configuration }}-${{env.IMAGE_TAG}}.zip
