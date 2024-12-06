@@ -77,10 +77,6 @@ namespace gloox {
         if (presence.subtype() == Presence::Error)
             return;
 
-        const Capabilities *c = presence.capabilities();
-        if (c->node() != XMLNS_JITSI_MEET) {
-            return;
-        }
 
         Tag *t = presence.tag();
         if (!t)
@@ -90,15 +86,27 @@ namespace gloox {
             return;
         }
 
-        Meet::Participant participant;
-        participant.region = t->findChild("jitsi_participant_region")->cdata();
-        participant.codecType = t->findChild("jitsi_participant_codecType")->cdata();
-        participant.avatarUrl = t->findChild("avatar-url")->cdata();
-        participant.email = t->findChild("email")->cdata();
-        participant.nick = t->findChild("nick")->cdata();
+        //message
+        std::string msg = t->name();
+        if (msg == "message") {
+            Tag *jm = t->findChild("json-message", "xmlns", XMLNS_JITSI_MEET);
+            if (jm) {
+                m_handler->handleJsonMessage(jm->cdata());
+            }
+        }
 
-        m_handler->handleParticipant(participant);
-        m_handler->handleStatsId(t->findChild("stats-id")->cdata());
+        const Capabilities *c = presence.capabilities();
+        if (c->node() == XMLNS_JITSI_MEET) {
+            Meet::Participant participant;
+            participant.region = t->findChild("jitsi_participant_region")->cdata();
+            participant.codecType = t->findChild("jitsi_participant_codecType")->cdata();
+            participant.avatarUrl = t->findChild("avatar-url")->cdata();
+            participant.email = t->findChild("email")->cdata();
+            participant.nick = t->findChild("nick")->cdata();
+            m_handler->handleParticipant(participant);
+            m_handler->handleStatsId(t->findChild("stats-id")->cdata());
+        }
+
     }
 
     void MeetManager::join(Meet &meet, const Meet::Participant &participant) {

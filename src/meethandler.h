@@ -16,6 +16,8 @@ namespace gloox {
         virtual void handleParticipant(const Meet::Participant &participant) = 0;
 
         virtual void handleStatsId(const std::string &statsId) = 0;
+
+        virtual void handleJsonMessage(const std::string& message)  = 0;
     };
 }
 
