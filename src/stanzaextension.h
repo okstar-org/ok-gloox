@@ -112,6 +112,7 @@ namespace gloox
 
     ExtJitsiConference,
     ExtMeet,
+    ExtMeetJsonMessage,
 
   };
 

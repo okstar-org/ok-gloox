@@ -505,13 +505,6 @@ namespace gloox
   /** XEP-0249: Direct MUC Invitations */
   GLOOX_API extern const std::string XMLNS_X_CONFERENCE;
 
-  /**
-   * Jitsi focus
-   */
-  GLOOX_API extern  const std::string XMLNS_JITSI_FOCUS;
-
-  GLOOX_API extern  const std::string XMLNS_JITSI_MEET;
-
   /** Multi-User Chat namespace (@xep{0045}) */
   GLOOX_API extern const std::string XMLNS_MUC;
 
@@ -728,6 +721,9 @@ namespace gloox
 
 
   GLOOX_API extern const std::string JITSI_CONFERENCE;
+  GLOOX_API extern const std::string XMLNS_JITSI_FOCUS;
+  GLOOX_API extern const std::string XMLNS_JITSI_MEET;
+  GLOOX_API extern const std::string XMLNS_JIT_MEET;
   GLOOX_API extern const std::string JITSI_DEVICES;
   GLOOX_API extern const std::string JITSI_AUDIO_MUTED;
   GLOOX_API extern const std::string JITSI_VIDEO_MUTED;

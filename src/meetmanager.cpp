@@ -8,6 +8,8 @@
 #include "meet.h"
 #include "util.h"
 #include "nickname.h"
+#include "message.h"
+#include "jsonmessage.h"
 
 namespace gloox {
     MeetManager::MeetManager(ClientBase *parent)
@@ -15,7 +17,9 @@ namespace gloox {
         if (m_parent) {
             m_parent->disco()->addFeature(XMLNS_JITSI_FOCUS);
             m_parent->registerStanzaExtension(new Meet());
+            m_parent->registerStanzaExtension(new JsonMessage());
             m_parent->registerIqHandler(this, ExtMeet);
+            m_parent->registerMessageHandler(this);
         }
     }
 
@@ -86,14 +90,6 @@ namespace gloox {
             return;
         }
 
-        //message
-        std::string msg = t->name();
-        if (msg == "message") {
-            Tag *jm = t->findChild("json-message", "xmlns", XMLNS_JITSI_MEET);
-            if (jm) {
-                m_handler->handleJsonMessage(jm->cdata());
-            }
-        }
 
         const Capabilities *c = presence.capabilities();
         if (c->node() == XMLNS_JITSI_MEET) {
@@ -107,6 +103,18 @@ namespace gloox {
             m_handler->handleStatsId(t->findChild("stats-id")->cdata());
         }
 
+    }
+
+    void MeetManager::handleMessage(const Message &msg, MessageSession *session) {
+        if (!m_handler) {
+            return;
+        }
+
+        //message
+        JsonMessage* t = (JsonMessage *) msg.findExtension(ExtMeetJsonMessage);
+        if (t) {
+            m_handler->handleJsonMessage(t);
+        }
     }
 
     void MeetManager::join(Meet &meet, const Meet::Participant &participant) {

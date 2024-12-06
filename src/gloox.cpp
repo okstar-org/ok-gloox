@@ -72,8 +72,6 @@ namespace gloox
   const std::string XMLNS_BYTESTREAMS       = "http://jabber.org/protocol/bytestreams";
 
   const std::string XMLNS_X_CONFERENCE      = "jabber:x:conference";
-  const std::string XMLNS_JITSI_FOCUS       = "http://jitsi.org/protocol/focus";
-  const std::string XMLNS_JITSI_MEET       = "https://jitsi.org/jitsi-meet";
   const std::string XMLNS_MUC               = "http://jabber.org/protocol/muc";
   const std::string XMLNS_MUC_USER          = "http://jabber.org/protocol/muc#user";
   const std::string XMLNS_MUC_ADMIN         = "http://jabber.org/protocol/muc#admin";
@@ -171,13 +169,16 @@ namespace gloox
   const std::string TYPE = "type";
   const std::string EmptyString = "";
 
-  const std::string JITSI_CONFERENCE = "http://jitsi.org/protocol/focus";
-  const std::string JITSI_DEVICES = "devices";
-  const std::string JITSI_AUDIO_MUTED = "http://jitsi.org/jitmeet/audio";
-  const std::string JITSI_VIDEO_MUTED = "http://jitsi.org/jitmeet/video";
-  const std::string JITSI_VIDEO_TYPE = "video_type";
-  const std::string JITSI_RAISED_HAND = "raised_hand";
-  const std::string JITSI_USER_AGENT = "user_agent";
+  const std::string XMLNS_JITSI_FOCUS           = "http://jitsi.org/protocol/focus";
+  const std::string XMLNS_JITSI_MEET            = "http://jitsi.org/jitsi-meet";
+  const std::string XMLNS_JIT_MEET              = "http://jitsi.org/jitmeet";
+  const std::string JITSI_CONFERENCE            = "http://jitsi.org/protocol/focus";
+  const std::string JITSI_DEVICES               = "devices";
+  const std::string JITSI_AUDIO_MUTED           = "http://jitsi.org/jitmeet/audio";
+  const std::string JITSI_VIDEO_MUTED           = "http://jitsi.org/jitmeet/video";
+  const std::string JITSI_VIDEO_TYPE            = "video_type";
+  const std::string JITSI_RAISED_HAND           = "raised_hand";
+  const std::string JITSI_USER_AGENT            = "user_agent";
 
   const std::string XMLNS_EXTERNAL_SERVICE_DISCOVERY = "urn:xmpp:extdisco:2";
 

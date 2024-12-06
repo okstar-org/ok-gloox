@@ -8,14 +8,15 @@
 #include "clientbase.h"
 #include "meethandler.h"
 #include "presencehandler.h"
-
+#include "messagehandler.h"
 
 #ifndef MEET_MANAGER_H
 #define MEET_MANAGER_H
 
 namespace gloox {
     static const std::string MEET_FOCUS = "focus";
-    class GLOOX_API MeetManager : public IqHandler, public PresenceHandler {
+
+    class GLOOX_API MeetManager : public IqHandler, public MessageHandler, public PresenceHandler {
     public:
         explicit MeetManager(ClientBase *parent);
 
@@ -38,6 +39,7 @@ namespace gloox {
         //PresenceHandler
         void handlePresence(const Presence &presence) override;
 
+        void handleMessage(const Message &msg, MessageSession *session = 0) override;
 
     private:
         MeetHandler *m_handler;

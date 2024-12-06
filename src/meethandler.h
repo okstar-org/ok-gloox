@@ -4,6 +4,7 @@
 
 #include "gloox.h"
 #include "meet.h"
+#include "jsonmessage.h"
 
 #ifndef MEET_HANDLER_H
 #define MEET_HANDLER_H
@@ -17,7 +18,8 @@ namespace gloox {
 
         virtual void handleStatsId(const std::string &statsId) = 0;
 
-        virtual void handleJsonMessage(const std::string& message)  = 0;
+        virtual void handleJsonMessage(const JsonMessage* message)  = 0;
+
     };
 }
 
