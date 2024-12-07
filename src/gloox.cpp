@@ -170,7 +170,7 @@ namespace gloox
   const std::string EmptyString = "";
 
   const std::string XMLNS_JITSI_FOCUS           = "http://jitsi.org/protocol/focus";
-  const std::string XMLNS_JITSI_MEET            = "http://jitsi.org/jitsi-meet";
+  const std::string XMLNS_JITSI_MEET            = "https://jitsi.org/jitsi-meet";
   const std::string XMLNS_JIT_MEET              = "http://jitsi.org/jitmeet";
   const std::string JITSI_CONFERENCE            = "http://jitsi.org/protocol/focus";
   const std::string JITSI_DEVICES               = "devices";

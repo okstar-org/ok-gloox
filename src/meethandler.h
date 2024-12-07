@@ -12,13 +12,13 @@
 namespace gloox {
     class GLOOX_API MeetHandler {
     public:
-        virtual void handleCreation(const JID &jid, bool ready, const std::map<std::string, std::string>& props) = 0;
+        virtual void handleCreation(const JID &jid, bool ready, const std::map<std::string, std::string> &props) = 0;
 
-        virtual void handleParticipant(const Meet::Participant &participant) = 0;
+        virtual void handleParticipant(const JID &jid, const Meet::Participant &participant) = 0;
 
-        virtual void handleStatsId(const std::string &statsId) = 0;
+        virtual void handleStatsId(const JID &jid, const std::string &statsId) = 0;
 
-        virtual void handleJsonMessage(const JsonMessage* message)  = 0;
+        virtual void handleJsonMessage(const JID &jid, const JsonMessage *message) = 0;
 
     };
 }

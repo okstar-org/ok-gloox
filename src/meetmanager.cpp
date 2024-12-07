@@ -99,21 +99,20 @@ namespace gloox {
             participant.avatarUrl = t->findChild("avatar-url")->cdata();
             participant.email = t->findChild("email")->cdata();
             participant.nick = t->findChild("nick")->cdata();
-            m_handler->handleParticipant(participant);
-            m_handler->handleStatsId(t->findChild("stats-id")->cdata());
-        }
 
+            const JID &jid = presence.from();
+            m_handler->handleParticipant(jid, participant);
+            m_handler->handleStatsId(jid, t->findChild("stats-id")->cdata());
+        }
     }
 
     void MeetManager::handleMessage(const Message &msg, MessageSession *session) {
         if (!m_handler) {
             return;
         }
-
-        //message
-        JsonMessage* t = (JsonMessage *) msg.findExtension(ExtMeetJsonMessage);
+        JsonMessage *t = (JsonMessage *) msg.findExtension(ExtMeetJsonMessage);
         if (t) {
-            m_handler->handleJsonMessage(t);
+            m_handler->handleJsonMessage(msg.from(), t);
         }
     }
 

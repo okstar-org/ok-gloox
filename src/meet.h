@@ -15,6 +15,7 @@ See the Mulan PubL v2 for more details.
 
 #include "client.h"
 #include "stanzaextension.h"
+#include "mucroom.h"
 
 namespace gloox {
 
@@ -33,6 +34,10 @@ namespace gloox {
             std::string email;
             std::string nick;
             std::string resource;
+            //self jid
+            MUCRoom::MUCUser mucUser;
+            bool e2ee;
+            std::map<std::string, std::string> idKeys;
         };
         typedef std::map<std::string, Participant> Participants;
 
@@ -42,6 +47,9 @@ namespace gloox {
 
         explicit Meet(const Tag *tag);
 
+        const std::string &getUid() const {
+            return uid;
+        }
 
         virtual Tag *tag() const override;
 
@@ -63,12 +71,12 @@ namespace gloox {
             return participants;
         }
 
-        bool addParticipant(const Participant& p){
-            if(p.resource.empty())
+        bool addParticipant(const Participant &p) {
+            if (p.resource.empty())
                 return false;
 
             Participants::const_iterator it = participants.find(p.resource);
-            if(it != participants.end()){
+            if (it != participants.end()) {
                 return false;
             }
 
