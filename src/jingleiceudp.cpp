@@ -43,19 +43,18 @@ namespace gloox {
             TagList::const_iterator it = candidates.begin();
             for (; it != candidates.end(); ++it) {
                 Candidate c;
-                c.component = std::stoi((*it)->findAttribute("component"));
+                c.component = (*it)->findAttribute("component").empty() ? 0 : std::stoi((*it)->findAttribute("component"));
                 c.foundation = (*it)->findAttribute("foundation");
-                c.generation = std::stoi((*it)->findAttribute("generation"));
+                c.generation =  (*it)->findAttribute("generation").empty() ? 0: std::stoi((*it)->findAttribute("generation"));
                 c.id = (*it)->findAttribute("id");
                 c.ip = (*it)->findAttribute("ip");
-                c.network = std::stoi((*it)->findAttribute("network"));
-                c.port = atoi((*it)->findAttribute("port").c_str());
-                c.priority = atoi((*it)->findAttribute("priority").c_str());
+                c.network =(*it)->findAttribute("network").empty() ? 0 : std::stoi((*it)->findAttribute("network"));
+                c.port = (*it)->findAttribute("port").empty() ? 0:  std::stoi((*it)->findAttribute("port"));
+                c.priority = (*it)->findAttribute("priority").empty()? 0: std::stoi((*it)->findAttribute("priority"));
                 c.protocol = (*it)->findAttribute("protocol");
                 c.rel_addr = (*it)->findAttribute("rel-addr");
-                c.rel_port = atoi((*it)->findAttribute("rel-port").c_str());
-                c.type = static_cast<Type>(
-                        util::lookup((*it)->findAttribute("type"), typeValues));
+                c.rel_port =(*it)->findAttribute("rel-port").empty() ? 0:  std::stoi((*it)->findAttribute("rel-port"));
+                c.type = static_cast<Type>(util::lookup((*it)->findAttribute("type"), typeValues));
                 m_candidates.push_back(c);
             }
 
