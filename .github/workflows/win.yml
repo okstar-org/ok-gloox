@@ -6,6 +6,7 @@ on:
       - v[0-9]+.*
     branches: [ develop, main ]
     paths-ignore:
+      - '.gitignore'
       - '!.github/workflows/win.yml'
 jobs:
   build-and-artifact:
