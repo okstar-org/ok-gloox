@@ -26,7 +26,9 @@ namespace gloox {
     MeetManager::~MeetManager() {
         if (m_parent) {
             m_parent->removeStanzaExtension(ExtMeet);
+            m_parent->removeStanzaExtension(ExtMeetJsonMessage);
             m_parent->removeIqHandler(this, ExtMeet);
+            m_parent->removeMessageHandler(this);
         }
     }
 
