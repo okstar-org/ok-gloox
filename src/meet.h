@@ -34,11 +34,10 @@ namespace gloox {
             std::string email;
             std::string nick;
             std::string resource;
-            //self jid
-            MUCRoom::MUCUser mucUser;
             bool e2ee;
             std::map<std::string, std::string> idKeys;
         };
+
         typedef std::map<std::string, Participant> Participants;
 
         explicit Meet();
@@ -71,26 +70,7 @@ namespace gloox {
             return participants;
         }
 
-        bool addParticipant(const Participant &p) {
-            if (p.resource.empty())
-                return false;
-
-            Participants::const_iterator it = participants.find(p.resource);
-            if (it != participants.end()) {
-                return false;
-            }
-
-            participants.insert(std::make_pair(p.resource, p));
-            return true;
-
-            // 使用 try_emplace 方法尝试插入元素
-//            auto result = participants.try_emplace(p.resource, p);
-//            // 检查是否成功插入新元素
-//            if (result.second) {
-//                return true;
-//            }
-//            return false;
-        }
+        bool addParticipant(const Participant &p);
 
     private:
         JID m_jid;

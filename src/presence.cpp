@@ -40,7 +40,7 @@ namespace gloox
   }
 
   Presence::Presence( Tag* tag )
-    : Stanza( tag ), m_subtype( Invalid ), m_stati( 0 ), m_priority( 0 )
+    : Stanza( tag ), m_subtype( Invalid ), m_stati( 0 ), m_priority( 0 ), originTag(tag)
   {
     if( !tag || tag->name() != "presence" )
       return;
@@ -71,7 +71,7 @@ namespace gloox
 
   Presence::Presence( PresenceType type, const JID& to, const std::string& status,
                       int priority, const std::string& xmllang )
-    : Stanza( to ), m_subtype( type ), m_stati( 0 )
+    : Stanza( to ), m_subtype( type ), m_stati( 0 ), originTag(NULL)
   {
     setLang( &m_stati, m_status, status, xmllang );
 

@@ -417,13 +417,13 @@ namespace gloox
 
   MUCRoom::MUCUser::~MUCUser()
   {
-    delete m_jid;
-    delete m_actor;
-    delete m_thread;
-    delete m_reason;
-    delete m_newNick;
-    delete m_password;
-    delete m_alternate;
+    if(m_jid) delete m_jid;
+    if(m_actor) delete m_actor;
+    if(m_thread) delete m_thread;
+    if(m_reason) delete m_reason;
+    if(m_newNick) delete m_newNick;
+    if(m_password) delete m_password;
+    if(m_alternate) delete m_alternate;
   }
 
   MUCRoomRole MUCRoom::MUCUser::getEnumRole( const std::string& role )

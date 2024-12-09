@@ -144,6 +144,10 @@ namespace gloox
       // reimplemented from Stanza
       virtual Tag* tag() const;
 
+      const Tag* getOriginTag()const{
+          return originTag;
+      }
+
     private:
 #ifdef PRESENCE_TEST
     public:
@@ -158,6 +162,7 @@ namespace gloox
       StringMap* m_stati;
       std::string m_status;
       int m_priority;
+      Tag* originTag;
 
   };
 
