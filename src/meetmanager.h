@@ -24,9 +24,9 @@ namespace gloox {
 
         void registerHandler(MeetHandler *handler);
 
-        void createMeet(const Meet &meet);
+        Meet *createMeet(const JID &room, std::map<std::string, std::string> &props);
 
-        void exitMeet(const JID &jid);
+        void exitMeet();
 
         void join(Meet &meet, const Meet::Participant &participant);
 
@@ -44,6 +44,7 @@ namespace gloox {
     private:
         MeetHandler *m_handler;
         ClientBase *m_parent;
+        Meet *m_meet;
     };
 
 } // gloox

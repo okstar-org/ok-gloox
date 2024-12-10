@@ -50,13 +50,16 @@ namespace gloox {
         return true;
     }
 
-    void MeetManager::createMeet(const Meet &meet) {
-        if (!m_parent)
-            return;
+    Meet *MeetManager::createMeet(const JID &room, std::map<std::string, std::string> &props) {
 
-        Tag *tag = meet.tag();
+        if (!m_parent)
+            return nullptr;
+
+        m_meet = new gloox::Meet(room, m_parent->getRandom(), props);
+
+        Tag *tag = m_meet->tag();
         if (!tag)
-            return;
+            return nullptr;
 
         JID to(MEET_FOCUS + "." + m_parent->server());
         IQ iq(IQ::Set, to, m_parent->getID());
@@ -65,15 +68,22 @@ namespace gloox {
         a->setXmlns(XMLNS_CLIENT);
         a->addChild(tag);
         m_parent->send(a);
+
+        return m_meet;
     }
 
-    void MeetManager::exitMeet(const JID &jid) {
+    void MeetManager::exitMeet() {
         if (!m_parent) {
             return;
         }
 
-        Presence un(Presence::Unavailable, jid, XMLNS_CLIENT);
-        m_parent->send(un);
+        Meet::Participants::const_iterator itp = m_meet->getParticipants().begin();
+        for (; itp != m_meet->getParticipants().end(); ++itp) {
+            JID partJid = itp->second.jid;
+            Presence un(Presence::Unavailable, partJid, XMLNS_CLIENT);
+            m_parent->send(un);
+        }
+
     }
 
 

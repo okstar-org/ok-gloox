@@ -63,9 +63,9 @@ namespace gloox {
 
         virtual StanzaExtension *clone() const { return new Meet(*this); }
 
-        const JID &jid() const { return m_jid; }
+        inline const JID &jid() const { return m_jid; }
 
-        const std::map<std::string, std::string> &getProperties() const {
+        inline const std::map<std::string, std::string> &getProperties() const {
             return properties;
         }
 
@@ -75,11 +75,16 @@ namespace gloox {
 
         bool addParticipant(const Participant &p);
 
+        inline const Participant &getSelf() const {
+            return self;
+        }
+
     private:
         JID m_jid;
         std::string uid;
         std::map<std::string, std::string> properties;
         Participants participants;
+        Participant self;
     };
 } // namespace gloox
 
