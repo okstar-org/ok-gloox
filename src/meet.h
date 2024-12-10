@@ -34,6 +34,9 @@ namespace gloox {
             std::string email;
             std::string nick;
             std::string resource;
+            std::string affiliation;
+            std::string role;
+            JID jid;
             bool e2ee;
             std::map<std::string, std::string> idKeys;
         };
