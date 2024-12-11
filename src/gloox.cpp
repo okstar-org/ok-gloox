@@ -128,6 +128,7 @@ namespace gloox
   const std::string XMLNS_JINGLE_APPS_GROUP      = "urn:xmpp:jingle:apps:grouping:0";
   const std::string XMLNS_JINGLE_APPS_RTP  = "urn:xmpp:jingle:apps:rtp:1";
   const std::string XMLNS_JINGLE_APPS_DTLS = "urn:xmpp:jingle:apps:dtls:0";
+  const std::string XMLNS_JINGLE_APPS_DTLS_SCTP = "urn:xmpp:jingle:transports:dtls-sctp:1";
   const std::string XMLNS_JINGLE_APPS_RTP_FB = "urn:xmpp:jingle:apps:rtp:rtcp-fb:0";
   const std::string XMLNS_JINGLE_APPS_RTP_HDREXT = "urn:xmpp:jingle:apps:rtp:rtp-hdrext:0";
   const std::string XMLNS_JINGLE_APPS_RTP_SSMA = "urn:xmpp:jingle:apps:rtp:ssma:0";

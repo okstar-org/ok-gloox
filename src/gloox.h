@@ -626,6 +626,8 @@ namespace gloox
 
   GLOOX_API extern const std::string XMLNS_JINGLE_APPS_DTLS;
 
+  GLOOX_API extern const std::string XMLNS_JINGLE_APPS_DTLS_SCTP;
+
   GLOOX_API extern const std::string XMLNS_JINGLE_APPS_RTP_FB;
 
   GLOOX_API extern const std::string XMLNS_JINGLE_APPS_RTP_HDREXT;

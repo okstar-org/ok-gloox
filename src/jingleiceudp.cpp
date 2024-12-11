@@ -43,17 +43,19 @@ namespace gloox {
             TagList::const_iterator it = candidates.begin();
             for (; it != candidates.end(); ++it) {
                 Candidate c;
-                c.component = (*it)->findAttribute("component").empty() ? 0 : std::stoi((*it)->findAttribute("component"));
+                c.component = (*it)->findAttribute("component").empty() ? 0 : std::stoi(
+                        (*it)->findAttribute("component"));
                 c.foundation = (*it)->findAttribute("foundation");
-                c.generation =  (*it)->findAttribute("generation").empty() ? 0: std::stoi((*it)->findAttribute("generation"));
+                c.generation = (*it)->findAttribute("generation").empty() ? 0 : std::stoi(
+                        (*it)->findAttribute("generation"));
                 c.id = (*it)->findAttribute("id");
                 c.ip = (*it)->findAttribute("ip");
-                c.network =(*it)->findAttribute("network").empty() ? 0 : std::stoi((*it)->findAttribute("network"));
-                c.port = (*it)->findAttribute("port").empty() ? 0:  std::stoi((*it)->findAttribute("port"));
-                c.priority = (*it)->findAttribute("priority").empty()? 0: std::stoi((*it)->findAttribute("priority"));
+                c.network = (*it)->findAttribute("network").empty() ? 0 : std::stoi((*it)->findAttribute("network"));
+                c.port = (*it)->findAttribute("port").empty() ? 0 : std::stoi((*it)->findAttribute("port"));
+                c.priority = (*it)->findAttribute("priority").empty() ? 0 : std::stoi((*it)->findAttribute("priority"));
                 c.protocol = (*it)->findAttribute("protocol");
                 c.rel_addr = (*it)->findAttribute("rel-addr");
-                c.rel_port =(*it)->findAttribute("rel-port").empty() ? 0:  std::stoi((*it)->findAttribute("rel-port"));
+                c.rel_port = (*it)->findAttribute("rel-port").empty() ? 0 : std::stoi((*it)->findAttribute("rel-port"));
                 c.type = static_cast<Type>(util::lookup((*it)->findAttribute("type"), typeValues));
                 m_candidates.push_back(c);
             }
@@ -66,6 +68,16 @@ namespace gloox {
                 dtls.setup = (*it)->findAttribute("setup");
                 dtls.fingerprint = (*it)->cdata();
                 m_dtls = (dtls);
+            }
+
+            const Tag *sctpmap = tag->findChild("sctpmap");
+            if (sctpmap) {
+                Sctp sctp;
+                sctp.port = std::stoi(sctpmap->findAttribute("number"));
+                sctp.protocol = sctpmap->findAttribute("protocol");
+                sctp.streams = sctpmap->findAttribute("streams").empty() ? 0 :
+                               std::stoi(sctpmap->findAttribute("streams"));
+                m_sctp = sctp;
             }
         }
 
@@ -96,14 +108,14 @@ namespace gloox {
                 c->addAttribute("generation", std::to_string((*it).generation));
                 c->addAttribute("id", (*it).id);
                 c->addAttribute("ip", (*it).ip);
-                c->addAttribute("network",std::to_string( (*it).network));
-                c->addAttribute("port",std::to_string( (*it).port));
-                c->addAttribute("priority",std::to_string( (*it).priority));
+                c->addAttribute("network", std::to_string((*it).network));
+                c->addAttribute("port", std::to_string((*it).port));
+                c->addAttribute("priority", std::to_string((*it).priority));
                 c->addAttribute("protocol", (*it).protocol);
                 c->addAttribute("type", util::lookup((*it).type, typeValues));
                 if ((*it).type != Host) {
                     c->addAttribute("rel-addr", (*it).rel_addr);
-                    c->addAttribute("rel-port",std::to_string( (*it).rel_port));
+                    c->addAttribute("rel-port", std::to_string((*it).rel_port));
                 }
             }
 
@@ -112,6 +124,16 @@ namespace gloox {
             c->addAttribute("hash", m_dtls.hash);
             c->addAttribute("setup", m_dtls.setup);
             c->setCData(m_dtls.fingerprint);
+
+            //<sctpmap xmlns='urn:xmpp:jingle:transports:dtls-sctp:1' number='5000' protocol='webrtc-datachannel' streams='1024'/>
+            if (!m_sctp.protocol.empty()) {
+                Tag *s = new Tag(t, "sctpmap");
+                s->setXmlns(XMLNS_JINGLE_APPS_DTLS_SCTP);
+                s->addAttribute("number", std::to_string(m_sctp.port));
+                if (m_sctp.streams > 0) {
+                    s->addAttribute("streams", std::to_string( m_sctp.streams));
+                }
+            }
 
             return t;
         }
@@ -127,6 +149,10 @@ namespace gloox {
 
         void ICEUDP::setDtls(const ICEUDP::Dtls &dtls) {
             m_dtls = dtls;
+        }
+
+        void ICEUDP::setSctp(const ICEUDP::Sctp &sctp) {
+            m_sctp = sctp;
         }
     } // namespace Jingle
 

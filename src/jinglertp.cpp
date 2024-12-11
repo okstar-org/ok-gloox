@@ -31,7 +31,7 @@ namespace gloox {
             } else if (tagMedia == "application") {
                 m_media = application;
             }
-            std::cout << "media:" << m_media << std::endl;
+
             const Tag *c = tag->findTag("description/payload-type");
             if (c) {
                 parsePayloadTypes(tag->findChildren("payload-type"));

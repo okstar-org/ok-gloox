@@ -66,6 +66,14 @@ namespace gloox {
             };
             typedef std::list<Dtls> DtlsList;
 
+            struct Sctp {
+                std::string protocol;
+                uint32_t port = 0;
+                uint32_t streams = 0;
+            };
+            typedef std::list<Sctp> SctpList;
+
+
             /**
              * Describes a single transport candidate.
              */
@@ -126,9 +134,11 @@ namespace gloox {
              */
             const CandidateList &candidates() const { return m_candidates; }
 
-            const Dtls dtls() const { return m_dtls; }
-
+            const Dtls& dtls() const { return m_dtls; }
             void setDtls(const Dtls &);
+
+            const Sctp& sctp() const {return m_sctp;}
+            void setSctp(const Sctp& sctp) ;
 
             // reimplemented from Plugin
             virtual const StringList features() const;
@@ -157,6 +167,7 @@ namespace gloox {
             CandidateList m_candidates;
             SignalingWebRTCDatachannels signalingWebRTCDatachannels;
             Dtls m_dtls;
+            Sctp m_sctp;
         };
 
     }
