@@ -20,6 +20,7 @@
 #include "jinglesessionhandler.h"
 #include "disco.h"
 #include "util.h"
+#include "jinglejsonmessage.h"
 
 namespace gloox
 {

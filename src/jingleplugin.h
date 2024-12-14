@@ -48,7 +48,8 @@ namespace gloox
                                      * to change. */
       PluginGroup,                  /** A plugin for Jingle-Group */
       PluginRTP,
-      PluginIBB                     /** A plugin for Jingle-InBandBytestream */
+      PluginIBB,                     /** A plugin for Jingle-InBandBytestream */
+      PluginJsonMessage             /** json-message */
     };
 
     /**

@@ -173,10 +173,10 @@ namespace gloox
   const std::string XMLNS_JITSI_FOCUS           = "http://jitsi.org/protocol/focus";
   const std::string XMLNS_JITSI_MEET            = "https://jitsi.org/jitsi-meet";
   const std::string XMLNS_JIT_MEET              = "http://jitsi.org/jitmeet";
-  const std::string JITSI_CONFERENCE            = "http://jitsi.org/protocol/focus";
-  const std::string JITSI_DEVICES               = "devices";
   const std::string JITSI_AUDIO_MUTED           = "http://jitsi.org/jitmeet/audio";
   const std::string JITSI_VIDEO_MUTED           = "http://jitsi.org/jitmeet/video";
+  const std::string JITSI_CONFERENCE            = "http://jitsi.org/protocol/focus";
+  const std::string JITSI_DEVICES               = "devices";
   const std::string JITSI_VIDEO_TYPE            = "video_type";
   const std::string JITSI_RAISED_HAND           = "raised_hand";
   const std::string JITSI_USER_AGENT            = "user_agent";

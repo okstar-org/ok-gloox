@@ -74,7 +74,7 @@ namespace gloox
       PluginList::const_iterator itp = m_plugins.begin();
       for( ; itp != m_plugins.end(); ++itp )
       {
-        const ConstTagList& match = tag->findTagList( (*itp)->filterString() );
+        const ConstTagList& match = tag->findTagList((*itp)->filterString());
         it = match.begin();
         for( ; it != match.end(); ++it )
         {

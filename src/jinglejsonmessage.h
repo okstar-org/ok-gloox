@@ -11,8 +11,8 @@
 */
 
 
-#ifndef JINGLE_IBB_H__
-#define JINGLE_IBB_H__
+#ifndef JINGLE_JSONMESSAGE_H__
+#define JINGLE_JSONMESSAGE_H__
 
 #include "jingleplugin.h"
 #include "inbandbytestream.h"
@@ -25,45 +25,29 @@ namespace gloox {
 
     namespace Jingle {
 
-    class GLOOX_API IBB : public Plugin  {
+        class GLOOX_API JsonMessage : public Plugin {
         public:
-
-            enum Action {
-                init,
-                open,
-                data
-            };
-
-            struct Data {
-                int seq;
-                std::string chunk;
-            };
+            static const std::string TAG_NAME;
 
             /**
              * Constructs a new instance.
-             * @param sid The @c sid value.
-             * @param blockSize The @c blockSize value.
+             * @param json The @c json value.
              */
-            IBB(const std::string &sid, long blockSize);
+            explicit JsonMessage(const std::string &json);
 
             /**
              * Constructs a new instance from the given tag.
              * @param tag The Tag to parse.
              */
-            IBB(const Tag *tag = 0);
+            explicit JsonMessage(const Tag *tag = 0);
 
             /**
              * Virtual destructor.
              */
-            virtual ~IBB() {}
+            virtual ~JsonMessage() {}
 
-            const std::string &sid() const { return m_sid; }
+            const std::string &json() const { return m_json; }
 
-            long blockSize() const { return m_blockSize; }
-
-            Action action()const {return m_action;}
-
-            const Data& getData() const {return m_data;}
 
             // reimplemented from Plugin
             virtual const StringList features() const;
@@ -79,14 +63,11 @@ namespace gloox {
 
             // reimplemented from Plugin
             virtual Plugin *clone() const {
-                return new IBB(*this);
+                return new JsonMessage(*this);
             }
 
         private:
-            std::string m_sid;
-            long m_blockSize;
-            Action m_action;
-            Data m_data;
+            std::string m_json;
         };
     }
 }
