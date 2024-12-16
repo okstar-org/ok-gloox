@@ -20,6 +20,7 @@
 #include "tag.h"
 #include "iqhandler.h"
 #include "jingleplugin.h"
+#include "jinglejsonmessage.h"
 
 #include <string>
 
@@ -65,6 +66,7 @@ namespace gloox
       TransportInfo,                /**< Exchange transport candidates. */
       TransportReject,              /**< Reject a transport-replace action received from another party. */
       TransportReplace,             /**< Redefine a transport method or replace it with a different method. */
+      SourceAdd,
       InvalidAction                 /**< Invalid action. */
     };
 
@@ -506,6 +508,15 @@ namespace gloox
          * @return @b False if a prerequisite is not met, @b true otherwise.
          */
         bool transportReplace( const Content* content );
+
+
+        /**
+         * Add a source
+         * @param jsonMessage
+         * @return
+         */
+        bool sourceAdd(const JsonMessage* jsonMessage);
+
 
         /**
          * Returns the session's state.

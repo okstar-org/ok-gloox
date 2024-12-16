@@ -400,6 +400,10 @@ namespace gloox
       return doAction( TransportReplace, content );
     }
 
+    bool Session::sourceAdd(const JsonMessage *jsonMessage) {
+        return doAction(SourceAdd, jsonMessage);
+    }
+
     bool Session::doAction( Action action, const Plugin* plugin )
     {
       PluginList pl;
