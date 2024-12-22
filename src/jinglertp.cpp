@@ -129,6 +129,12 @@ namespace gloox {
                 sTag->setXmlns(XMLNS_JINGLE_APPS_RTP_SSMA);
                 sTag->addAttribute("ssrc", (*it).ssrc);
 
+                if(!(*it).name.empty())
+                    sTag->addAttribute("name", (*it).name);
+
+                if(!((*it).videoType.empty()))
+                    sTag->addAttribute("videoType", (*it).videoType);
+
                 Tag *cname = new Tag("parameter");
                 cname->addAttribute("name", "cname");
                 cname->addAttribute("value", (*it).cname);
@@ -205,6 +211,8 @@ namespace gloox {
             for (; it != tagList.end(); ++it) {
                 Source f;
                 f.ssrc = (*it)->findAttribute("ssrc").data();
+                f.name = (*it)->findAttribute("name").data();
+                f.videoType = (*it)->findAttribute("videoType").data();
                 std::list<RTP::Parameter> parameters = parseParameters((*it)->findChildren("parameter"));
                 for(auto &p: parameters){
                     if(p.name == "cname"){

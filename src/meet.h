@@ -22,10 +22,6 @@ namespace gloox {
 
     class Meet : public StanzaExtension {
     public:
-        struct SourceInfo {
-
-        };
-
         struct Participant {
             std::string region;
             std::string codecType;
@@ -37,6 +33,7 @@ namespace gloox {
             std::string affiliation;
             std::string role;
             JID jid;
+            std::string sourceInfo;
             bool e2ee;
             std::map<std::string, std::string> idKeys;
         };

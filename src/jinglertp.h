@@ -80,6 +80,8 @@ public:
 
   struct Source {
     std::string ssrc;
+    std::string name;
+    std::string videoType;
     std::string cname;
     std::string msid;
   };
