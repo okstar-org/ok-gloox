@@ -80,9 +80,10 @@ public:
 
   struct Source {
     std::string ssrc;
-    Parameters parameters;
+    std::string cname;
+    std::string msid;
   };
-  typedef std::list<Source> Sources;
+  typedef std::vector<Source> Sources;
 
   struct SsrcGroup {
     std::string semantics;

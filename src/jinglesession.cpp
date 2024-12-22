@@ -43,7 +43,8 @@ namespace gloox
       "transport-accept",
       "transport-info",
       "transport-reject",
-      "transport-replace"
+      "transport-replace",
+      "source-add"
     };
 
     static inline Action actionType( const std::string& type )

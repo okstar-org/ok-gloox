@@ -93,8 +93,8 @@ namespace gloox {
                 case application:
                     r->addAttribute("media", "application");
                     break;
-              default:
-                break;
+                default:
+                    break;
             }
 
             addPayloadTypes(r);
@@ -110,7 +110,7 @@ namespace gloox {
         }
 
         void RTP::addSsrcGroup(Tag *r) const {
-            if(m_ssrcGroup.ssrcs.empty())
+            if (m_ssrcGroup.ssrcs.empty())
                 return;
             Tag *f = new Tag(r, "ssrc-group");
             f->setXmlns(XMLNS_JINGLE_APPS_RTP_SSMA);
@@ -125,15 +125,20 @@ namespace gloox {
         void RTP::addSources(Tag *r) const {
             Sources::const_iterator it = m_sources.begin();
             for (; it != m_sources.end(); ++it) {
-                Tag *f = new Tag(r, "source");
-                f->setXmlns(XMLNS_JINGLE_APPS_RTP_SSMA);
-                f->addAttribute("ssrc", (*it).ssrc);
-                Parameters::const_iterator it2 = (*it).parameters.begin();
-                for (; it2 != (*it).parameters.end(); ++it2) {
-                    Tag *pt = new Tag(f, "parameter");
-                    pt->addAttribute("name", (*it2).name);
-                    pt->addAttribute("value", (*it2).value);
-                }
+                Tag *sTag = new Tag(r, "source");
+                sTag->setXmlns(XMLNS_JINGLE_APPS_RTP_SSMA);
+                sTag->addAttribute("ssrc", (*it).ssrc);
+
+                Tag *cname = new Tag("parameter");
+                cname->addAttribute("name", "cname");
+                cname->addAttribute("value", (*it).cname);
+                sTag->addChild(cname);
+
+                Tag *msid = new Tag("parameter");
+                msid->addAttribute("name", "msid");
+                msid->addAttribute("value", (*it).msid);
+                sTag->addChild(msid);
+
             }
         }
 
@@ -200,7 +205,15 @@ namespace gloox {
             for (; it != tagList.end(); ++it) {
                 Source f;
                 f.ssrc = (*it)->findAttribute("ssrc").data();
-                f.parameters = parseParameters((*it)->findChildren("parameter"));
+                std::list<RTP::Parameter> parameters = parseParameters((*it)->findChildren("parameter"));
+                for(auto &p: parameters){
+                    if(p.name == "cname"){
+                        f.cname = p.value;
+                    }
+                    else if(p.name == "msid"){
+                        f.msid = p.value;
+                    }
+                }
                 m_sources.push_back(f);
             }
         }
