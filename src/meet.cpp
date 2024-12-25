@@ -13,21 +13,17 @@ See the Mulan PubL v2 for more details.
 #include "meet.h"
 #include "disco.h"
 #include "util.h"
-
+#include "message.h"
 
 namespace gloox {
 
-    Meet::Meet() : StanzaExtension(ExtMeet) {
-        m_valid = true;
-    }
-
-    Meet::Meet(const gloox::JID &m_jid_, const std::string &uid_,
+    Meet::Meet(ClientBase *parent, const gloox::JID &m_jid_, const std::string &uid_,
                const std::map<std::string, std::string> &properties_)
-            : StanzaExtension(ExtMeet), m_jid(m_jid_), uid(uid_), properties(properties_) {
+            : StanzaExtension(ExtMeet), m_jid(m_jid_), uid(uid_), properties(properties_), m_parent(parent) {
         m_valid = true;
     }
 
-    Meet::Meet(const Tag *tag) : StanzaExtension(ExtMeet) {
+    Meet::Meet(const Tag *tag) : StanzaExtension(ExtMeet), m_parent(nullptr) {
         if (!(tag && tag->name() == "conference" && tag->xmlns() == XMLNS_JITSI_FOCUS))
             return;
 
@@ -90,6 +86,13 @@ namespace gloox {
 //                return true;
 //            }
 //            return false;
+    }
+
+    void Meet::send(const std::string &msg) {
+        Message m(gloox::Message::MessageType::Groupchat,
+                  jid(),
+                  msg);
+        m_parent->send(m);
     }
 
 } // namespace gloox

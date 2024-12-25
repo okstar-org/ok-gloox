@@ -40,9 +40,7 @@ namespace gloox {
 
         typedef std::map<std::string, Participant> Participants;
 
-        explicit Meet();
-
-        explicit Meet(const JID &m_jid, const std::string &uid, const std::map<std::string, std::string> &properties);
+        explicit Meet(ClientBase* parent, const JID &m_jid, const std::string &uid, const std::map<std::string, std::string> &properties);
 
         explicit Meet(const Tag *tag);
 
@@ -76,12 +74,15 @@ namespace gloox {
             return self;
         }
 
+        void send(const std::string &msg);
+
     private:
         JID m_jid;
         std::string uid;
         std::map<std::string, std::string> properties;
         Participants participants;
         Participant self;
+        ClientBase *m_parent;
     };
 } // namespace gloox
 

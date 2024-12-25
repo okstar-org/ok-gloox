@@ -16,7 +16,7 @@ namespace gloox {
             : m_handler(nullptr), m_parent(parent) {
         if (m_parent) {
             m_parent->disco()->addFeature(XMLNS_JITSI_FOCUS);
-            m_parent->registerStanzaExtension(new Meet());
+            m_parent->registerStanzaExtension(new Meet(nullptr));
             m_parent->registerStanzaExtension(new JsonMessage());
             m_parent->registerIqHandler(this, ExtMeet);
             m_parent->registerMessageHandler(this);
@@ -55,7 +55,7 @@ namespace gloox {
         if (!m_parent)
             return nullptr;
 
-        m_meet = new gloox::Meet(room, m_parent->getRandom(), props);
+        m_meet = new gloox::Meet(m_parent, room, m_parent->getRandom(), props);
 
         Tag *tag = m_meet->tag();
         if (!tag)
