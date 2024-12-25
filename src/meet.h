@@ -18,9 +18,7 @@ See the Mulan PubL v2 for more details.
 #include "mucroom.h"
 
 namespace gloox {
-
-
-    class Meet : public StanzaExtension {
+    class GLOOX_API Meet : public StanzaExtension {
     public:
         struct Participant {
             std::string region;
@@ -36,11 +34,18 @@ namespace gloox {
             std::string sourceInfo;
             bool e2ee;
             std::map<std::string, std::string> idKeys;
+            std::string stats_id;
+
         };
+
+        Tag* tagParticipant(const Participant& p, Presence &presence) const;
+
+        Participant parseParticipant(const gloox::JID &from, const gloox::Presence &presence);
 
         typedef std::map<std::string, Participant> Participants;
 
-        explicit Meet(ClientBase* parent, const JID &m_jid, const std::string &uid, const std::map<std::string, std::string> &properties);
+        explicit Meet(ClientBase *parent, const JID &m_jid, const std::string &uid,
+                      const std::map<std::string, std::string> &properties);
 
         explicit Meet(const Tag *tag);
 
@@ -75,6 +80,8 @@ namespace gloox {
         }
 
         void send(const std::string &msg);
+
+        void sendPresence(const Participant &self);
 
     private:
         JID m_jid;

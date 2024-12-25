@@ -95,4 +95,96 @@ namespace gloox {
         m_parent->send(m);
     }
 
+    void Meet::sendPresence(const Meet::Participant &participant) {
+        Presence p(Presence::Available, jid());
+        auto t = tagParticipant(participant, p);
+        m_parent->send(t);
+    }
+
+    Tag *Meet::tagParticipant(const Participant &p, Presence &presence) const {
+        Tag *t = presence.tag();
+        t->addChild(new Tag("email", p.email));
+
+        if (!p.stats_id.empty()) {
+            t->addChild(new Tag("stats-id", p.stats_id));
+        }
+
+        if (!p.region.empty()) {
+            t->addChild(new Tag("jitsi_participant_region", p.region));
+        }
+
+        if (!p.codecType.empty()) {
+            t->addChild(new Tag("jitsi_participant_codecType", p.codecType));
+        }
+
+        if (!p.nick.empty()) {
+            Tag *n = new Tag("nick", "xmlns", XMLNS_NICKNAME);
+            n->setCData(p.nick);
+            t->addChild(n);
+        }
+
+        if (!p.avatarUrl.empty()) {
+            t->addChild(new Tag("avatar-url", p.avatarUrl));
+        }
+
+        if (!p.sourceInfo.empty()) {
+            t->addChild(new Tag("SourceInfo", p.sourceInfo));
+        }
+
+        return t;
+    }
+
+    Meet::Participant Meet::parseParticipant(const gloox::JID &from, const gloox::Presence &presence) {
+
+        auto t = presence.getOriginTag();
+
+        // 成员上线
+        auto email = t->findChild("email");
+        if (!email) {
+            return {};
+        }
+
+        Meet::Participant p = {
+                .region = t->findChild("jitsi_participant_region")->cdata(),
+                .codecType = t->findChild("jitsi_participant_codecType")->cdata(),
+                .avatarUrl = t->findChild("avatar-url")
+                             ? t->findChild("avatar-url")->cdata()
+                             : "",
+                .email = email->cdata(),
+                .nick = t->findChild("nick") ? t->findChild("nick")->cdata() : "",
+                .resource = from.resource(),
+                .jid = from.full(),
+                .e2ee = false,
+                .stats_id = t->findChild("stats-id")->cdata()};
+
+        auto fts = t->findChild("features");
+        if (fts) {
+            auto e2ee = fts->findChild("feature", "var", "https://jitsi.org/meet/e2ee");
+            if (e2ee) {
+                p.e2ee = true;
+                auto ed25519 = t->findChild("jitsi_participant_e2ee.idKey.ed25519");
+                if (ed25519) {
+                    p.idKeys.insert(std::make_pair("ed25519", ed25519->cdata()));
+                }
+                auto curve25519 = t->findChild("jitsi_participant_e2ee.idKey.curve25519");
+                if (curve25519) {
+                    p.idKeys.insert(
+                            std::make_pair("curve25519", curve25519->cdata()));
+                }
+            }
+        }
+
+        // 获取群组用户jid
+        auto userTag = t->findChild("x", "xmlns", "http://jabber.org/protocol/muc#user");
+        if (userTag) {
+            gloox::MUCRoom::MUCUser mucUser(userTag);
+        }
+
+        auto si = t->findChild("SourceInfo");
+        if (si) {
+            p.sourceInfo = si->cdata();
+        }
+
+        return p;
+    }
 } // namespace gloox
