@@ -24,7 +24,7 @@ namespace gloox {
 
         void registerHandler(MeetHandler *handler);
 
-        Meet *createMeet(const JID &room, std::map<std::string, std::string> &props);
+        Meet *createMeet(const JID &room, const std::string& resource, std::map<std::string, std::string> &props);
 
         void exitMeet();
 

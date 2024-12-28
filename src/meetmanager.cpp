@@ -50,12 +50,12 @@ namespace gloox {
         return true;
     }
 
-    Meet *MeetManager::createMeet(const JID &room, std::map<std::string, std::string> &props) {
+    Meet *MeetManager::createMeet(const JID &room, const std::string& resource, std::map<std::string, std::string> &props) {
 
         if (!m_parent)
             return nullptr;
 
-        m_meet = new gloox::Meet(m_parent, room, m_parent->getRandom(), props);
+        m_meet = new gloox::Meet(m_parent, room, m_parent->getRandom(), resource,props);
 
         Tag *tag = m_meet->tag();
         if (!tag)

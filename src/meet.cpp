@@ -17,9 +17,15 @@ See the Mulan PubL v2 for more details.
 
 namespace gloox {
 
-    Meet::Meet(ClientBase *parent, const gloox::JID &m_jid_, const std::string &uid_,
+    Meet::Meet(ClientBase *parent,
+               const gloox::JID &m_jid_,
+               const std::string &uid_,
+               const std::string &resource_,
                const std::map<std::string, std::string> &properties_)
-            : StanzaExtension(ExtMeet), m_jid(m_jid_), uid(uid_), properties(properties_), m_parent(parent) {
+            : StanzaExtension(ExtMeet), m_jid(m_jid_), uid(uid_),
+            properties(properties_),
+            resource(resource_),
+            m_parent(parent) {
         m_valid = true;
     }
 
@@ -70,6 +76,11 @@ namespace gloox {
 
         if (p.resource.empty())
             return false;
+
+        if(p.resource == resource){
+            self = p;
+            return true;
+        }
 
         Participants::const_iterator it = participants.find(p.resource);
         if (it != participants.end()) {
@@ -137,7 +148,9 @@ namespace gloox {
     Meet::Participant Meet::parseParticipant(const gloox::JID &from, const gloox::Presence &presence) {
 
         auto t = presence.getOriginTag();
-
+        if (!t) {
+            return {};
+        }
         // 成员上线
         auto email = t->findChild("email");
         if (!email) {
@@ -145,8 +158,10 @@ namespace gloox {
         }
 
         Meet::Participant p = {
-                .region = t->findChild("jitsi_participant_region")->cdata(),
-                .codecType = t->findChild("jitsi_participant_codecType")->cdata(),
+                .region = t->findChild("jitsi_participant_region") ?
+                          t->findChild("jitsi_participant_region")->cdata() : "",
+                .codecType = t->findChild("jitsi_participant_codecType")
+                             ? t->findChild("jitsi_participant_codecType")->cdata() : "",
                 .avatarUrl = t->findChild("avatar-url")
                              ? t->findChild("avatar-url")->cdata()
                              : "",
@@ -155,7 +170,8 @@ namespace gloox {
                 .resource = from.resource(),
                 .jid = from.full(),
                 .e2ee = false,
-                .stats_id = t->findChild("stats-id")->cdata()};
+                .stats_id = t->findChild("stats-id") ? t->findChild("stats-id")->cdata() : ""
+        };
 
         auto fts = t->findChild("features");
         if (fts) {
