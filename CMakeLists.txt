@@ -2,8 +2,10 @@ cmake_minimum_required(VERSION 3.22)
 
 project( ok-gloox )
 
+set(CMAKE_CXX_STANDARD 20)
+
 if (WIN32)
-    set(CMAKE_CXX_FALGS ${CMAKE_CXX_FALGS} /utf-8)
+    set(CMAKE_CXX_FALGS "${CMAKE_CXX_FALGS} /utf-8")
     add_definitions(-D_WIN -DUNICODE)
 
     if (CMAKE_BUILD_TYPE STREQUAL Debug)
