@@ -59,7 +59,7 @@ namespace gloox {
 
             const std::string &sid() const { return m_sid; }
 
-            long blockSize() const { return m_blockSize; }
+            size_t blockSize() const { return m_blockSize; }
 
             Action action()const {return m_action;}
 
@@ -84,7 +84,7 @@ namespace gloox {
 
         private:
             std::string m_sid;
-            long m_blockSize;
+            size_t m_blockSize;
             Action m_action;
             Data m_data;
         };

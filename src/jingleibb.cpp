@@ -94,7 +94,7 @@ namespace gloox {
         Tag *IBB::tag() const {
             Tag *t = new Tag("transport", XMLNS, XMLNS_JINGLE_IBB);
             t->addAttribute("sid", m_sid);
-            t->addAttribute("block-size", m_blockSize);
+            t->addAttribute("block-size", (long)m_blockSize);
             return t;
         }
 
