@@ -18,7 +18,8 @@ namespace gloox {
 
         RTP::RTP(const Tag *tag) : Plugin(PluginRTP),
                                    m_media(invalid),
-                                   m_rtcpMux(false) {
+                                   m_rtcpMux(false),
+                                   m_originTag(tag) {
             if (!tag || tag->name() != "description" ||
                 tag->xmlns() != XMLNS_JINGLE_APPS_RTP)
                 return;
@@ -210,6 +211,10 @@ namespace gloox {
             TagList::const_iterator it = tagList.begin();
             for (; it != tagList.end(); ++it) {
                 Source f;
+                Tag* si = (*it)->findChild("ssrc-info");
+                if(si){
+                    f.owner = si->findAttribute("owner");
+                }
                 f.ssrc = (*it)->findAttribute("ssrc").data();
                 f.name = (*it)->findAttribute("name").data();
                 f.videoType = (*it)->findAttribute("videoType").data();

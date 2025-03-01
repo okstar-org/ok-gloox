@@ -46,14 +46,14 @@ namespace gloox
       if( !tag )
         return;
 
-      ConstTagList::const_iterator it;
+      
 
       PluginList::const_iterator itp = m_plugins.begin();
       for( ; itp != m_plugins.end(); ++itp )
       {
         const ConstTagList& match = tag->findTagList( (*itp)->filterString() );
-        it = match.begin();
-        for( ; it != match.end(); ++it )
+        ConstTagList::const_iterator it;
+        for(it = match.begin(); it != match.end(); ++it )
         {
           Plugin* pl = (*itp)->newInstance( (*it) );
           if( pl )

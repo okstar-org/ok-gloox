@@ -120,7 +120,9 @@ namespace gloox
         virtual Tag* tag() const;
 
         // reimplemented from Plugin
-        virtual Plugin* newInstance( const Tag* tag ) const { return new Content( tag, m_factory ); }
+        virtual Plugin* newInstance( const Tag* tag ) const { 
+          return new Content( tag, m_factory );
+        }
 
         // reimplemented from Plugin
         virtual Plugin* clone() const;

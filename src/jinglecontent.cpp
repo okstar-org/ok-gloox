@@ -45,8 +45,11 @@ namespace gloox
       return static_cast<Content::Senders>( util::lookup( type, sendersValues ) );
     }
 
-    Content::Content( const std::string& name, const PluginList& plugins, Creator creator,
-                      Senders senders, const std::string& disposition )
+    Content::Content( const std::string& name,
+                      const PluginList& plugins, 
+                      Creator creator,
+                      Senders senders, 
+                      const std::string& disposition )
       : Plugin( PluginContent ), m_creator( creator ), m_disposition( disposition ),
         m_name( name ), m_senders( senders )
     {

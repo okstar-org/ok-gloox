@@ -84,6 +84,7 @@ public:
     std::string videoType;
     std::string cname;
     std::string msid;
+    std::string owner; //jitmeet
   };
   typedef std::vector<Source> Sources;
 
@@ -145,6 +146,8 @@ public:
   // reimplemented from Plugin
   virtual Plugin *clone() const { return new RTP(*this); }
 
+  const Tag *getOriginTag() const { return m_originTag; };
+
 private:
   void parsePayloadTypes(const TagList &payloadTypes);
   void addPayloadTypes(Tag* r) const;
@@ -162,6 +165,7 @@ private:
   SsrcGroup m_ssrcGroup;
   Media m_media;
   bool m_rtcpMux;
+  const Tag* m_originTag;
 };
 
 } // namespace Jingle
